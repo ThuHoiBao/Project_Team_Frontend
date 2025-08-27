@@ -18,6 +18,7 @@ const Register = () => {
     e.preventDefault();
     try {
       // Tạo đối tượng DTO
+      //
       const userDto = new RegisterUserResponseDTO();
       userDto.email = email;
       userDto.password = password;
