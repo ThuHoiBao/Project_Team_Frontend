@@ -1,14 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./ProfilePage.css";
 import images from "../../assets/images";
+import { getMyInfo } from "../../services/user/getMyInfoApi";
+import { AxiosError } from "axios";
 
 function Profile() {
   const [avatar, setAvatar] = useState(images.noImage);
-  const [name, setName] = useState("Phạm Nguyễn Tiến Mạnh");
-  const [email] = useState("22110376@student.hcmute.edu.vn"); // email không đổi
-  const [phone, setPhone] = useState("012345678");
-  const [address, setAddress] = useState("123 Đường ABC, Quận XYZ");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState(""); // email không đổi
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [isEditing, setIsEditing] = useState(false); // trạng thái chỉnh sửa
+
+  useEffect(()=>{
+    const getInfoResponse = async()=>{
+      try{
+        const data = await getMyInfo();
+        setLastName(data.lastName);
+        setFirstName(data.firstName);
+        setEmail(data.email || "");
+        setAddress(data.address || "");
+        setPhone(data.phone || "");
+      }
+      catch(error){
+        if (error instanceof AxiosError) {
+          console.error("API error:", error.response?.data);
+        } else {
+        console.error("Unexpected error:", error);
+        } 
+      }
+    }
+
+    getInfoResponse()
+  }, [])
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -49,11 +74,20 @@ function Profile() {
                 <input type="email" value={email} readOnly />
             </div>
             <div className="info-item">
+                <label>Họ:</label>
+                <input
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                readOnly={!isEditing}
+                />
+            </div>
+            <div className="info-item">
                 <label>Tên:</label>
                 <input
                 type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 readOnly={!isEditing}
                 />
             </div>
