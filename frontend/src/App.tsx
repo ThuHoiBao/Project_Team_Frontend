@@ -9,6 +9,7 @@ import HomePage from './components/homePageComponent/HomePage';
 
 import ResetPassword from './components/auth/forgotPasswordComponent/ResetPassword'; // Import ResetPassword component
 import ProfilePage from './components/profilePageComponent/ProfilePage';
+import CartPage from './components/cartPage';
 function App() {
   return (
     <div className="App">
@@ -22,6 +23,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />{/* Thêm route cho trang Verify OTP */}
         <Route path="/" element={<Login />} />
         <Route path="/myinfo" element={<ProfilePage />} />
+        <Route path="/cart" element={<CartPage />} />
       </Routes>
     </div>
   );
