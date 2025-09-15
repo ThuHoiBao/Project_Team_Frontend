@@ -6,10 +6,11 @@ import ForgotPassword from './components/auth/forgotPasswordComponent/ForgotPass
 import VerifyOtp from './components/auth/verifyOtp/VerifyOtpComponent';  // Import VerifyOtp component
 import Register from './components/auth/registerComponent/RegisterComponent';
 import HomePage from './components/homePageComponent/HomePage';
-
 import ResetPassword from './components/auth/forgotPasswordComponent/ResetPassword'; // Import ResetPassword component
 import ProfilePage from './components/profilePageComponent/ProfilePage';
 import CartPage from './components/cartPage';
+import ProductDetailPage from './components/productDetail/productDetailComponent/ProductDetailPage';
+
 function App() {
   return (
     <div className="App">
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/myinfo" element={<ProfilePage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/product-detail" element={<ProductDetailPage />} />
       </Routes>
     </div>
   );
