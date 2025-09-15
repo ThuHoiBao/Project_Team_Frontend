@@ -16,6 +16,8 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await loginUser({ email, password });  // Gọi API đăng nhập
+      // Lưu vào localStorage
+      localStorage.setItem("token", response.data.token);
       console.log(response.data);  // In ra dữ liệu từ backend
  // Lưu token vào Local Storage
       localStorage.setItem('token', response.data.token);  // Lưu token từ backend vào Local Storage
