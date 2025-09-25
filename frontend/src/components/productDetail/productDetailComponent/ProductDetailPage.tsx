@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from "react-router-dom"; // nếu bạn dùng react-router
-import { getProductDetail, getSizes, getProductByCategory, getFullnameUserFeedback } from "../../../services/product/productDetailApi";
+import { getProductDetail, getSizes, getProductByCategory, getFullnameUserFeedback, getImageFeedbacks } from "../../../services/product/productDetailApi";
 import './ProductDetailPage.css';
 // TypeScript Interfaces for data structures
 interface Review {
-  id: number;
+  id: string;
   author: string;
   rating: number;
   text: string;
   date: string;
+}
+interface ImageFeedback {
+  id: string;
+  imageFeedback: string;
 }
 interface ProductSize {
   product: string;
@@ -31,12 +35,14 @@ interface RecommendedProduct {
   images: object[];
 }
 const ProductDetailPage: React.FC = () => {
+
   const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [recommended, setRecommended] = useState<RecommendedProduct[]>([]);
   const [usernames, setUsernames] = useState<Record<string, string>>({});
   const [images, setImages] = useState<string[]>([]);
+  const [imageFeedbacks, setImageFeedbacks] = useState<Record<string, ImageFeedback[]>>({});
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
@@ -63,6 +69,22 @@ const ProductDetailPage: React.FC = () => {
       }
     });
   }, [reviews]);
+  useEffect(() => {
+    const fetchImages = async () => {
+      const newFeedbackImages: Record<string, ImageFeedback[]> = {};
+      for (const review of reviews) {
+        try {
+          const result = await getImageFeedbacks(review.id);
+          newFeedbackImages[review.id] = result.data;
+        } catch (error: any) {
+          console.error(`Error fetching images for review ${review.id}:`, error);
+        }
+      }
+      setImageFeedbacks(newFeedbackImages);
+    }
+    if (reviews.length > 0) fetchImages();
+
+  }, [reviews])
   const getUserNameFeedback = async (id: string) => {
     try {
       const res = await getFullnameUserFeedback(id);
@@ -80,7 +102,6 @@ const ProductDetailPage: React.FC = () => {
         const sizeData = await getSizes(id);
         const categoryProducts = await getProductByCategory(productData.data.product.category.id);
         const feedbackData = await getFullnameUserFeedback(productData.data.feedbacks[0].user);
-
 
         const recommendedProducts = categoryProducts.data.map((item: any) => ({
           id: item.id,
@@ -119,7 +140,31 @@ const ProductDetailPage: React.FC = () => {
 
     fetchData();
   }, [id]);
+  const modal = document.getElementById("imageModal") as HTMLDivElement;
+  const modalImg = document.getElementById("fullImage") as HTMLImageElement;
+  function openModal(element: HTMLImageElement) {
+    if (modal && modalImg) {
+      modal.style.display = "block";
+      modalImg.src = element.src;
+    }
+  }
 
+
+  // Hàm đóng modal
+  function closeModal() {
+    if (modal) {
+      modal.style.display = "none";
+    }
+  }
+
+  // Đóng modal khi click ra ngoài ảnh
+  window.onclick = function (event: MouseEvent) {
+    // Ép kiểu 'event.target' để so sánh an toàn hơn.
+    const target = event.target as HTMLElement;
+    if (target === modal) {
+      closeModal();
+    }
+  }
   return (
     <div className="product-detail-page">
       {/* Header/Nav can be a separate component */}
@@ -130,7 +175,6 @@ const ProductDetailPage: React.FC = () => {
 
       <main className="main-content">
         <div className="product-container">
-          {/* Product Image Gallery */}
           <div className="product-gallery">
             <div className="thumbnails">
               {product?.images.map((img, index) => (
@@ -152,7 +196,7 @@ const ProductDetailPage: React.FC = () => {
           <div className="product-info">
             <h1 className="product-name">{product?.name}</h1>
             <div className="product-rating">
-              <span>{'★'.repeat((reviews.reduce((sum,obj) => sum + obj.rating,0)) / reviews.length)}{'☆'.repeat(5-(reviews.reduce((sum,obj) => sum + obj.rating,0)) / reviews.length)}</span> 
+              <span>{'★'.repeat(Math.round((reviews.reduce((sum, obj) => sum + obj.rating, 0)) / reviews.length))}{'☆'.repeat(Math.round(5 - (reviews.reduce((sum, obj) => sum + obj.rating, 0)) / reviews.length))}</span>
             </div>
             <div className="product-price">
               <span className="current-price">${product?.price}</span>
@@ -197,13 +241,11 @@ const ProductDetailPage: React.FC = () => {
         <div className="reviews-section">
           <div className="tabs">
             <button className="tab-btn active">Rating & Reviews</button>
-            <button className="tab-btn">FAQs</button>
           </div>
           <div className="reviews-header">
             <h2>All Reviews <span className='review-count'>({reviews.length})</span></h2>
             <div>
               <button className="latest-btn">Latest</button>
-              <button className="write-review-btn">Write a Review</button>
             </div>
           </div>
           <div className="reviews-grid">
@@ -214,28 +256,43 @@ const ProductDetailPage: React.FC = () => {
                     <span className="review-rating">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
                     <h4>{usernames[review.author] || "Loading..."}</h4>
                   </div>
-                  <button className="more-options-btn">⋮</button>
                 </div>
+
+                {imageFeedbacks[review.id] && imageFeedbacks[review.id].map((image) => {
+                  return (
+                    <img
+                      key={image.id}
+                      src={image.imageFeedback}
+                      className="thumbnail"
+                      onClick={(event) => openModal(event.target as HTMLImageElement)}
+                    />
+                  );
+                })}
+
+
+
                 <p>{review.text}</p>
-                <span className="review-date">{review.date.slice(0,10)}</span>
+                <span className="review-date">{review.date.slice(0, 10)}</span>
               </div>
             ))}
           </div>
-          <button className="load-more-btn">Load More Reviews</button>
         </div>
-
+        <div id="imageModal" className="modal">
+          <span className="close" onClick={closeModal}>&times;</span>
+          <img className="modal-content" id="fullImage" />
+        </div>
         <div className="recommendations">
           <h2>YOU MIGHT ALSO LIKE</h2>
           <div className="product-grid">
             {recommended.map(recommended => (
               <div className="product-card"
-              onClick={() => handleRecommendedProductClick(recommended.id)}>
+                onClick={() => handleRecommendedProductClick(recommended.id)}>
                 <img src={(recommended.images[0] as any).imageProduct} alt={recommended.name} />
 
                 <h3>{recommended.name}</h3>
                 <p className="price">
                   ${recommended.price}
-                  
+
                 </p>
               </div>
             ))}

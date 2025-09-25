@@ -23,3 +23,8 @@ export const getFullnameUserFeedback = async (id: string) => {
   const response = await api.get(`/product/feedback/user/${id}`);
   return response.data;
 };
+
+export const getImageFeedbacks = async (id: string) => {
+  const response = await api.get(`/feedback/image/${id}`);
+  return response.data;
+}
