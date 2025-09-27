@@ -1,0 +1,26 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 60px; // khoảng cách giữa các section (Banner, Product, Feedback)
+
+  @media (max-width: 1024px) {
+    gap: 40px;
+    padding: 0 16px;
+  }
+
+  @media (max-width: 768px) {
+    gap: 30px;
+    padding: 0 12px;
+  }
+}
+
+
+.divider {
+  border: none;
+  height: 3px;
+  background-color: #d1d5db; 
+}

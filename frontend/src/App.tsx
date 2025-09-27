@@ -5,7 +5,8 @@ import Login from './components/auth/loginComponent/LoginComponent';
 import ForgotPassword from './components/auth/forgotPasswordComponent/ForgotPasswordComponent'; // Giả sử bạn có ForgotPassword component
 import VerifyOtp from './components/auth/verifyOtp/VerifyOtpComponent';  // Import VerifyOtp component
 import Register from './components/auth/registerComponent/RegisterComponent';
-import HomePage from './components/homePageComponent/HomePage';
+// import HomePage from './components/homePageComponent/HomePage';
+import HomePage from './components/homePage/HomePage';
 import ResetPassword from './components/auth/forgotPasswordComponent/ResetPassword'; // Import ResetPassword component
 import ProfilePage from './components/profilePageComponent/ProfilePage';
 import CartPage from './components/cartPage';

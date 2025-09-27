@@ -16,14 +16,15 @@ import 'tippy.js/dist/tippy.css';
 import Button from '../Button';
 import styles from './Header.module.scss';
 import Menu from '../Popper/Menu';
-import { CartIcon, InboxIcon } from '../Icons';
+import { CartIcon, InboxIcon, MoreVertIcon } from '../Icons';
 import Search from '../Search';
 // import { Link } from 'react-router-dom';
 import { MenuItemType } from "../types/MenuItemType";
 import { useEffect, useState } from 'react';
-import { getMyInfo } from '../../../services/user/myInfoApi';
+import { getMyInfo, logoutUser } from '../../../services/user/myInfoApi';
 import images from '../../../assets/images';
 import { AxiosError } from 'axios';
+import { useNavigate } from "react-router-dom";
 
 
 const cx = classNames.bind(styles);
@@ -84,16 +85,32 @@ const MENU_ITEMS: MenuItemType[] = [
 ];
 
 function Header() {
+const navigate = useNavigate();
+
     const [avatar, setAvatar] = useState<string>(images.noImage);
-    const currentUser = true;
+    const [currentUser, setCurrentUser] = useState<boolean>();
+
 
     // Handle logic
-    const handleMenuChange = (menuItem: MenuItemType) => {
-        switch (menuItem.type) {
-            case 'language':
-                // Handle change language
-                break;
-            default:
+    const handleMenuChange = async (menuItem: MenuItemType) => {
+        switch (menuItem.title) {
+        case "Log out":
+            try {
+            // Gọi API logout
+            await logoutUser();
+            // Xóa token trong localStorage
+            localStorage.removeItem("token");
+            // Chờ 1s rồi mới chuyển trang
+            setTimeout(() => {
+                navigate("/login");
+            }, 1000);
+            } catch (error) {
+            console.error("Logout failed:", error);
+            }
+            break;
+
+        default:
+            break;
         }
     };
 
@@ -117,7 +134,6 @@ function Header() {
         {
             icon: <FontAwesomeIcon icon={faSignOut} />,
             title: 'Log out',
-            to: '/logout',
             separate: true,
         },
     ];
@@ -126,17 +142,25 @@ function Header() {
         const getInfoResponse = async () => {
           try {
             const data = await getMyInfo();
+            setCurrentUser(true);
             setAvatar(data.image);
           } catch (error) {
             if (error instanceof AxiosError) {
-              console.error("API error:", error.response?.data);
+                setCurrentUser(false);
+                console.error("API error:", error.response?.data);
             } else {
-              console.error("Unexpected error:", error);
+                setCurrentUser(false);
+                console.error("Unexpected error:", error);
             }
           }
         };
         getInfoResponse();
       }, []);
+
+      console.log("currentUser:", currentUser);
+    console.log("userMenu:", userMenu);
+
+
     
 
     return (
@@ -172,9 +196,9 @@ function Header() {
                     {currentUser ? (
                         <>
                             <Tippy delay={[0, 50]} content="Your cart" placement="bottom">
-                                <button className={cx('action-btn')}>
+                                <Button to="/cart" className={cx('action-btn')}>
                                     <CartIcon />
-                                </button>
+                                </Button>
                             </Tippy>
                             <Tippy delay={[0, 50]} content="Inbox" placement="bottom">
                                 <button className={cx('action-btn')}>
@@ -185,8 +209,7 @@ function Header() {
                         </>
                     ) : (
                         <>
-                            <Button text>Upload</Button>
-                            <Button primary>Log in</Button>
+                            <Button text to="/login">Log in</Button>
                         </>
                     )}
                     <Menu items={currentUser ? userMenu : MENU_ITEMS} onChange={handleMenuChange}>
@@ -198,7 +221,7 @@ function Header() {
                             />
                         ) : (
                             <button className={cx('more-btn')}>
-                                <FontAwesomeIcon icon={faEllipsisVertical} />
+                                <MoreVertIcon/>
                             </button>
                         )}
                     </Menu>

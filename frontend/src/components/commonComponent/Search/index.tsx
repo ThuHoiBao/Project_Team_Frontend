@@ -10,39 +10,38 @@ import { Wrapper as PopperWrapper } from "../Popper";
 import styles from "./Search.module.scss";
 import { SearchIcon } from "../Icons";
 import { useDeBounce } from "../../../hooks";
+import { searchProducts } from "../../../services/search/search";
+import ProductItem from "../ProductItem";
+import { Product } from "../../../services/search/search";
 
 const cx = classNames.bind(styles);
 
-interface Account {
-  id: number | string;
-  [key: string]: any; // nếu bạn có cấu trúc rõ ràng hơn thì khai báo chi tiết hơn
-}
 
 function Search() {
   const [searchValue, setSearchValue] = useState<string>("");
-  const [searchResult, setSearchResult] = useState<Account[]>([]);
+  const [searchResult, setSearchResult] = useState<Product[]>([]);
   const [showResult, setShowResult] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const debounced = useDeBounce(searchValue, 500);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // useEffect(() => {
-  //       if (!debounced.trim()) {
-  //           setSearchResult([]);
-  //           setLoading(false);
-  //           return;
-  //       }
+  useEffect(() => {
+        if (!debounced.trim()) {
+            setSearchResult([]);
+            setLoading(false);
+            return;
+        }
 
-  //       const fetchAPi = async () => {
-  //           setLoading(true);
-  //           const result = await searchServices.search(debounced);
-  //           setSearchResult(result);
-  //           setLoading(false);
-  //       };
-  //       fetchAPi();
+        const fetchAPi = async () => {
+            setLoading(true);
+            const result = await searchProducts(debounced);
+            setSearchResult(result);
+            setLoading(false);
+        };
+        fetchAPi();
 
-  //   }, [debounced]);
+    }, [debounced]);
 
   const handleClear = () => {
     setSearchValue("");
@@ -64,10 +63,10 @@ function Search() {
         render={(attrs) => (
           <div className={cx("search-result")} tabIndex={-1} {...attrs}>
             <PopperWrapper>
-              <h4 className={cx("search-title")}>Accounts</h4>
-              {/* {searchResult.map((result) => (
-                <AccountItem key={result.id} data={result} />
-              ))} */}
+              <h4 className={cx("search-title")}>Sản phẩm</h4>
+              {searchResult.map((result) => (
+                <ProductItem key={result._id} data={result} />
+              ))}
             </PopperWrapper>
           </div>
         )}

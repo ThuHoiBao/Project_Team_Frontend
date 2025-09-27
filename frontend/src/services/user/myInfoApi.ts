@@ -46,3 +46,7 @@ export const updateMyAvatar = async (file: File) => {
   return response.data;
 };
 
+export const logoutUser = async () => {
+  const response = await api.post("/logout"); 
+  return response.data; 
+};

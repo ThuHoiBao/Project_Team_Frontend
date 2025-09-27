@@ -112,3 +112,49 @@ export const CartIcon: React.FC<IconProps> = ({
     <circle cx="34" cy="36" r="3" />
   </svg>
 );
+
+export const MoreVertIcon: React.FC<IconProps> = ({
+  width = "2rem",
+  height = "2rem",
+  className,
+}) => (
+  <svg
+    className={className}
+    width={width}
+    height={height}
+    viewBox="0 0 48 48"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <circle cx="24" cy="12" r="3" />
+    <circle cx="24" cy="24" r="3" />
+    <circle cx="24" cy="36" r="3" />
+  </svg>
+);
+
+export const CheckCircleIcon: React.FC<IconProps> = ({
+  width = "1rem",
+  height = "1rem",
+  className,
+}) => (
+  <svg
+    className={className}
+    width={width}
+    height={height}
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Hình tròn xanh */}
+    <circle cx="12" cy="12" r="12" fill="#22C55E" />
+
+    {/* Dấu tick trắng */}
+    <path
+      d="M7 12.5L10 15.5L17 8.5"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
