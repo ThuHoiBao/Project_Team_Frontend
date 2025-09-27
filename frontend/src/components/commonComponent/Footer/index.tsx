@@ -9,6 +9,7 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 
 import styles from './Footer.module.scss';
+import images from '../../../assets/images';
 
 const cx = classNames.bind(styles);
 
@@ -85,11 +86,11 @@ const Footer: React.FC = () => {
                         <p>Uteshop © 2000-2023, All Rights Reserved</p>
                     </div>
                     <div className={cx('payment-methods')}>
-                        <img src="/images/visa.png" alt="Visa" className={cx('payment-icon')} />
-                        <img src="/images/mastercard.png" alt="Mastercard" className={cx('payment-icon')} />
-                        <img src="/images/paypal.png" alt="PayPal" className={cx('payment-icon')} />
-                        <img src="/images/applepay.png" alt="Apple Pay" className={cx('payment-icon')} />
-                        <img src="/images/googlepay.png" alt="Google Pay" className={cx('payment-icon')} />
+                        <img src={images.visaImage} alt="Visa" className={cx('payment-icon')} />
+                        <img src={images.mastercardImage} alt="Mastercard" className={cx('payment-icon')} />
+                        <img src={images.paypalImage} alt="PayPal" className={cx('payment-icon')} />
+                        <img src={images.applepayImage} alt="Apple Pay" className={cx('payment-icon')} />
+                        <img src={images.googlePayImage} alt="Google Pay" className={cx('payment-icon')} />
                     </div>
                 </div>
             </div>

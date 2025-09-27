@@ -114,6 +114,8 @@
 
 
 .alert {
+  display: flex;
+  align-items: center;        /* căn giữa theo chiều dọc */
   position: fixed !important; /* !important để ghi đè Bootstrap */
   top: 20px !important;
   right: 20px !important;
@@ -126,6 +128,13 @@
   animation: slideInRight 0.3s ease-out; /* Animation */
 }
 
+.alert-dismissible .btn-close-custom {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 2;
+    padding: 0.9rem 1rem;
+}
 
 /* Animation cho alert */
 @keyframes slideInRight {
@@ -137,4 +146,10 @@
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;   /* khoảng cách giữa 2 nút */
+  margin-top: 10px;
 }

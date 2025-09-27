@@ -1,4 +1,4 @@
-import { useState, ReactNode } from 'react';
+import { useState, ReactNode, useEffect } from 'react';
 import Tippy from '@tippyjs/react/headless';
 import { Wrapper as PopperWrapper } from '../../Popper';
 import classNames from 'classnames/bind';
@@ -8,8 +8,6 @@ import Header from './Header';
 import { MenuItemType } from '../../types/MenuItemType';
 
 const cx = classNames.bind(styles);
-
-
 
 interface MenuProps {
   children: React.ReactElement; // thay vì ReactNode
@@ -25,6 +23,10 @@ function Menu({ children, items = [], hideOnClick = false, onChange = defaultFn 
   const [history, setHistory] = useState<{ data: MenuItemType[]; title?: string }[]>([
     { data: items },
   ]);
+
+  useEffect(() => {
+    setHistory([{ data: items }]);
+  }, [items]);
 
   const current = history[history.length - 1];
 

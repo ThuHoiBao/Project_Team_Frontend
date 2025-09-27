@@ -1,0 +1,26 @@
+.banner {
+  margin: 40px 0;
+
+  img {
+    width: 100vw;         // full chiều ngang màn hình
+    height: 500px;
+    object-fit: fill;
+    border-radius: 0;     // bỏ bo góc nếu muốn full sát cạnh
+    display: block;       // bỏ khoảng trống ảnh inline
+  }
+
+  .carousel-caption {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 12px 20px;
+    border-radius: 8px;
+  }
+
+  h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+}
