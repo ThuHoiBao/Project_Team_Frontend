@@ -10,7 +10,8 @@ import ResetPassword from './components/auth/forgotPasswordComponent/ResetPasswo
 import ProfilePage from './components/profilePageComponent/ProfilePage';
 import CartPage from './components/cartPage';
 import ProductDetailPage from './components/productDetail/productDetailComponent/ProductDetailPage';
-
+import OrderHome from './components/OrderHomeComponent/OrderHome';
+import OrderDetail from './components/OrderDetailComponent/OrderDetail';
 function App() {
   return (
     <div className="App">
@@ -26,6 +27,8 @@ function App() {
         <Route path="/myinfo" element={<ProfilePage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/product-detail" element={<ProductDetailPage />} />
+        <Route path="/order" element={<OrderHome/>} />
+        <Route path="/order-detail" element={<OrderDetail/>}/>
       </Routes>
     </div>
   );

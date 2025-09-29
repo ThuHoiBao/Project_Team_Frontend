@@ -1,0 +1,329 @@
+/* modal to hơn */
+.feedback-modal {
+  width: 750px;
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.feedback-modal h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+  text-align: left; /* căn trái */
+}
+.feedback-item{
+  margin-bottom: 30px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+
+}
+
+/* product info */
+.product-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.product-img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.product-name {
+  font-size: 17px;
+  font-weight: 500;
+  color: #444;
+  margin: 0;
+}
+
+/* rating */
+.rating-row {
+  margin-bottom: 30px;
+  margin-right: 80px;
+}
+
+.rating-row .label {
+  display: inline-block;
+  margin-right: 100px;
+  margin-left: 0px;
+  font-size: 15px;
+  color: #333;
+}
+
+.rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.star {
+  font-size: 32px;
+  cursor: pointer;
+  color: #ccc;
+}
+
+.star.active {
+  color: #f6b01e;
+}
+
+.rating-text {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #f48c06;
+}
+
+/* textarea */
+textarea {
+  width: 100%;
+  min-height: 80px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  resize: none;
+}
+
+/* upload button */
+.upload-btn {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px dashed #ccc;
+  color: #555;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.upload-btn:hover {
+  border-color: #f6b01e;
+  color: #f6b01e;
+}
+
+/* preview ảnh */
+.preview {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  background: #fff;
+}
+
+.preview-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.preview-wrapper img {
+  width: 50px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.remove-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  color: rgb(15, 15, 15);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 2px 5px;
+}
+.feedback-container {
+  max-height: 400px;     /* Giả sử bạn muốn có vùng scroll */
+  overflow-y: auto;      /* Cho phép cuộn */
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+/* header dính sát top */
+.feedback-header {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
+  padding: 15px 20px;   /* giữ padding ngang thôi */
+}
+
+/* phần body cuộn */
+.feedback-body {
+  flex: 1;
+  overflow-y: auto;     /* chỉ body cuộn thôi */
+  padding: 20px;
+}
+
+/* footer cố định dưới */
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;  /* đẩy toàn bộ nút sang bên phải */
+  gap: 10px;                  /* khoảng cách giữa các nút */
+  padding: 15px 20px;
+  /* border-top: 1px solid #eee; */
+  background: #fff;
+}
+
+.show-username {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #333;
+}
+
+.show-username input {
+  margin-right: 8px;
+}
+
+.show-username .sub-text {
+  font-size: 12px;
+  color: #888;
+  margin-left: 22px;
+}
+
+.feedback-guide {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  background: #fff8e5;
+  border: 1px solid #ffd580;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 0 20px 10px 20px;
+  cursor: pointer;
+}
+
+.feedback-guide .highlight {
+  color: #e63946;
+  font-weight: 600;
+}
+
+.feedback-guide .arrow {
+  margin-left: auto;
+  font-size: 12px;
+  color: #666;
+}
+
+/* Overlay mờ nền */
+.guide-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* Khung modal */
+.guide-modal {
+  width: 500px;
+  max-height: 80vh;
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 25px;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: fadeInScale 0.25s ease;
+}
+
+/* Animation modal bật lên */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Tiêu đề */
+.guide-modal h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 10px;
+}
+
+/* Nội dung */
+.guide-modal p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+/* Danh sách */
+.guide-modal ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 15px;
+}
+
+.guide-modal li {
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 5px;
+}
+
+/* Highlight số Xu */
+.guide-modal b {
+  color: #f53d2d;
+  font-weight: 600;
+}
+
+/* Note nhỏ */
+.guide-note {
+  background: #f9f9f9;
+  border-left: 3px solid #f6b01e;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #666;
+  border-radius: 4px;
+  margin-bottom: 15px;
+}
+
+.guide-note p {
+  margin: 4px 0;
+}
+
+/* Footer nút */
+.guide-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.guide-footer button {
+  padding: 8px 16px;
+  background: #f53d2d;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.guide-footer button:hover {
+  background: #d7321f;
+}

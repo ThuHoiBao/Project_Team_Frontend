@@ -1,0 +1,203 @@
+.order-detail {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.order-header h3 {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.date {
+  color: #676565;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+}
+.date-order {
+  color: #1e1d1d;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+
+}
+
+
+
+.order-status-container {
+  display: flex;
+  justify-content: space-between;  /* Đảm bảo các trạng thái cách đều nhau */
+  position: relative;
+  margin-bottom: 30px;
+  width: 100%;
+}
+
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  text-align: center;
+  
+   /* Đảm bảo tất cả các trạng thái có chiều cao bằng nhau */
+  flex-grow: 1;  /* Cho phép mỗi item chiếm không gian đều */
+}
+
+.status-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #ccc;  /* Màu xám cho trạng thái chưa hoàn thành */
+  margin-bottom: 5px;
+  position: relative;
+  z-index: 1;
+  transition: background-color 0.3s ease;
+}
+
+.status-dot.active {
+  background-color: #0fb407;  /* Màu xanh cho trạng thái đã hoàn thành */
+}
+
+.status-line {
+  height: 7px;
+  background-color: #ccc;  /* Màu xám cho các trạng thái chưa hoàn thành */
+  position: absolute;
+  top: 20%;  /* Đặt dòng nối vào giữa các dấu chấm */
+  transform: translateY(-50%);  /* Đảm bảo dòng nối nằm chính giữa */
+  /* Dòng nối bắt đầu từ vị trí của dot */
+  width: 105%;  /* Chiều dài của dòng nối từ dot trước đó tới dot kế tiếp */
+  right: 77px;
+  transition: background-color 0.3s ease;
+}
+
+.status-line.active {
+  background-color: #0fb407;  /* Dòng xanh cho các trạng thái đã hoàn thành */
+}
+
+
+/* Màu sắc cho trạng thái đang hoạt động */
+.status-text {
+  font-size: 12px;
+  color: #333;
+  position: relative;
+  z-index: 1;
+  width: 85%;
+}
+
+.status-text.active {
+  color: #0fb407; /* Màu xanh cho trạng thái đang hoạt động */
+}
+
+.order-date {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+/* Tạo một line divider giữa header và order status */
+.status-line-divider {
+  height: 1px;
+  background-color: #e2e1e1; /* Màu xám cho line */
+  margin-bottom: 30px;
+  margin-top: 30px; /* Khoảng cách giữa line và phần status */
+  width: 100%;
+}
+.status-line-total {
+  height: 1px;
+  background-color: #e2e1e1; /* Màu xám cho line */
+  margin-bottom: 10px;
+  margin-top: 10px; /* Khoảng cách giữa line và phần status */
+  width: 100%;
+}
+/* Màu sắc cho trạng thái đang hoạt động */
+.status-text {
+  font-size: 12px;
+  color: #333;
+  position: relative;
+  z-index: 1;
+  width: 85%;
+}
+
+.status-text.active {
+  color: #0fb407; /* Màu xanh cho trạng thái đang hoạt động */
+}
+
+.order-date {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+.order-summary-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: left; /* Căn chỉnh tất cả nội dung về phía trái */
+}
+
+.order-summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.summary-item {
+  width: 48%; /* Mỗi phần chiếm khoảng 50% chiều rộng */
+}
+
+.summary-item h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 30px; /* Thêm khoảng cách dưới tiêu đề */
+}
+
+.summary-item p,
+.summary-item ul {
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.summary-item ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 15px;
+}
+
+.summary-item ul li {
+  display: flex;
+  align-items: center;  /* Căn giữa theo chiều dọc */
+  margin-bottom: 15px;
+  color: #777;
+}
+
+.summary-item ul li .title {
+  font-weight: 600;
+  width: 150px;
+  margin-right: 20px;
+  color: #777;
+  flex-shrink: 0;  /* Đảm bảo tiêu đề không bị co lại */
+}
+
+.summary-item ul li span {
+  flex-grow: 1;  /* Làm cho giá trị chiếm phần còn lại của dòng */
+}
+
+
+
+/* Đảm bảo căn chỉnh cho mobile */
+@media screen and (max-width: 768px) {
+  .order-summary-row {
+    flex-direction: column;
+  }
+
+  .summary-item {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
