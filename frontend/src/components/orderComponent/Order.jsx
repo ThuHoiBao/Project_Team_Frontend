@@ -6,8 +6,11 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { cancelOrderApi } from '../../services/order/order';  // Thêm useNavigate
 import imageCanceled from '../../images/cancelled.png'
-import FeedbackModal  from "../FeedbackItemComponent/FeedbackModal";
-import axios from "axios";
+import FeedbackModal  from "../FeedbackComponent/FeedbackModal";
+import { submitBulkFeedback ,getFeedbacksByOrder } from "../../services/feedback/feedbackApi";
+import ViewFeedbackModal from "../viewFeedBack/ViewFeedbackModal";
+
+
 
 // Modal Component với fade-in
 const AppModal = ({ message, onClose }) => (
@@ -30,7 +33,6 @@ const ConfirmModal = ({ message, onConfirm, onClose }) => (
         alt="Cancel Icon" 
         className="modal-icon"
       />
-
       <div className="modal-buttons">
         <button onClick={onClose}>Hủy</button>
         <button onClick={onConfirm} className="btn-feedback">Xác nhận</button>
@@ -42,45 +44,51 @@ const ConfirmModal = ({ message, onConfirm, onClose }) => (
 const Order = ({ order, orderItems, userId ,onOrderUpdate  }) => {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-const [cancelOrderId, setCancelOrderId] = useState(null);
+  const [cancelOrderId, setCancelOrderId] = useState(null);
   console.log(userId);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [showViewFeedbackModal, setShowViewFeedbackModal] = useState(false);
 const handleSubmitFeedback = async (feedbackList) => {
   try {
     const formData = new FormData();
 
-    // Gom nhiều feedback vào 1 request
     feedbackList.forEach((fb, index) => {
       formData.append(`feedbacks[${index}].comment`, fb.comment);
       formData.append(`feedbacks[${index}].rating`, fb.rating.toString());
       formData.append(`feedbacks[${index}].orderItemId`, fb.orderItemId);
+      formData.append(`feedbacks[${index}].userId`, userId);
+      formData.append(`feedbacks[${index}].orderId`, order.id);
 
       fb.images.forEach((img) => {
         formData.append(`feedbacks[${index}].images`, img);
       });
     });
 
-    // 🔥 Log ra FormData gom chung
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-    console.log(Array.from(formData.entries()));
-    
-    await axios.post("http://localhost:8088/api/feedback/bulk", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const result = await submitBulkFeedback(formData); // chỉ truyền formData
+    console.log("Server response:", result);
 
     openModal("Cảm ơn bạn đã đánh giá");
     setShowFeedbackModal(false);
+    // 🔥 gọi lại API từ cha để reload danh sách
+    if (typeof onOrderUpdate === "function") {
+      onOrderUpdate();
+    }
   } catch (err) {
     const errorMessage =
       err.response?.data?.message || err.message || "Có lỗi xảy ra";
     openModal(errorMessage);
   }
 };
-
-
+  const handleViewFeedback = async () => {
+    try {
+      const res = await getFeedbacksByOrder(order.id);
+      setFeedbacks(res); // BE trả về array DTO
+      setShowViewFeedbackModal(true);
+    } catch (err) {
+      console.error("Lỗi khi load feedback:", err);
+    }
+  };
 const navigate = useNavigate();  // Khai báo navigate
   // Lấy thông báo trạng thái đơn hàng
   const getOrderStatusMessage = (status) => {
@@ -148,7 +156,9 @@ const handleItemClick = () => {
         return (
           <>
             <button className="btn-buy-again" onClick={() => openModal('Bạn đã mua lại thành công')}>Mua lại</button>
-            <button className="btn-view-feedback" onClick={() => openModal('Bạn đã xem đánh giá')}>Xem đánh giá</button>
+             <button className="btn-view-feedback" onClick={handleViewFeedback}>
+              Xem đánh giá
+            </button>
           </>
         );
 
@@ -226,6 +236,12 @@ const handleItemClick = () => {
           orderItems={orderItems}
           onClose={() => setShowFeedbackModal(false)}
           onSubmit={handleSubmitFeedback}
+        />
+      )}
+      {showViewFeedbackModal && (
+        <ViewFeedbackModal
+          feedbacks={feedbacks}
+          onClose={() => setShowViewFeedbackModal(false)}
         />
       )}
     </div>
