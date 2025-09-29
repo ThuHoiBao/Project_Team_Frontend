@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from "react-router-dom"; // nếu bạn dùng react-router
 import { getProductDetail, getSizes, getProductByCategory, getFullnameUserFeedback, getImageFeedbacks } from "../../../services/product/productDetailApi";
 import './ProductDetailPage.css';
+import Header from '../../commonComponent/Header';
+import Footer from '../../commonComponent/Footer';
 // TypeScript Interfaces for data structures
 interface Review {
   id: string;
@@ -101,7 +103,7 @@ const ProductDetailPage: React.FC = () => {
         const productData = await getProductDetail(id);
         const sizeData = await getSizes(id);
         const categoryProducts = await getProductByCategory(productData.data.product.category.id);
-        const feedbackData = await getFullnameUserFeedback(productData.data.feedbacks[0].user);
+        // const feedbackData = await getFullnameUserFeedback(productData.data.feedbacks[0]?.user);
 
         const recommendedProducts = categoryProducts.data.map((item: any) => ({
           id: item.id,
@@ -122,11 +124,11 @@ const ProductDetailPage: React.FC = () => {
 
 
         setReviews(productData.data.feedbacks.map((fb: any) => ({
-          id: fb.id,
-          author: fb.user,
-          rating: fb.rating,
-          text: fb.comment,
-          date: fb.date
+          id: fb.feedback.id,
+          author: fb.order.user,
+          rating: fb.feedback.rating,
+          text: fb.feedback.comment,
+          date: fb.feedback.date
         })));
         setSelectedImage(productData.data.product.listImage[0].imageProduct)
         setRecommended(recommendedProducts);
@@ -166,6 +168,8 @@ const ProductDetailPage: React.FC = () => {
     }
   }
   return (
+    <>
+      <Header />
     <div className="product-detail-page">
       {/* Header/Nav can be a separate component */}
       <header className="page-header">
@@ -188,7 +192,7 @@ const ProductDetailPage: React.FC = () => {
               ))}
             </div>
             <div className="main-image">
-              <img src={selectedImage} alt={product?.name} />
+              {selectedImage && <img src={selectedImage} alt={product?.name} />}
             </div>
           </div>
 
@@ -285,7 +289,7 @@ const ProductDetailPage: React.FC = () => {
           <h2>YOU MIGHT ALSO LIKE</h2>
           <div className="product-grid">
             {recommended.map(recommended => (
-              <div className="product-card"
+              <div key={recommended.id} className="product-card"
                 onClick={() => handleRecommendedProductClick(recommended.id)}>
                 <img src={(recommended.images[0] as any).imageProduct} alt={recommended.name} />
 
@@ -300,8 +304,9 @@ const ProductDetailPage: React.FC = () => {
         </div>
       </main>
 
-
     </div>
+      <Footer />
+    </>
   );
 };
 
