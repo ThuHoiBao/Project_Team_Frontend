@@ -263,12 +263,12 @@ body {
 .latest-btn, .write-review-btn {
   padding: 0.75rem 1.5rem;
   border-radius: 20px;
-  cursor: pointer;
 }
 .latest-btn {
   background-color: var(--secondary-color);
   border: none;
   margin-right: 1rem;
+  cursor: none;
 }
 .write-review-btn {
   background-color: var(--primary-color);
