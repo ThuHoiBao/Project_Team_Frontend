@@ -8,10 +8,15 @@ import { faArrowLeft, faArrowRight} from "@fortawesome/free-solid-svg-icons";
 
 const cx = classNames.bind(styles);
 
+interface User{
+  firstName: string;
+  lastName: string;
+}
+
 interface Feedback {
-  name: string;
   comment: string;
   rating: number;
+  user: User
 }
 
 interface CustomerFeedbackProps {
@@ -60,7 +65,7 @@ const CustomerFeedback: React.FC<CustomerFeedbackProps> = ({ data }) => {
             <div key={index} className={cx("card")}>
               <p>{"⭐".repeat(fb.rating)}</p>
               <h4>
-                {fb.name} <CheckCircleIcon className={cx("verifiedIcon")} />
+                {fb.user.firstName + " " + fb.user.lastName} <CheckCircleIcon className={cx("verifiedIcon")} />
               </h4>
               <p>{fb.comment}</p>
             </div>

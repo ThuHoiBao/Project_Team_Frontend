@@ -28,3 +28,13 @@ export const getImageFeedbacks = async (id: string) => {
   const response = await api.get(`/feedback/image/${id}`);
   return response.data;
 }
+
+export const getNewProducts = async () => {
+  const response = await api.get('product/new');
+  return response.data.data;
+}
+
+export const getTopSellingProducts = async () => {
+  const response = await api.get('product/top-selling');
+  return response.data.data;
+}

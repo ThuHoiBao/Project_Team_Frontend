@@ -19,8 +19,12 @@
   width: 100%;
 }
 
-.arrowBtn{
-    background-color: transparent;
+.arrowBtn {
+  background: transparent;
+  border-radius: 50%;
+  &:hover {
+    background: #f0f0f0;
+  }
 }
 
 .track {
