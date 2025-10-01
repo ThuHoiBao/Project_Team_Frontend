@@ -330,7 +330,6 @@ const ProductDetailPage: React.FC = () => {
                 <div key={recommended.id} className="product-card"
                   onClick={() => handleRecommendedProductClick(recommended.id)}>
                   <img src={(recommended.images[0] as any).imageProduct} alt={recommended.name} />
-
                   <h3>{recommended.name}</h3>
                   <p className="price">
                     ${recommended.price}
@@ -341,7 +340,6 @@ const ProductDetailPage: React.FC = () => {
             </div>
           </div>
         </main>
-
       </div>
       <Footer />
       <LoginPromptModal

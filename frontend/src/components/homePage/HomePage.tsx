@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import classNames from 'classnames/bind';
 import Banner from "./Banner";
@@ -9,94 +9,42 @@ import styles from "./HomePage.module.scss";
 import Header from "../commonComponent/Header";
 import Footer from "../commonComponent/Footer";
 import BrowseByDressStyle from "./BrowseByDressStyle";
+import { getNewProducts, getTopSellingProducts } from "../../services/product/productDetailApi";
+import { getBestFeedback } from "../../services/feedback/feedbackApi";
 
 const cx = classNames.bind(styles);
 
 const HomePage: React.FC = () => {
-  const products = [
-    {
-      id: 1,
-      name: "T-shirt with Tape Details",
-      price: 120,
-      rating: 4.5,
-      image: "data:image/jpeg;base64,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",
-    },
-    {
-      id: 2,
-      name: "Skinny Fit Jeans",
-      price: 240,
-      oldPrice: 260,
-      discount: "-20%",
-      rating: 3.5,
-      image: "data:image/jpeg;base64,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",
-    },
-    {
-      id: 3,
-      name: "Checkered Shirt",
-      price: 180,
-      rating: 4.5,
-      image: "data:image/jpeg;base64,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",
-    },
-    {
-      id: 4,
-      name: "Sleeve Striped T-shirt",
-      price: 130,
-      oldPrice: 160,
-      discount: "-30%",
-      rating: 4.5,
-      image: "data:image/jpeg;base64,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",
-    },
-  ];
+  const [newProducts, setNewProducts] = useState([]);
+  const [topSellingProducts, setTopSellingProducts] = useState([]);
+  const [bestFeedback, setBestFeedback] = useState([]);
+  
+  useEffect(() => {
+    const fetchAPi = async () => {
+        const newProductResponse = await getNewProducts();
+        const topSellingProductsResponse = await getTopSellingProducts();
+        const bestFeedbackResponse = await getBestFeedback();
+        setNewProducts(newProductResponse);
+        setTopSellingProducts(topSellingProductsResponse);
+        setBestFeedback(bestFeedbackResponse);
+    };
+    fetchAPi();
+  }, []);
 
-  const feedbacks = [
-    {
-      name: "Sarah M.",
-      comment:
-        "I'm blown away by the quality and style of the clothes I received from Shop.co...",
-      rating: 5,
-    },
-    {
-      name: "Alex K.",
-      comment:
-        "Finding clothes that align with my personal style used to be a challenge...",
-      rating: 5,
-    },
-    {
-      name: "James F.",
-      comment:
-        "As someone who's always on the lookout for unique fashion pieces...",
-      rating: 5,
-    },
-    {
-      name: "Sarah M.",
-      comment:
-        "I'm blown away by the quality and style of the clothes I received from Shop.co...",
-      rating: 5,
-    },
-    {
-      name: "Alex K.",
-      comment:
-        "Finding clothes that align with my personal style used to be a challenge...",
-      rating: 5,
-    },
-    {
-      name: "James L.",
-      comment:
-        "As someone who's always on the lookout for unique fashion pieces...",
-      rating: 5,
-    },
-  ];
+  console.log(newProducts);
+  console.log(topSellingProducts);
+  console.log(bestFeedback);
 
   return (
     <>
       <Header />
       <Banner />
       <div className={cx("container")}>
-        <ListProduct title="New Arrivals" data={products} />
+        <ListProduct title="New Arrivals" data={newProducts} />
         <hr className={cx("divider")} />
-        <ListProduct title="Top Selling" data={products} />
+        <ListProduct title="Top Selling" data={topSellingProducts} />
         <BrowseByDressStyle/>
-        <CustomerFeedback data={feedbacks} />
+        <CustomerFeedback data={bestFeedback} />
       </div>
       <Footer />
     </>

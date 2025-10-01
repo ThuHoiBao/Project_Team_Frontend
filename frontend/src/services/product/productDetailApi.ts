@@ -72,6 +72,16 @@ export const getImageFeedbacks = async (id: string) => {
   return response.data;
 }
 
+
+export const getNewProducts = async () => {
+  const response = await api.get('product/new');
+  return response.data.data;
+}
+
+export const getTopSellingProducts = async () => {
+  const response = await api.get('product/top-selling');
+  return response.data.data;
+
 export const saveFavoriteProduct = async (id?: string) => {
   const response = await apiAuth.post(`/product/wishlist/add/${id}`);
   return response.data;
@@ -89,6 +99,5 @@ export const checkExistedWishlist = async (id?: string) => {
 
 export const getWishlist = async () => {
   const response = await apiAuth.get("/product/wishlist")
-
   return response.data;
 }

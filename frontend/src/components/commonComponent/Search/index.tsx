@@ -65,8 +65,15 @@ function Search() {
             <PopperWrapper>
               <h4 className={cx("search-title")}>Sản phẩm</h4>
               {searchResult.map((result) => (
-                <ProductItem key={result._id} data={result} />
-              ))}
+                <div
+                  key={result._id}
+                  onClick={() => {
+                    handleHideResult(); // ẩn popper
+                  }}
+                >
+                  <ProductItem data={result} />
+                </div>
+              ))}       
             </PopperWrapper>
           </div>
         )}
