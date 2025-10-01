@@ -12,6 +12,7 @@ import ProfilePage from './components/profilePageComponent/ProfilePage';
 import CartPage from './components/cartPage';
 import ProductDetailPage from './components/productDetail/productDetailComponent/ProductDetailPage';
 import CasualPage from './components/categoryComponent/casualPage/CasualPage';
+import WishlistPage from './components/listFavoriteComponent/listFavoriteComponent';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/casual" element={<CasualPage/>}/>
+        <Route path="/product/wishlist" element={<WishlistPage />} />
       </Routes>
     </div>
   );
