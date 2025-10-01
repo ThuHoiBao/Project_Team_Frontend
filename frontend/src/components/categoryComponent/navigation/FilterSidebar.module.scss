@@ -1,0 +1,116 @@
+.sidebar {
+  width: 295px;
+  padding: 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-family: "Satoshi", sans-serif;
+}
+
+.sideBar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sideBar-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.filterGroup {
+  margin-bottom: 20px;
+
+  h4 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+  }
+  .price-range-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  font-size: 16x;
+  margin-bottom: 8px;
+  color: #00000099;
+  input {
+    margin-right: 8px;
+  }
+}
+
+.sizeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sizeBtn {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: blue;
+  }
+
+  &.active {
+    background: #000;
+    color: #fff;
+    border: 2px solid #fff;
+  }
+}
+
+// Rating 
+.ratingList {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ratingBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: orange;
+  text-align: left;
+}
+
+.ratingBtn.active {
+  background-color: #faf8f8;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+
+.applyBtn {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 62px;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+
+  &:hover {
+    background: #333;
+  }
+}

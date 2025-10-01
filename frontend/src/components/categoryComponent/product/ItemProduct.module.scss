@@ -1,0 +1,43 @@
+.productCard {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: box-shadow 0.2s;
+  cursor: pointer;
+   font-family: "Satoshi", sans-serif;
+   letter-spacing: 0%;
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.productImage {
+  width: 250px;
+  height: 250px;     
+  object-fit: cover; 
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+
+.productName {
+  margin-top: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: left;
+  
+}
+
+.productRating {
+  color: #f5a623; 
+  font-size: 14px;
+}
+
+.productPrice {
+  font-size: 24px;
+  font-weight: 700;
+  color: #d32f2f; // đỏ cho giá
+}
