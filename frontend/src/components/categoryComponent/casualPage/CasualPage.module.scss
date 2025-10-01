@@ -1,0 +1,84 @@
+.headerBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.info {
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  
+
+  .sort {
+  font-size: 14px;
+  margin-left: 16px;
+
+  select {
+    margin-left: 8px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    cursor: pointer;
+  }
+}
+}
+
+
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-top: 80px; 
+}
+
+.breadcrumb {
+  padding-left: 24px; 
+  display: flex;
+  align-items: center;
+  gap: 4px; 
+  font-size: 16px; 
+
+  a, button {
+    color: #00000099;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 400;
+    font-size: inherit;
+    padding: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .separator {
+    color: #999;
+    font-size: 12px;
+  }
+
+  .active {
+    color: #000;
+  }
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  padding: 24px; 
+  gap: 24px; 
+}
+
+.content {
+  flex: 1;
+}

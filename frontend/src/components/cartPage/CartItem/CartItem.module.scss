@@ -44,8 +44,14 @@
             .size,
             .color {
                 font-size: 14px;
-                color: #666;
+                color: #000;
             }
+
+            .size-value, 
+            .color-value {
+                color: #626161;
+            }
+
         }
 
         .price {
@@ -69,7 +75,7 @@
             height: 24px;
             border: none;
             background: none;
-            font-size: 20px;
+            font-size: 35px;
             font-weight: 500;
             cursor: pointer;
             display: flex;

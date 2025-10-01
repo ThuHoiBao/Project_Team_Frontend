@@ -12,6 +12,7 @@ const images = {
     aoThun: require('./aoThun.jpg'),
     aoTheDuc: require('./aoTheDuc.jpg'),
     aoSoMi: require('./aoSoMi.jpg'),
+    vector: require('./Vector.png')
     
 };
 
