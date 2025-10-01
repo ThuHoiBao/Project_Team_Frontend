@@ -8,6 +8,10 @@
   --font-family: 'Satoshi', sans-serif; /* Assuming font from image */
 }
 
+p{
+  text-align: left;
+}
+
 body {
   font-family: var(--font-family);
   margin: 0;
@@ -60,10 +64,14 @@ body {
   border: 2px solid transparent;
   transition: border-color 0.3s;
 }
-
-.thumbnails img.active {
-  border-color: var(--primary-color);
+.thumbnail{
+    width: 100px;
+  height: 120px;
+  object-fit: cover;
+  padding-right: 12px;
 }
+
+
 
 .main-image {
   flex-grow: 1;
@@ -96,7 +104,7 @@ body {
     color: #666;
 }
 
-.product-price {
+.product-price-wishlist {
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -255,12 +263,12 @@ body {
 .latest-btn, .write-review-btn {
   padding: 0.75rem 1.5rem;
   border-radius: 20px;
-  cursor: pointer;
 }
 .latest-btn {
   background-color: var(--secondary-color);
   border: none;
   margin-right: 1rem;
+  cursor: none;
 }
 .write-review-btn {
   background-color: var(--primary-color);
@@ -273,6 +281,10 @@ body {
   gap: 2rem;
   margin-bottom: 2rem;
 }
+.thumbnails img.active {
+  border-color: var(--primary-color);
+}
+
 .review-card {
   border: 1px solid var(--border-color);
   border-radius: 20px;
@@ -302,15 +314,7 @@ body {
   margin-top: 1rem;
   display: block;
 }
-.load-more-btn {
-  display: block;
-  margin: 2rem auto 0;
-  padding: 0.75rem 2rem;
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
-  background: none;
-  cursor: pointer;
-}
+
 
 
 /* Recommendations Section */
@@ -333,7 +337,9 @@ body {
 .product-card {
   text-align: left;
 }
-
+.product-card :hover {
+  cursor: pointer;
+}
 .product-card img {
   width: 100%;
   border-radius: 20px;
@@ -411,4 +417,75 @@ body {
 .footer-links {
     padding: 2rem;
     /* Add more styles for the full footer */
+}
+.product-gallery .main-image {
+  width: 100%;
+  max-width: 400px;   /* tùy bạn muốn khung ảnh to bao nhiêu */
+  height: 400px;      /* fix chiều cao khung */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;   /* tránh tràn */
+}
+
+.product-gallery .main-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;  /* giữ nguyên tỉ lệ, thu nhỏ vừa khung */
+}
+
+
+
+/* Style cho modal (nền mờ) */
+.modal {
+    display: none; /* Ban đầu ẩn */
+    position: fixed;
+    z-index: 1; /* Hiển thị trên mọi thứ */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.9);
+}
+
+/* Nội dung bên trong modal (ảnh lớn) */
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain; 
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+/* Nút đóng (×) */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Hiệu ứng phóng to khi mở modal */
+@keyframes zoom {
+    from {transform: scale(0.1)}
+    to {transform: scale(1)}
+}
+
+.list-image-feedbacks{
+  display: flex;
+  flex-direction: row;
 }

@@ -92,7 +92,7 @@ function Profile() {
     <div className={cx("profile-container")}>
       {error && (
         <div className={cx("alert", "alert-danger", "alert-dismissible")}>
-          <strong>Error!</strong> {error}
+          <strong>Error!</strong>{error}
           <button
             type="button"
             className={cx("btn-close")}
@@ -105,7 +105,7 @@ function Profile() {
 
       {success && (
         <div className={cx("alert", "alert-success", "alert-dismissible")}>
-          <strong>Success!</strong> {success}
+          <strong>Success!</strong>{success}
           <button
             type="button"
             className={cx("btn-close")}
@@ -118,7 +118,7 @@ function Profile() {
 
       <div className={cx("profile-card", "shadow-lg", "p-4", "rounded")}>
         <div className={cx("avatar-wrapper")}>
-          <img src={avatar} alt="avatar" className={cx("profile-avatar")} />
+          <img src={avatar || images.noImage} alt="avatar" className={cx("profile-avatar")} />
           <label htmlFor="avatar-upload" className={cx("avatar-upload-btn")}>
             <span className={cx("btn-add-img")}>+</span>
           </label>

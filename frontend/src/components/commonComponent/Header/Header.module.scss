@@ -14,6 +14,7 @@
     width: 100%;
     box-shadow: 0px 1px 1px rgb(0 0 0 / 12%);
     background-color: var(--white);
+    font-family: "Satoshi", sans-serif;
 }
 
 .inner {
@@ -34,13 +35,19 @@
     align-items: center;
 }
 
+
 .more-btn {
-    font-size: 2rem;
-    margin-left: 28px;
-    padding: 4px 8px;
-    background-color: transparent;
-    cursor: pointer;
+  display: flex;              /* dùng flex để canh giữa */
+  align-items: center;        /* canh giữa theo chiều dọc */
+  justify-content: center;    /* canh giữa theo chiều ngang */
+  padding: 4px 8px;;               
+  width: 40px;               
+  height: 40px;
+  margin-left: 28px;            
+  background: transparent;    
+  cursor: pointer;
 }
+
 
 .action-btn {
     position: relative;

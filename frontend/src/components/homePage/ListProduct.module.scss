@@ -1,0 +1,113 @@
+.listProduct {
+    margin: 10px 0;
+
+    .header {
+        position: relative; // để controls định vị tuyệt đối bên trong
+        display: flex;
+        justify-content: center; // căn giữa nội dung (title)
+        align-items: center;
+        padding: 0 40px; // thêm padding để tránh controls đè lên chữ
+
+        h2 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 40px;
+        }
+
+        .controls {
+            position: absolute;
+            right: 0; // ép controls về mép phải
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+        }
+    }
+
+
+    .arrowBtn {
+      background: transparent;
+      border-radius: 50%;
+      &:hover {
+        background: #f0f0f0;
+      }
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 24px;
+    }
+
+    .card {
+    flex: 0 0 calc(100% / 4 - 1rem);// hiển thị 4 feedback
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 0.5rem;
+    text-align: left; // 👈 đổi từ center sang left
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+
+    &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    img {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        margin-bottom: 12px;
+        display: block; // để ảnh không bị ảnh hưởng text-align
+        margin-left: auto;
+        margin-right: auto; // ảnh vẫn giữ ở giữa
+    }
+
+    h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #111827;
+    }
+
+    p {
+        margin: 4px 0;
+        font-size: 0.95rem;
+        color: #374151;
+    }
+
+    .oldPrice {
+        text-decoration: line-through;
+        color: #9ca3af;
+        font-size: 0.85rem;
+    }
+
+    .discount {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: #ef4444;
+        color: #fff;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    }
+}
+
+.viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.arrowBtn{
+    background-color: transparent;
+}
+
+.track {
+  display: flex;
+}

@@ -5,13 +5,17 @@ import Login from './components/auth/loginComponent/LoginComponent';
 import ForgotPassword from './components/auth/forgotPasswordComponent/ForgotPasswordComponent'; // Giả sử bạn có ForgotPassword component
 import VerifyOtp from './components/auth/verifyOtp/VerifyOtpComponent';  // Import VerifyOtp component
 import Register from './components/auth/registerComponent/RegisterComponent';
-import HomePage from './components/homePageComponent/HomePage';
+// import HomePage from './components/homePageComponent/HomePage';
+import HomePage from './components/homePage/HomePage';
 import ResetPassword from './components/auth/forgotPasswordComponent/ResetPassword'; // Import ResetPassword component
 import ProfilePage from './components/profilePageComponent/ProfilePage';
 import CartPage from './components/cartPage';
 import ProductDetailPage from './components/productDetail/productDetailComponent/ProductDetailPage';
 import OrderHome from './components/OrderHomeComponent/OrderHome';
 import OrderDetail from './components/OrderDetailComponent/OrderDetail';
+import CasualPage from './components/categoryComponent/casualPage/CasualPage';
+import WishlistPage from './components/listFavoriteComponent/listFavoriteComponent';
+
 function App() {
   return (
     <div className="App">
@@ -29,6 +33,9 @@ function App() {
         <Route path="/product-detail" element={<ProductDetailPage />} />
         <Route path="/order" element={<OrderHome/>} />
         <Route path="/order-detail" element={<OrderDetail/>}/>
+        <Route path="/product/:id" element={<ProductDetailPage />} />
+        <Route path="/casual" element={<CasualPage/>}/>
+        <Route path="/product/wishlist" element={<WishlistPage />} />
       </Routes>
     </div>
   );

@@ -1,6 +1,6 @@
 import Header from '../commonComponent/Header';
 import classNames from 'classnames/bind';
-import styles from './cartPage.module.scss';
+
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight, faTag } from '@fortawesome/free-solid-svg-icons';
@@ -9,7 +9,7 @@ import { faArrowRight, faTag } from '@fortawesome/free-solid-svg-icons';
 import CartItem from './CartItem';
 import Button from '../commonComponent/Button';
 import Footer from '../commonComponent/Footer';
-
+import styles from './cartPage.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -81,13 +81,14 @@ const CartPage: React.FC = () => {
         <div className={cx('wrapper')}>    
             <Header />
             <div className={cx('container')}>
-                <div className={cx('breadcrumb')}>
-                    <Button text to='/home'>Home</Button>
-                    <span className={cx('separator')}>{'>'}</span>
-                    <Button text>Cart</Button>
-                </div>
+               <div className={cx('breadcrumb')}>
+                <Button text to='/home'>Home</Button>
+                <span className={cx('separator')}>{'>'}</span>
+                <Button text className={cx('active')}>Cart</Button>
+            </div>
                 
                 <div className={cx('content')}>
+                    <h3 className={cx('cart-title')}>YOUR CART</h3>
                     <div className={cx('cart-layout')}>
                         <div className={cx('cart-items')}>
                             {cartItems.map(item => (
