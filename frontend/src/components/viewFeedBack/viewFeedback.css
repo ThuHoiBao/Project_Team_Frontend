@@ -1,0 +1,207 @@
+/* --- Modal overlay --- */
+.app-modal-overlay-viewFeedback {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* --- Modal container --- */
+.app-modal-viewFeedback {
+  background: #fff;
+  border-radius: 8px;
+  width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- Header --- */
+.feedback-header-viewFeedback {
+  padding: 16px 20px;
+  border-bottom: 1px solid #eee;
+  
+}
+
+.feedback-header-viewFeedback h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #434343;
+  text-align: left; 
+}
+
+/* --- Feedback list (scroll) --- */
+.feedback-list-viewFeedback {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 20px;
+}
+
+/* --- Footer --- */
+.modal-buttons-viewFeedback {
+  padding: 12px 20px;
+  border-top: 1px solid #eee;
+  background: #fafafa;
+  text-align: right;
+}
+
+.modal-buttons-viewFeedback button {
+  padding: 8px 20px;
+  background: #f13105;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modal-buttons-viewFeedback button:hover {
+  background: #ff4618;
+}
+
+/* --- Feedback item --- */
+.feedback-item-view-viewFeedback {
+  padding: 16px 0;
+  
+  font-family: Arial, sans-serif;
+  background: #fff;
+}
+
+/* product */
+.product-info-viewFeedback {
+  display: flex;
+  align-items:start; 
+  margin-bottom: 12px;
+  gap: 12px;   
+  border-bottom: 1px solid #eee;   
+}
+
+.product-img-viewFeedback {
+  width: 60px;
+  height: 60px;
+  object-fit:contain;
+  margin-bottom: 10px;
+}
+
+.product-text-viewFeedback {
+  flex: 0.8;
+  margin-right: 400px;
+
+}
+
+.product-name-viewFeedback {
+  font-size: 15px;
+  font-weight: 500;
+  color: #222;
+  margin: 0;
+}
+
+.product-option-viewFeedback {
+  font-size: 13px;
+  color: #999;
+  margin-top: 5px;
+}
+
+/* user */
+.feedback-body-viewFeedback {
+  padding-left: 42px; /* bám avatar + căn trái đẹp */
+}
+
+.user-info-viewFeedback {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.user-avatar-viewFeedback {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.username-viewFeedback {
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.rating-viewFeedback {
+  font-size: 14px;
+  color: #ffce3d;
+  line-height: 1.2;
+}
+
+.comment-viewFeedback {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.comment-label-viewFeedback {
+  font-size: 14px;
+  color: #777; /* xám */
+  white-space: nowrap; /* không xuống dòng label */
+}
+
+.comment-text-viewFeedback {
+  display: inline-block;
+  max-width: 60%;          /* gói gọn bên trái modal */
+  background: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+  word-wrap: break-word;   /* tự xuống dòng */
+  text-align: left;
+}
+
+/* feedback images */
+.feedback-images-viewFeedback {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+.feedback-img-viewFeedback {
+  width: 100px;
+  height: 100px;
+
+  border-radius: 4px;
+  object-fit: contain;
+  cursor: pointer;                /* đổi chuột thành hand */
+  transition: transform 0.3s ease; /* hiệu ứng mượt */
+}
+
+.feedback-img-viewFeedback:hover {
+  transform: scale(2);          /* phóng to ảnh khi hover */
+  z-index: 10;                    /* nổi lên trên */
+}
+
+
+/* date */
+.date-feedback-viewFeedback {
+  display: block;        /* không cần flex ở đây */
+  color: #999;           /* xám nhạt */
+  margin-top: 4px;       /* cách phần trên 1 chút */
+  font-size: 13px;       /* chữ nhỏ */
+  font-style: italic;    /* (tuỳ chọn) chữ nghiêng để phân biệt */
+}
+.date-feedback-viewFeedback {
+  text-align: left;      /* căn trái */
+  width: fit-content;    /* chỉ chiếm độ rộng cần thiết */
+}

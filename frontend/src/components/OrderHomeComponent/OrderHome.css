@@ -1,0 +1,32 @@
+/* OrderHome.css */
+.order-list {
+  max-width: 900px;
+  margin: 20px auto;
+}
+
+.order-status-filter {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.order-status-filter button {
+  margin: 0 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.order-status-filter button.active {
+  background-color: #00b894;
+  color: white;
+}
+
+.order-items-list {
+  display: flex;
+  flex-direction: column;
+}
+
