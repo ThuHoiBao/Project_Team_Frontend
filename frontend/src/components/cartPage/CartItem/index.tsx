@@ -53,8 +53,8 @@ const CartItem: React.FC<CartItemProps> = ({
             <div className={cx('product-info')}>
                 <h3 className={cx('product-name')}>{name}</h3>
                 <div className={cx('product-details')}>
-                    <span className={cx('size')}>Size: {size}</span>
-                    <span className={cx('color')}>Color: {color}</span>
+                    <span className={cx('size')}>Size: <span className={cx('size-value')}>{size}</span></span>
+                    <span className={cx('color')}>Color:  <span className={cx('color-value')}>{color}</span></span>
                 </div>
                 <div className={cx('price')}>${price}</div>
             </div>
