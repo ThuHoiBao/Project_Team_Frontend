@@ -4,9 +4,10 @@ import {
   getProductDetail, getSizes, getProductByCategory, getFullnameUserFeedback, getImageFeedbacks,
   saveFavoriteProduct, deleteFavoriteProduct, checkExistedWishlist
 } from "../../../services/product/productDetailApi";
-import './ProductDetailPage.css';
+import '../productDetailComponent/ProductDetailPage.css'
 import Header from '../../commonComponent/Header';
 import Footer from '../../commonComponent/Footer';
+import LoginPromptModal from '../../LoginPromptModal/LoginPromptModal';
 // TypeScript Interfaces for data structures
 interface Review {
   id: string;
@@ -42,6 +43,7 @@ interface RecommendedProduct {
 const ProductDetailPage: React.FC = () => {
 
   const { id } = useParams();
+  const token = localStorage.getItem("token");
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [recommended, setRecommended] = useState<RecommendedProduct[]>([]);
@@ -52,8 +54,15 @@ const ProductDetailPage: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
 
   const handleHeartClick = async () => {
+
+    if (!token) {
+      setShowLoginPrompt(true);
+      return;
+    }
     try {
       if (isFavorite) {
         await deleteFavoriteProduct(id);
@@ -120,9 +129,10 @@ const ProductDetailPage: React.FC = () => {
     const fetchData = async () => {
       try {
         if (id) {
-          const status = await checkExistedWishlist(id);
-          
-          setIsFavorite(status);
+          if (token) {
+            const status = await checkExistedWishlist(id);
+            setIsFavorite(status);
+          }
         }
         const productData = await getProductDetail(id);
         const sizeData = await getSizes(id);
@@ -223,20 +233,18 @@ const ProductDetailPage: React.FC = () => {
             <div className="product-info">
               <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
                 <h1 className="product-name">{product?.name}</h1>
-                <img src={isFavorite? "https://icons.iconarchive.com/icons/designbolts/free-valentine-heart/256/Heart-icon.png"
+                <img src={isFavorite ? "https://icons.iconarchive.com/icons/designbolts/free-valentine-heart/256/Heart-icon.png"
                   : "https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png"
                 } style={{
                   maxWidth: "30px", maxHeight: "30px",
                   marginTop: "10px", cursor: "pointer"
-                }} onClick={handleHeartClick}/>
+                }} onClick={handleHeartClick} />
               </div>
               <div className="product-rating">
                 <span>{'★'.repeat(Math.round((reviews.reduce((sum, obj) => sum + obj.rating, 0)) / reviews.length))}{'☆'.repeat(Math.round(5 - (reviews.reduce((sum, obj) => sum + obj.rating, 0)) / reviews.length))}</span>
               </div>
               <div className="product-price">
                 <span className="current-price">${product?.price}</span>
-                <span className="original-price">${product?.price}</span>
-                <span className="discount-badge">-30%</span>
               </div>
               <p className="product-description">{product?.description}</p>
 
@@ -336,6 +344,9 @@ const ProductDetailPage: React.FC = () => {
 
       </div>
       <Footer />
+      <LoginPromptModal
+        show={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)} />
     </>
   );
 };
