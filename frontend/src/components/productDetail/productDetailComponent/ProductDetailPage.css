@@ -104,7 +104,7 @@ body {
     color: #666;
 }
 
-.product-price {
+.product-price-wishlist {
   display: flex;
   align-items: center;
   gap: 1rem;

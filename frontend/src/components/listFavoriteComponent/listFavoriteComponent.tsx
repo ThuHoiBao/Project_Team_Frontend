@@ -103,18 +103,12 @@ const WishlistPage: React.FC = () => {
                                     <img src={item.image} alt={item.name} />
                                 </div>
                                 <div className="card-info">
-                                    <h3 className="product-name" onClick={() => handleViewProduct(item.product_id)}>
+                                    <h3 className="product-name-wishlist" onClick={() => handleViewProduct(item.product_id)}>
                                         {item.name}
                                     </h3>
-                                    <p className="product-price">${item.price.toFixed(2)}</p>
+                                    <p className="product-price-wishlist">${item.price.toFixed(2)}</p>
                                     
                                     <div className="card-actions">
-                                        <button 
-                                            className="action-btn add-to-cart"
-                                            // Bạn có thể thêm logic Add To Cart ở đây
-                                        >
-                                            Thêm vào Giỏ hàng
-                                        </button>
                                         <button 
                                             className="action-btn remove-btn" 
                                             onClick={() => handleRemoveFromWishlist(item.product_id)}

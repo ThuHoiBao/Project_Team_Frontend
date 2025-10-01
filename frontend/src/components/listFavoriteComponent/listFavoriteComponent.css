@@ -58,9 +58,10 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    justify-content: center;
 }
 
-.product-name {
+.product-name-wishlist {
     font-size: 1.2em;
     font-weight: 600;
     margin-top: 0;
@@ -75,7 +76,7 @@
     color: #4CAF50; /* Màu nhấn khi hover */
 }
 
-.product-price {
+.product-price-wishlist {
     font-size: 1.5em;
     color: #388e3c; /* Màu xanh lá cây cho giá */
     font-weight: 700;
