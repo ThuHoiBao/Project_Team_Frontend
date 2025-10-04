@@ -1,6 +1,6 @@
 // App.tsx
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';  // Import Routes và Route từ react-router-dom
+import { Routes, Route} from 'react-router-dom';  // Import Routes và Route từ react-router-dom
 import Login from './components/auth/loginComponent/LoginComponent';
 import ForgotPassword from './components/auth/forgotPasswordComponent/ForgotPasswordComponent'; // Giả sử bạn có ForgotPassword component
 import VerifyOtp from './components/auth/verifyOtp/VerifyOtpComponent';  // Import VerifyOtp component
@@ -13,10 +13,12 @@ import CartPage from './components/cartPage';
 import ProductDetailPage from './components/productDetail/productDetailComponent/ProductDetailPage';
 import CasualPage from './components/categoryComponent/casualPage/CasualPage';
 import WishlistPage from './components/listFavoriteComponent/listFavoriteComponent';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <div className="App">
+      <ScrollToTop />
       <Routes>
         <Route path="/login" element={<Login />} />  {/* Đăng nhập */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
