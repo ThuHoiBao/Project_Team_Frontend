@@ -1,16 +1,17 @@
 import React from "react";
 import classNames from "classnames/bind";
 import styles from "./ListProduct.module.scss";
-import ItemProduct from "./ItemProduct";
+import ItemProduct, {ProductImage} from "./ItemProduct";
 
 const cx = classNames.bind(styles);
 
 interface Product {
-    id: number;
-    name: string;
-    image: string;
-    rating: number;
+    _id: string
+    listImage: ProductImage[];
+    productName: string;
+    averageRating: number;
     price: number;
+    createDate: string;
 }
 
 interface ListProductProps {
@@ -21,7 +22,7 @@ const ListProduct: React.FC<ListProductProps> = ({products}) => {
     return (
         <div className={cx("productList")}> 
             {products.map((product) => ( 
-            <ItemProduct key={product.id} product={product} /> ))}
+            <ItemProduct key={product._id} product={product} /> ))}
          </div>
 
     )
