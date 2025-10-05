@@ -1,0 +1,492 @@
+/* General Styling */
+:root {
+  --primary-color: #000;
+  --secondary-color: #f0f0f0;
+  --text-color: #333;
+  --accent-color: #4F4B3C;
+  --border-color: #e5e5e5;
+  --font-family: 'Satoshi', sans-serif; /* Assuming font from image */
+}
+
+p{
+  text-align: left;
+}
+
+body {
+  font-family: var(--font-family);
+  margin: 0;
+  background-color: #fff;
+  color: var(--text-color);
+}
+
+.product-detail-page {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Header */
+.page-header {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Main Content */
+.main-content {
+  padding: 2rem 0;
+}
+
+.product-container {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+/* Product Gallery */
+.product-gallery {
+  display: flex;
+  gap: 1rem;
+  flex: 1;
+}
+
+.thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.thumbnails img {
+  width: 100px;
+  height: 120px;
+  object-fit: cover;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+.thumbnail{
+    width: 100px;
+  height: 120px;
+  object-fit: cover;
+  padding-right: 12px;
+}
+
+
+
+.main-image {
+  flex-grow: 1;
+}
+
+.main-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
+  background-color: var(--secondary-color);
+}
+
+/* Product Info */
+.product-info {
+  flex: 1;
+  padding-left: 2rem;
+}
+
+.product-name {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 0 0 0.5rem;
+}
+
+.product-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: #666;
+}
+
+.product-price-wishlist {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.current-price {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+}
+
+.discount-badge {
+  background-color: #FF333320;
+  color: #FF3333;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.product-description {
+  line-height: 1.6;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.option-group {
+  margin-bottom: 1.5rem;
+}
+
+.option-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.color-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.color-swatch {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.color-swatch.selected {
+  border-color: var(--primary-color);
+  outline: 1px solid white;
+  outline-offset: -3px;
+}
+
+.size-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.size-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 20px;
+  background-color: var(--secondary-color);
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.size-button.selected {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.product-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.quantity-adjuster {
+  display: flex;
+  align-items: center;
+  background-color: var(--secondary-color);
+  border-radius: 20px;
+}
+
+.quantity-adjuster button {
+  background: none;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.quantity-adjuster span {
+  padding: 0 1rem;
+}
+
+.add-to-cart-btn {
+  flex-grow: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 20px;
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Reviews Section */
+.reviews-section {
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+.tabs {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+.tab-btn {
+  background: none;
+  border: none;
+  padding-bottom: 1rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #999;
+  border-bottom: 2px solid transparent;
+}
+.tab-btn.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  font-weight: bold;
+}
+.reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.reviews-header h2 {
+  margin: 0;
+}
+.review-count {
+  font-weight: normal;
+  color: #999;
+}
+.latest-btn, .write-review-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+}
+.latest-btn {
+  background-color: var(--secondary-color);
+  border: none;
+  margin-right: 1rem;
+  cursor: none;
+}
+.write-review-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+.thumbnails img.active {
+  border-color: var(--primary-color);
+}
+
+.review-card {
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+.review-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+.review-rating {
+  color: #FFC633;
+}
+.review-card h4 {
+  margin: 0.25rem 0;
+}
+.more-options-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.review-date {
+  color: #999;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  display: block;
+}
+
+
+
+/* Recommendations Section */
+.recommendations {
+  text-align: center;
+  padding: 4rem 0;
+}
+
+.recommendations h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.product-card {
+  text-align: left;
+}
+.product-card :hover {
+  cursor: pointer;
+}
+.product-card img {
+  width: 100%;
+  border-radius: 20px;
+  background-color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+.product-card h3 {
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+}
+.product-card .price {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.original-price-rec {
+    text-decoration: line-through;
+    color: #999;
+    font-weight: normal;
+    margin-left: 0.5rem;
+}
+.discount-badge-rec {
+    background-color: #FF333320;
+    color: #FF3333;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+
+/* Footer */
+.page-footer {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.newsletter-signup {
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 1px solid #333;
+}
+.newsletter-signup h2 {
+    font-size: 2.5rem;
+    max-width: 500px;
+    margin: 0 auto 1.5rem;
+}
+.newsletter-signup form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+.newsletter-signup input {
+    padding: 0.75rem 1rem;
+    border-radius: 20px;
+    border: none;
+    background-color: #ffffff20;
+    color: white;
+    width: 300px;
+}
+.newsletter-signup input::placeholder {
+    color: #ccc;
+}
+.newsletter-signup button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 20px;
+    border: none;
+    background-color: white;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-weight: bold;
+}
+.footer-links {
+    padding: 2rem;
+    /* Add more styles for the full footer */
+}
+.product-gallery .main-image {
+  width: 100%;
+  max-width: 400px;   /* tùy bạn muốn khung ảnh to bao nhiêu */
+  height: 400px;      /* fix chiều cao khung */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;   /* tránh tràn */
+}
+
+.product-gallery .main-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;  /* giữ nguyên tỉ lệ, thu nhỏ vừa khung */
+}
+
+
+
+/* Style cho modal (nền mờ) */
+.modal {
+    display: none; /* Ban đầu ẩn */
+    position: fixed;
+    z-index: 1000; /* Hiển thị trên mọi thứ */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.9);
+}
+
+/* Nội dung bên trong modal (ảnh lớn) */
+.modal-content {
+    margin: auto;
+    margin-top: 150px;
+    display: block;
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain; 
+    animation-name: zoom;
+    animation-duration: 0.6s;
+}
+
+/* Nút đóng (×) */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.close:hover,
+.close:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Hiệu ứng phóng to khi mở modal */
+@keyframes zoom {
+    from {transform: scale(0.1)}
+    to {transform: scale(1)}
+}
+
+.list-image-feedbacks{
+  display: flex;
+  flex-direction: row;
+}
