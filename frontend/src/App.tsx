@@ -16,6 +16,8 @@ import OrderDetail from './components/OrderDetailComponent/OrderDetail';
 import CasualPage from './components/categoryComponent/casualPage/CasualPage';
 import WishlistPage from './components/listFavoriteComponent/listFavoriteComponent';
 import ScrollToTop from './components/ScrollToTop';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
@@ -39,6 +41,7 @@ function App() {
         <Route path="/casual" element={<CasualPage/>}/>
         <Route path="/product/wishlist" element={<WishlistPage />} />
       </Routes>
+      <ToastContainer position="bottom-right" />
     </div>
   );
 }
