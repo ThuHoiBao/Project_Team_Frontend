@@ -9,6 +9,7 @@ import {
     faGear,
     faSignOut,
     faChevronDown,
+    faBell,
 } from '@fortawesome/free-solid-svg-icons';
 import Tippy from '@tippyjs/react';
 import 'tippy.js/dist/tippy.css';
@@ -25,6 +26,10 @@ import { getMyInfo, logoutUser } from '../../../services/user/myInfoApi';
 import images from '../../../assets/images';
 import { AxiosError } from 'axios';
 import { useNavigate } from "react-router-dom";
+import { getSocket, initSocket } from "../../../socket/socket";
+import { getNotifications, markAsRead } from "../../../services/notification/notificationApi";
+import { toast } from "react-toastify";
+import { message } from 'antd';
 
 
 const cx = classNames.bind(styles);
@@ -83,34 +88,64 @@ const MENU_ITEMS: MenuItemType[] = [
         to: '/feedback',
     },
 ];
-
+type NotificationData = {
+    _id: string;
+    title: string;
+    message: string;
+    type: string;
+    isRead: boolean;
+    createAt: string;
+};
 function Header() {
-const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const [avatar, setAvatar] = useState<string>(images.noImage);
     const [currentUser, setCurrentUser] = useState<boolean>();
+    const [notifications, setNotifications] = useState<NotificationData[]>([]);
+    const [unreadCount, setUnreadCount] = useState<number>(0);
+    const [showNotifications, setShowNotifications] = useState<boolean>(false);
+    const [selectedNotification, setSelectedNotification] = useState<NotificationData | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const handleOpenNotification = async (noti: NotificationData) => {
+        setSelectedNotification(noti);
+        setIsModalOpen(true);
+        toggleNotifications()
+        if (!noti.isRead) {
+            try {
+                await markAsRead(noti._id); 
+                setNotifications((prev) =>
+                    prev.map((n) =>
+                        n._id === noti._id ? { ...n, isRead: true } : n
+                    )
+                );
+                setUnreadCount((prev) => Math.max(prev - 1, 0));
+            } catch (err) {
+                console.error("Lỗi cập nhật trạng thái đã đọc:", err);
+            }
+        }
+    };
 
 
     // Handle logic
     const handleMenuChange = async (menuItem: MenuItemType) => {
         switch (menuItem.title) {
-        case "Log out":
-            try {
-            // Gọi API logout
-            await logoutUser();
-            // Xóa token trong localStorage
-            localStorage.removeItem("token");
-            // Chờ 1s rồi mới chuyển trang
-            setTimeout(() => {
-                navigate("/login");
-            }, 1000);
-            } catch (error) {
-            console.error("Logout failed:", error);
-            }
-            break;
+            case "Log out":
+                try {
+                    // Gọi API logout
+                    await logoutUser();
+                    // Xóa token trong localStorage
+                    localStorage.removeItem("token");
+                    // Chờ 1s rồi mới chuyển trang
+                    setTimeout(() => {
+                        navigate("/login");
+                    }, 1000);
+                } catch (error) {
+                    console.error("Logout failed:", error);
+                }
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
     };
 
@@ -140,28 +175,57 @@ const navigate = useNavigate();
 
     useEffect(() => {
         const getInfoResponse = async () => {
-          try {
-            const data = await getMyInfo();
-            setCurrentUser(true);
-            setAvatar(data.image);
-          } catch (error) {
-            if (error instanceof AxiosError) {
-                setCurrentUser(false);
-                console.error("API error:", error.response?.data);
-            } else {
-                setCurrentUser(false);
-                console.error("Unexpected error:", error);
+            try {
+                const data = await getMyInfo();
+                setCurrentUser(true);
+                setAvatar(data.image);
+
+                // Lấy danh sách thông báo
+                const notis = await getNotifications(data._id);
+                const listNotifications = notis.map((noti: any) => ({
+                    _id: noti._id,
+                    title: noti.title,
+                    message: noti.message,
+                    type: noti.type,
+                    isRead: noti.isRead, 
+                    createAt: noti.createdAt.slice(0,10)
+                }));
+                
+                setNotifications(listNotifications);
+
+
+                // Đếm số chưa đọc
+                const unread = listNotifications.filter((n: any) => !n.isRead).length;
+                setUnreadCount(unread);
+
+                const socket = initSocket(data._id);
+                socket.on("notification", (data: NotificationData) => {
+                    setNotifications((prev) => [data, ...prev]);
+                    setUnreadCount((prev) => prev + 1);
+                });
+                
+            } catch (error) {
+                if (error instanceof AxiosError) {
+                    setCurrentUser(false);
+                    console.error("API error:", error.response?.data);
+                } else {
+                    setCurrentUser(false);
+                    console.error("Unexpected error:", error);
+                }
             }
-          }
         };
         getInfoResponse();
-      }, []);
+        return () => {
+            const socket = getSocket();
+            socket?.off("notification");
+            socket?.disconnect();
+        };
+    }, []);
+    const toggleNotifications = () => {
+        setShowNotifications((prev) => !prev);
+    };
 
-      console.log("currentUser:", currentUser);
-    console.log("userMenu:", userMenu);
 
-
-    
 
     return (
         <header className={cx('wrapper')}>
@@ -171,23 +235,23 @@ const navigate = useNavigate();
                 </div>
 
                 {/* Navigation Menu */}
-            <nav className={cx('navigation')}>
-                <div className={cx('nav-item', 'dropdown')}>
-                    <span className={cx('nav-link')}>
-                        Shop
-                        <FontAwesomeIcon icon={faChevronDown} className={cx('dropdown-icon')} />
-                    </span>
-                </div>
-                <div className={cx('nav-item')}>
-                    <span className={cx('nav-link')}>On Sale</span>
-                </div>
-                <div className={cx('nav-item')}>
-                    <span className={cx('nav-link')}>New Arrivals</span>
-                </div>
-                <div className={cx('nav-item')}>
-                    <span className={cx('nav-link')}>Brands</span>
-                </div>
-            </nav>
+                <nav className={cx('navigation')}>
+                    <div className={cx('nav-item', 'dropdown')}>
+                        <span className={cx('nav-link')}>
+                            Shop
+                            <FontAwesomeIcon icon={faChevronDown} className={cx('dropdown-icon')} />
+                        </span>
+                    </div>
+                    <div className={cx('nav-item')}>
+                        <span className={cx('nav-link')}>On Sale</span>
+                    </div>
+                    <div className={cx('nav-item')}>
+                        <span className={cx('nav-link')}>New Arrivals</span>
+                    </div>
+                    <div className={cx('nav-item')}>
+                        <span className={cx('nav-link')}>Brands</span>
+                    </div>
+                </nav>
 
 
                 <Search />
@@ -200,6 +264,33 @@ const navigate = useNavigate();
                                     <CartIcon />
                                 </Button>
                             </Tippy>
+                            {/* 🔔 Bell icon */}
+                            <div className={cx('notification-wrapper')}>
+                                <button onClick={toggleNotifications} className={cx('action-btn')}>
+                                    <FontAwesomeIcon icon={faBell} />
+                                    {unreadCount > 0 && (
+                                        <span className={cx('badge')}>{unreadCount}</span>
+                                    )}
+                                </button>
+
+                                {showNotifications && (
+                                    <div className={cx('notification-dropdown')}>
+                                        {notifications.length === 0 ? (
+                                            <p className={cx('no-notify')}>No notifications yet</p>
+                                        ) : (
+                                            notifications.map((noti, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className={cx('notification-item', { 'read': noti.isRead })}
+                                                    onClick={() => handleOpenNotification(noti)}
+                                                >
+                                                    <p>{noti.title}</p>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                             <Tippy delay={[0, 50]} content="Inbox" placement="bottom">
                                 <button className={cx('action-btn')}>
                                     <InboxIcon />
@@ -216,19 +307,31 @@ const navigate = useNavigate();
                         {currentUser ? (
                             <img
                                 className={cx('user-avatar')}
-                                src= {avatar || images.noImage}
+                                src={avatar || images.noImage}
                                 alt="Avatar"
                             />
                         ) : (
                             <button className={cx('more-btn')}>
-                                <MoreVertIcon/>
+                                <MoreVertIcon />
                             </button>
                         )}
                     </Menu>
                 </div>
             </div>
+            {isModalOpen && selectedNotification && (
+                <div className={cx('modal-overlay')}>
+                    <div className={cx('modal-content')}>
+                        <h2>{selectedNotification.title}</h2>
+                        <p>{selectedNotification.message}</p>
+                        <p style={{fontSize: "12px", color: "#999"}}>{selectedNotification.createAt}</p>
+                        <button onClick={() => setIsModalOpen(false)}>Đóng</button>
+                    </div>
+                </div>
+            )}
         </header>
+
     );
+
 }
 
 export default Header;
