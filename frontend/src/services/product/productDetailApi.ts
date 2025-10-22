@@ -81,6 +81,7 @@ export const getNewProducts = async () => {
 export const getTopSellingProducts = async () => {
   const response = await api.get('product/top-selling');
   return response.data.data;
+}
 
 export const saveFavoriteProduct = async (id?: string) => {
   const response = await apiAuth.post(`/product/wishlist/add/${id}`);

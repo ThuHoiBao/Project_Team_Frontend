@@ -17,7 +17,7 @@ export const submitBulkFeedback = async (formData: FormData) => {
 export const getFeedbacksByOrder = async (orderId: string) => {
   const res = await axios.get(`http://localhost:8088/api/feedback/order/${orderId}`);
   return res.data;
-
+}
 // Tạo instance riêng
 const api = axios.create({
     baseURL: "http://localhost:8088/api",
@@ -26,4 +26,4 @@ const api = axios.create({
 export const getBestFeedback = async () => {
     const response = await api.get("feedback/best");
     return response.data.data
-};
+}

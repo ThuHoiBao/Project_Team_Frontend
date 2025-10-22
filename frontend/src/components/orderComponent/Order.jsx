@@ -2,14 +2,29 @@ import React, { useState } from 'react';
 import OrderItem from '../orderItemComponent/OrderItem';
 import './Order.css';
 import imageOrder from '../../images/order.png';
-import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { cancelOrderApi } from '../../services/order/order';  // Thêm useNavigate
 import imageCanceled from '../../images/cancelled.png'
 import FeedbackModal  from "../FeedbackComponent/FeedbackModal";
 import { submitBulkFeedback ,getFeedbacksByOrder } from "../../services/feedback/feedbackApi";
 import ViewFeedbackModal from "../viewFeedBack/ViewFeedbackModal";
+import { Link } from 'react-router-dom';
+// Modal hiển thị cảm ơn và số Xu
+// Modal hiển thị cảm ơn và số Xu
+const ThankYouModal = ({ xu, onClose }) => (
+  <div className="app-modal-overlay">
+    <div className="app-modal thank-you-modal">
+      <h4>Cảm ơn bạn đã đánh giá!</h4>
+      <p>Bạn đã nhận được <b>{xu}<i className="fa fa-coins"></i></b>💰cho đánh giá của mình.</p>
+      
+      <div className="thank-you-note">
+        <p>Chúc bạn có những trải nghiệm tuyệt vời tiếp theo!</p>
+      </div>
 
+      <button onClick={onClose}>Đóng</button>
+    </div>
+  </div>
+);
 
 
 // Modal Component với fade-in
@@ -49,6 +64,9 @@ const Order = ({ order, orderItems, userId ,onOrderUpdate  }) => {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbacks, setFeedbacks] = useState([]);
   const [showViewFeedbackModal, setShowViewFeedbackModal] = useState(false);
+  const [showThankYouModal, setShowThankYouModal] = useState(false);
+const [xu, setXu] = useState(0);  // Số xu nhận được
+
 const handleSubmitFeedback = async (feedbackList) => {
   try {
     const formData = new FormData();
@@ -68,7 +86,23 @@ const handleSubmitFeedback = async (feedbackList) => {
     const result = await submitBulkFeedback(formData); // chỉ truyền formData
     console.log("Server response:", result);
 
-    openModal("Cảm ơn bạn đã đánh giá");
+  // Tính Xu
+    let totalXu = 0;
+    feedbackList.forEach((fb) => {
+        console.log(fb.comment.length)
+        console.log(fb.images.length )
+      if (fb.comment.length >= 50) {
+        if (fb.images.length > 1) {
+          totalXu += 200;  // 200 Xu nếu có hơn 1 hình ảnh
+        } else if (fb.images.length === 1) {
+          totalXu += 100;  // 100 Xu nếu có 1 hình ảnh
+        }
+      }
+    });
+
+    // Cập nhật số xu và mở modal cảm ơn
+    setXu(totalXu);  // Cập nhật số xu
+    setShowThankYouModal(true);  // Mở modal
     setShowFeedbackModal(false);
     // 🔥 gọi lại API từ cha để reload danh sách
     if (typeof onOrderUpdate === "function") {
@@ -244,6 +278,10 @@ const handleItemClick = () => {
           onClose={() => setShowViewFeedbackModal(false)}
         />
       )}
+          {/* Modal khi gửi đánh giá thành công */}
+    {showThankYouModal && (
+      <ThankYouModal xu={xu} onClose={() => setShowThankYouModal(false)} />
+    )}
     </div>
   );
 };
