@@ -102,3 +102,68 @@ export const getWishlist = async () => {
   const response = await apiAuth.get("/product/wishlist")
   return response.data;
 }
+
+
+interface FilterValues {
+  category?: string[];
+  priceRange?: [number, number];
+  size?: string[];
+  rating?: number | null;
+  sort?: string; // ⚠️ thêm sort
+  page?: number;
+  limit?: number;
+}
+
+export const getFilteredProducts = async (filters: FilterValues) => {
+  const {
+    category,
+    priceRange,
+    size,
+    rating,
+    sort,
+    page = 1,
+    limit = 9,
+  } = filters;
+
+  // build query params
+  const params: any = {};
+
+  // categories - backend nhận dạng "categories" (số nhiều)
+  if (category && category.length > 0) {
+    params.categories = category.join(",");
+  }
+
+  // priceMin và priceMax
+  if (priceRange) {
+    params.priceMin = priceRange[0];
+    params.priceMax = priceRange[1];
+  }
+
+  // sizes - backend nhận dạng "sizes" (số nhiều) và hỗ trợ nhiều size
+  if (size && size.length > 0) {
+    params.sizes = size.join(",");
+  }
+
+  // rating
+  if (rating !== null && rating !== undefined) {
+    params.rating = rating;
+  }
+
+  // sort
+  if (sort) {
+    params.sort = sort;
+  }
+
+  // pagination
+  params.page = page;
+  params.limit = limit;
+
+  // call API
+  const response = await apiAuth.get("/product/filter", { params });
+  return response.data;
+};
+
+export const getCategories = async () => {
+  const response = await apiAuth.get("/category")
+  return response.data;
+}

@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from "react-router-dom"; // nếu bạn dùng react-router
+import { useParams } from "react-router-dom";
 import {
   getProductDetail, getSizes, getProductByCategory, getFullnameUserFeedback, getImageFeedbacks,
   saveFavoriteProduct, deleteFavoriteProduct, checkExistedWishlist
 } from "../../../services/product/productDetailApi";
-import '../productDetailComponent/ProductDetailPage.css'
+
+import classNames from "classnames/bind";
+import styles from './ProductDetailPage.module.scss'
+
 import Header from '../../commonComponent/Header';
 import Footer from '../../commonComponent/Footer';
 import LoginPromptModal from '../../LoginPromptModal/LoginPromptModal';
+
+const cx = classNames.bind(styles);
+
 // TypeScript Interfaces for data structures
 interface Review {
   id: string;
@@ -40,8 +46,8 @@ interface RecommendedProduct {
   price: number;
   images: object[];
 }
-const ProductDetailPage: React.FC = () => {
 
+const ProductDetailPage: React.FC = () => {
   const { id } = useParams();
   const token = localStorage.getItem("token");
   const [product, setProduct] = useState<Product | null>(null);
@@ -56,9 +62,7 @@ const ProductDetailPage: React.FC = () => {
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
-
   const handleHeartClick = async () => {
-
     if (!token) {
       setShowLoginPrompt(true);
       return;
@@ -75,7 +79,8 @@ const ProductDetailPage: React.FC = () => {
       console.error("Lỗi khi cập nhật Wishlist: ", error);
       alert("Lỗi xảy ra. Vui lòng thử lại.");
     }
-  }
+  };
+
   const handleRecommendedProductClick = async (productId: string) => {
     try {
       window.location.href = `/product/${productId}`;
@@ -83,15 +88,17 @@ const ProductDetailPage: React.FC = () => {
       console.error("Error navigating to product:", error);
     }
   };
+
   const handleQuantityChange = (amount: number) => {
     setQuantity(prev => Math.max(1, prev + amount));
-
   };
+
   useEffect(() => {
     if (product) {
       console.log("Product updated:", product);
     }
   }, [product]);
+
   useEffect(() => {
     reviews.forEach(review => {
       if (!usernames[review.author]) {
@@ -99,6 +106,7 @@ const ProductDetailPage: React.FC = () => {
       }
     });
   }, [reviews]);
+
   useEffect(() => {
     const fetchImages = async () => {
       const newFeedbackImages: Record<string, ImageFeedback[]> = {};
@@ -111,10 +119,10 @@ const ProductDetailPage: React.FC = () => {
         }
       }
       setImageFeedbacks(newFeedbackImages);
-    }
+    };
     if (reviews.length > 0) fetchImages();
+  }, [reviews]);
 
-  }, [reviews])
   const getUserNameFeedback = async (id: string) => {
     try {
       const res = await getFullnameUserFeedback(id);
@@ -136,7 +144,10 @@ const ProductDetailPage: React.FC = () => {
         }
         const productData = await getProductDetail(id);
         const sizeData = await getSizes(id);
-        const categoryProducts = await getProductByCategory(productData.data.product.category.id, productData.data.product.id);
+        const categoryProducts = await getProductByCategory(
+          productData.data.product.category.id,
+          productData.data.product.id
+        );
 
         const recommendedProducts = categoryProducts.data.map((item: any) => ({
           id: item.id,
@@ -144,6 +155,7 @@ const ProductDetailPage: React.FC = () => {
           price: item.price,
           images: item.listImage
         }));
+
         setProduct({
           id: productData.data.product.id,
           name: productData.data.product.productName,
@@ -152,10 +164,8 @@ const ProductDetailPage: React.FC = () => {
           images: productData.data.product.listImage.map((img: any) => img.imageProduct),
           sizes: sizeData.data,
         });
+
         setImages(productData.data.product.listImage.map((img: any) => img.imageProduct));
-
-
-
         setReviews(productData.data.feedbacks.map((fb: any) => ({
           id: fb.feedback.id,
           author: fb.order.user,
@@ -163,20 +173,22 @@ const ProductDetailPage: React.FC = () => {
           text: fb.feedback.comment,
           date: fb.feedback.date
         })));
-        setSelectedImage(productData.data.product.listImage[0].imageProduct)
+
+        setSelectedImage(productData.data.product.listImage[0].imageProduct);
         setRecommended(recommendedProducts);
-        // setSelectedImage(productData.images[0]);
         setSelectedSize(sizeData.data[0].size);
       } catch (err) {
         console.error("Error fetching product:", err);
       }
     };
 
-
     fetchData();
   }, [id]);
+
   const modal = document.getElementById("imageModal") as HTMLDivElement;
   const modalImg = document.getElementById("fullImage") as HTMLImageElement;
+  
+
   function openModal(element: HTMLImageElement) {
     if (modal && modalImg) {
       modal.style.display = "block";
@@ -184,55 +196,49 @@ const ProductDetailPage: React.FC = () => {
     }
   }
 
-
-  // Hàm đóng modal
   function closeModal() {
     if (modal) {
       modal.style.display = "none";
     }
   }
 
-  // Đóng modal khi click ra ngoài ảnh
   window.onclick = function (event: MouseEvent) {
-    // Ép kiểu 'event.target' để so sánh an toàn hơn.
     const target = event.target as HTMLElement;
     if (target === modal) {
       closeModal();
     }
-  }
+  };
+
   return (
     <>
       <Header />
-      <div className="product-detail-page">
-        {/* Header/Nav can be a separate component */}
-        <header className="page-header">
-          {/* Simplified Header for example */}
+      <div className={cx("product-detail-page")}>
+        <header className={cx("page-header")}>
           <nav>SHOP.CO</nav>
         </header>
 
-        <main className="main-content">
-          <div className="product-container">
-            <div className="product-gallery">
-              <div className="thumbnails">
+        <main className={cx("main-content")}>
+          <div className={cx("product-container")}>
+            <div className={cx("product-gallery")}>
+              <div className={cx("thumbnails")}>
                 {product?.images.map((img, index) => (
                   <img
                     key={index}
                     src={img}
                     alt={`Thumbnail ${index + 1}`}
-                    className={selectedImage === img ? 'active' : ''}
+                    className={cx({ active: selectedImage === img })}
                     onClick={() => setSelectedImage(img)}
                   />
                 ))}
               </div>
-              <div className="main-image">
+              <div className={cx("main-image")}>
                 {selectedImage && <img src={selectedImage} alt={product?.name} />}
               </div>
             </div>
 
-            {/* Product Information */}
-            <div className="product-info">
-              <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
-                <h1 className="product-name">{product?.name}</h1>
+            <div className={cx("product-info")}>
+              <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+                <h1 className={cx("product-name")}>{product?.name}</h1>
                 <img src={isFavorite ? "https://icons.iconarchive.com/icons/designbolts/free-valentine-heart/256/Heart-icon.png"
                   : "https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png"
                 } style={{
@@ -240,25 +246,29 @@ const ProductDetailPage: React.FC = () => {
                   marginTop: "10px", cursor: "pointer"
                 }} onClick={handleHeartClick} />
               </div>
-              <div className="product-rating">
-                <span>{'★'.repeat(Math.round((reviews.reduce((sum, obj) => sum + obj.rating, 0)) / reviews.length))}{'☆'.repeat(Math.round(5 - (reviews.reduce((sum, obj) => sum + obj.rating, 0)) / reviews.length))}</span>
-              </div>
-              <div className="product-price">
-                <span className="current-price">${product?.price}</span>
-              </div>
-              <p className="product-description">{product?.description}</p>
 
-              <div className="product-options">
-                <div className="option-group">
+              <div className={cx("product-rating")}>
+                <span>
+                  {"★".repeat(Math.round((reviews.reduce((sum, obj) => sum + obj.rating, 0)) / reviews.length))}
+                  {"☆".repeat(Math.round(5 - (reviews.reduce((sum, obj) => sum + obj.rating, 0)) / reviews.length))}
+                </span>
+              </div>
 
-                </div>
-                <div className="option-group">
+              <div className={cx("product-price")}>
+                <span className={cx("current-price")}>${product?.price}</span>
+              </div>
+
+              <p className={cx("product-description")}>{product?.description}</p>
+
+              <div className={cx("product-options")}>
+                <div className={cx("option-group")}></div>
+                <div className={cx("option-group")}>
                   <label>Choose Size</label>
-                  <div className="size-selector">
+                  <div className={cx("size-selector")}>
                     {product?.sizes.map(s => (
                       <button
                         key={s.id}
-                        className={`size-button ${selectedSize === s.size ? 'selected' : ''}`}
+                        className={cx("size-button", { selected: selectedSize === s.size })}
                         onClick={() => setSelectedSize(s.size)}
                       >
                         {s.size} ({s.quantity})
@@ -268,83 +278,86 @@ const ProductDetailPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="product-actions">
-                <div className="quantity-adjuster">
+              <div className={cx("product-actions")}>
+                <div className={cx("quantity-adjuster")}>
                   <button onClick={() => handleQuantityChange(-1)}>-</button>
                   <span>{quantity}</span>
                   <button onClick={() => handleQuantityChange(1)}>+</button>
                 </div>
-                <button className="add-to-cart-btn">Add to Cart</button>
+                <button className={cx("add-to-cart-btn")}>Add to Cart</button>
               </div>
             </div>
           </div>
 
-          {/* Reviews Section */}
-          <div className="reviews-section">
-            <div className="tabs">
-              <button className="tab-btn active">Rating & Reviews</button>
+          <div className={cx("reviews-section")}>
+            <div className={cx("tabs")}>
+              <button className={cx("tab-btn", "active")}>Rating & Reviews</button>
             </div>
-            <div className="reviews-header">
-              <h2>All Reviews <span className='review-count'>({reviews.length})</span></h2>
+            <div className={cx("reviews-header")}>
+              <h2>
+                All Reviews <span className={cx("review-count")}>({reviews.length})</span>
+              </h2>
               <div>
-                <button className="latest-btn">Latest</button>
+                <button className={cx("latest-btn")}>Latest</button>
               </div>
             </div>
-            <div className="reviews-grid">
+
+            <div className={cx("reviews-grid")}>
               {reviews.map(review => (
-                <div key={review.id} className="review-card">
-                  <div className="review-card-header">
+                <div key={review.id} className={cx("review-card")}>
+                  <div className={cx("review-card-header")}>
                     <div>
-                      <span className="review-rating">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
+                      <span className={cx("review-rating")}>
+                        {"★".repeat(review.rating)}
+                        {"☆".repeat(5 - review.rating)}
+                      </span>
                       <h4>{usernames[review.author] || "Loading..."}</h4>
                     </div>
                   </div>
 
-                  {imageFeedbacks[review.id] && imageFeedbacks[review.id].map((image) => {
-                    return (
+                  {imageFeedbacks[review.id] &&
+                    imageFeedbacks[review.id].map((image) => (
                       <img
                         key={image.id}
                         src={image.imageFeedback}
-                        className="thumbnail"
+                        className={cx("thumbnail")}
                         onClick={(event) => openModal(event.target as HTMLImageElement)}
                       />
-                    );
-                  })}
-
-
+                    ))}
 
                   <p>{review.text}</p>
-                  <span className="review-date">{review.date.slice(0, 10)}</span>
+                  <span className={cx("review-date")}>{review.date.slice(0, 10)}</span>
                 </div>
               ))}
             </div>
           </div>
-          <div id="imageModal" className="modal">
-            <span className="close" onClick={closeModal}>&times;</span>
-            <img className="modal-content" id="fullImage" />
+
+          <div id="imageModal" className={cx("modal")}>
+            <span className={cx("close")} onClick={closeModal}>&times;</span>
+            <img className={cx("modal-content")} id="fullImage" />
           </div>
-          <div className="recommendations">
+
+          <div className={cx("recommendations")}>
             <h2>YOU MIGHT ALSO LIKE</h2>
-            <div className="product-grid">
+            <div className={cx("product-grid")}>
               {recommended.map(recommended => (
-                <div key={recommended.id} className="product-card"
-                  onClick={() => handleRecommendedProductClick(recommended.id)}>
+                <div
+                  key={recommended.id}
+                  className={cx("product-card")}
+                  onClick={() => handleRecommendedProductClick(recommended.id)}
+                >
                   <img src={(recommended.images[0] as any).imageProduct} alt={recommended.name} />
                   <h3>{recommended.name}</h3>
-                  <p className="price">
-                    ${recommended.price}
-
-                  </p>
+                  <p className={cx("price")}>${recommended.price}</p>
                 </div>
               ))}
             </div>
           </div>
         </main>
       </div>
+
       <Footer />
-      <LoginPromptModal
-        show={showLoginPrompt}
-        onClose={() => setShowLoginPrompt(false)} />
+      <LoginPromptModal show={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
     </>
   );
 };

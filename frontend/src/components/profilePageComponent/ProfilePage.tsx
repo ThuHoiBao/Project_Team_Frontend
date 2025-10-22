@@ -13,7 +13,6 @@ function Profile() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -27,7 +26,6 @@ function Profile() {
         setLastName(data.lastName);
         setFirstName(data.firstName);
         setEmail(data.email || "");
-        setAddress(data.address || "");
         setPhone(data.phoneNumber || "");
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -48,14 +46,12 @@ function Profile() {
         email,
         firstName,
         lastName,
-        address,
         phoneNumber: phone,
       });
       setSuccess("Cập nhật thành công!");
       setIsEditing(false);
       setFirstName(updatedUser.firstName || firstName);
       setLastName(updatedUser.lastName || lastName);
-      setAddress(updatedUser.address || address);
       setPhone(updatedUser.phoneNumber || phone);
       console.log("Updated:", updatedUser);
     } catch (err: any) {
@@ -66,6 +62,27 @@ function Profile() {
       setError(msg);
     }
   };
+
+  const handleCancel = ()=>{
+    setIsEditing(false)
+    const getInfoResponse = async () => {
+      try {
+        const data = await getMyInfo();
+        setAvatar(data.image);
+        setLastName(data.lastName);
+        setFirstName(data.firstName);
+        setEmail(data.email || "");
+        setPhone(data.phoneNumber || "");
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.error("API error:", error.response?.data);
+        } else {
+          console.error("Unexpected error:", error);
+        }
+      }
+    };
+    getInfoResponse();
+  }
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -140,8 +157,8 @@ function Profile() {
             <label>Họ:</label>
             <input
               type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               readOnly={!isEditing}
             />
           </div>
@@ -149,8 +166,8 @@ function Profile() {
             <label>Tên:</label>
             <input
               type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
               readOnly={!isEditing}
             />
           </div>
@@ -163,15 +180,6 @@ function Profile() {
               readOnly={!isEditing}
             />
           </div>
-          <div className={cx("info-item")}>
-            <label>Địa chỉ:</label>
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              readOnly={!isEditing}
-            />
-          </div>
         </div>
 
         {isEditing ? (
@@ -179,7 +187,7 @@ function Profile() {
             <button className={cx("btn", "btn-primary", "me-2")} onClick={handleSave}>
               Lưu thông tin
             </button>
-            <button className={cx("btn", "btn-secondary")} onClick={() => setIsEditing(false)}>
+            <button className={cx("btn", "btn-secondary")} onClick={handleCancel}>
               Hủy
             </button>
           </div>

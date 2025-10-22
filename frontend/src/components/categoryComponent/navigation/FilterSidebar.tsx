@@ -11,6 +11,7 @@ export interface FilterValues {
   category: string[];
   priceRange: [number, number];
   size: string[];
+  rating: number | null;
 }
 
 interface FilterSidebarProps {
@@ -25,7 +26,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   sizes,
 }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 600000]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
 
@@ -51,6 +52,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
       category: selectedCategories,
       priceRange,
       size: selectedSizes,
+      rating: selectedRating,
     });
   };
 
@@ -85,7 +87,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
         <Slider
           range
           min={0}
-          max={300}
+          max={600000}
           value={priceRange}
           onChange={(val) => setPriceRange(val as [number, number])}
           trackStyle={[{ backgroundColor: "black", height: 5 }]}

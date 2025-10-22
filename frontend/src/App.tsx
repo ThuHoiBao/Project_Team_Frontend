@@ -1,6 +1,6 @@
 // App.tsx
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';  // Import Routes và Route từ react-router-dom
+import { Routes, Route} from 'react-router-dom';  // Import Routes và Route từ react-router-dom
 import Login from './components/auth/loginComponent/LoginComponent';
 import ForgotPassword from './components/auth/forgotPasswordComponent/ForgotPasswordComponent'; // Giả sử bạn có ForgotPassword component
 import VerifyOtp from './components/auth/verifyOtp/VerifyOtpComponent';  // Import VerifyOtp component
@@ -15,10 +15,14 @@ import OrderHome from './components/OrderHomeComponent/OrderHome';
 import OrderDetail from './components/OrderDetailComponent/OrderDetail';
 import CasualPage from './components/categoryComponent/casualPage/CasualPage';
 import WishlistPage from './components/listFavoriteComponent/listFavoriteComponent';
+import ScrollToTop from './components/ScrollToTop';
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
     <div className="App">
+      <ScrollToTop />
       <Routes>
         <Route path="/login" element={<Login />} />  {/* Đăng nhập */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -37,6 +41,7 @@ function App() {
         <Route path="/casual" element={<CasualPage/>}/>
         <Route path="/product/wishlist" element={<WishlistPage />} />
       </Routes>
+      <ToastContainer position="bottom-right" />
     </div>
   );
 }
