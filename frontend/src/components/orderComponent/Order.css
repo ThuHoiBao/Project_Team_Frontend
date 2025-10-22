@@ -204,3 +204,97 @@
     opacity: 1;
   }
 }
+
+/* Modal cảm ơn với biểu tượng Xu */
+.thank-you-modal {
+  width: 450px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  animation: fadeIn 0.5s ease-out;
+  font-family: 'Arial', sans-serif; /* Thêm font chữ đẹp */
+}
+
+.thank-you-modal h4 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+  letter-spacing: 1px;  /* Tăng độ rộng chữ */
+}
+
+.thank-you-modal p {
+  font-size: 20px;
+  color: #444;
+  margin: 10px 0;
+  line-height: 1.5;  /* Tăng khoảng cách giữa các dòng */
+}
+
+.thank-you-modal b {
+  color: #f6b01e;  /* Màu vàng cho xu */
+  font-weight: bold;
+}
+
+.thank-you-modal .fa-coins {
+  color: #f6b01e;  /* Màu vàng cho xu */
+  font-size: 26px;
+  margin-left: 8px;
+  transition: transform 0.3s ease;  /* Thêm hiệu ứng hover cho icon */
+}
+
+.thank-you-modal .fa-coins:hover {
+  transform: scale(1.2);  /* Tăng kích thước icon khi hover */
+}
+
+.thank-you-note {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #888;
+ /* Làm chữ nghiêng */
+}
+
+.thank-you-modal button {
+  margin-top: 25px;
+  padding: 12px 25px;
+  background-color: #f53d2d;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.thank-you-modal button:hover {
+  background-color: #d7321f;
+  transform: scale(1.05);  /* Thêm hiệu ứng phóng to khi hover */
+}
+
+/* Animation fade-in cho modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Thêm hiệu ứng overlay mờ nền */
+.app-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Đảm bảo modal luôn hiển thị trên các phần tử khác */
+}
