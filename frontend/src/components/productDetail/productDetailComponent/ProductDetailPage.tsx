@@ -355,8 +355,27 @@ const getQuantityAlreadyInCart = useCallback(
   }, [selectedSize]);
 
   // ---------- Image modal ----------
-  const openModal = (imgSrc: string) => setModalImage(imgSrc);
-  const closeModal = () => setModalImage(null);
+  //const openModal = (imgSrc: string) => setModalImage(imgSrc);
+  const modal = document.getElementById("imageModal") as HTMLDivElement;
+  const modalImg = document.getElementById("fullImage") as HTMLImageElement;
+  function openModal(element: HTMLImageElement) {
+    if (modal && modalImg) {
+      modal.style.display = "block";
+      modalImg.src = element.src;
+    }
+  }
+    function closeModal() {
+    if (modal) {
+      modal.style.display = "none";
+    }
+  }
+
+  window.onclick = function (event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (target === modal) {
+      closeModal();
+    }
+  };
 
   // ---------- Quantity adjustments ----------
   // FIX: Cleaned up quantity adjustment logic
@@ -476,17 +495,7 @@ const getQuantityAlreadyInCart = useCallback(
               </div>
 
               <div className={cx("main-image")}>
-                {selectedImage ? (
-                  // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-                  <img
-                    src={selectedImage}
-                    alt={product?.name || "Product image"}
-                    onClick={() => openModal(selectedImage)}
-                    style={{ cursor: "zoom-in" }}
-                  />
-                ) : (
-                  <div className={cx("no-image")}>No image</div>
-                )}
+                {selectedImage && <img src={selectedImage} alt={product?.name} />}
               </div>
             </div>
 
@@ -634,7 +643,7 @@ const getQuantityAlreadyInCart = useCallback(
                         src={image.imageFeedback}
                         className={cx("thumbnail")}
                         alt="feedback"
-                        onClick={() => openModal(image.imageFeedback)}
+                        onClick={(event) => openModal(event.target as HTMLImageElement)}
                         style={{ cursor: "pointer" }}
                       />
                     ))}
@@ -644,6 +653,10 @@ const getQuantityAlreadyInCart = useCallback(
                 </div>
               ))}
             </div>
+          </div>
+          <div id="imageModal" className={cx("modal")}>
+            <span className={cx("close")} onClick={closeModal}>&times;</span>
+            <img className={cx("modal-content")} id="fullImage" />
           </div>
 
           {/* Modal for image */}
