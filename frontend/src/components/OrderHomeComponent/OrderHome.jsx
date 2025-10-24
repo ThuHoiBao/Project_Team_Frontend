@@ -8,7 +8,7 @@ import Header from '../commonComponent/Header';
 import AdBanner from '../AddBannerComponent/AddBanner';
 import { getOrdersByUserId } from '../../services/order/order';const OrderHome = () => {
   const [statusFilter, setStatusFilter] = useState('Tất cả');
-  const userId = "68d6b2ace5c0543cb874bbe5";
+  const userId = "68e7313a4e30d6bb62f03934";
   const [orders, setOrders] = useState([]);
   const filteredOrders = orders.filter(order =>
     statusFilter === 'Tất cả' || order.orderStatus === statusFilter
@@ -27,6 +27,7 @@ import { getOrdersByUserId } from '../../services/order/order';const OrderHome =
   }, []);
   return (
     <div>
+      <Header></Header>
       <AdBanner></AdBanner>
     <div className="order-list">
       {/* Thanh trạng thái để lọc đơn hàng */}

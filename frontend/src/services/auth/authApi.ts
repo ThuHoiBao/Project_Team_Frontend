@@ -1,6 +1,7 @@
 
 import axios from 'axios';
 import {RegisterUserResponseDTO} from '../../dto/responseDTO/RegisterUserResponseDTO';  // Import DTO
+import { GoogleLoginDTO } from '../../dto/requestDTO/GoogleLoginDTO';
 const API_URL = 'http://localhost:8088/api/auth';
 
 // Lấy token từ localStorage (nếu có)
@@ -25,4 +26,11 @@ export const forgotPassword = async (email: string) => {
 // Xác minh OTP khi người dùng nhập OTP
 export const verifyOtp = async (otpData: RegisterUserResponseDTO) => {
   return await axios.post(`${API_URL}/verify-otp`, otpData.toPlain());  // Gửi OTP để xác minh
+};
+
+
+export const googleLogin = async (googleCredential: string) => {
+  const dto = new GoogleLoginDTO(googleCredential);
+  const response = await axios.post(`${API_URL}/google`, dto.toPlain());
+  return response.data;  // { token, user }
 };

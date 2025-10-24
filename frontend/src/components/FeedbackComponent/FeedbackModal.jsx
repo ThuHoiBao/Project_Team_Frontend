@@ -29,7 +29,7 @@ const FeedbackModal = ({ orderItems, onClose, onSubmit }) => {
       <span className="icon">💰</span>
       <span>
         Xem Hướng dẫn đánh giá chuẩn để nhận đến 
-        <span className="highlight"> 200 xu!</span>
+        <span className="highlight"> 2 xu!</span>
       </span>
       <span className="arrow">▼</span>
     </div>
@@ -57,8 +57,8 @@ const FeedbackModal = ({ orderItems, onClose, onSubmit }) => {
 
       <h4>Xu thưởng cho đánh giá hợp lệ</h4>
       <ul>
-        <li>Nhập ít nhất 50 ký tự kèm 1 hình ảnh.<b>100 Xu</b></li>
-        <li>Nhập ít nhất 50 ký tự kèm nhiều hơn 1 hình ảnh.<b>200 Xu</b></li>
+        <li>Nhập ít nhất 50 ký tự kèm 1 hình ảnh.<b>1 Xu</b></li>
+        <li>Nhập ít nhất 50 ký tự kèm nhiều hơn 1 hình ảnh.<b>2 Xu</b></li>
       </ul>
 
       <div className="guide-note">
