@@ -27,8 +27,8 @@ import images from '../../../assets/images';
 import { AxiosError } from 'axios';
 import { useLoginModal } from '../../../context/LoginContext';
 import { useAuth } from '../../../context/AuthContext';
-import { useLocation, useNavigate } from "react-router-dom";
-        
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import { getSocket, initSocket } from "../../../socket/socket";
 import { getNotifications, markAsRead } from "../../../services/notification/notificationApi";
 import { toast } from "react-toastify";
@@ -120,7 +120,7 @@ function Header() {
         toggleNotifications()
         if (!noti.isRead) {
             try {
-                await markAsRead(noti._id); 
+                await markAsRead(noti._id);
                 setNotifications((prev) =>
                     prev.map((n) =>
                         n._id === noti._id ? { ...n, isRead: true } : n
@@ -137,21 +137,21 @@ function Header() {
     // Handle logic
     const handleMenuChange = async (menuItem: MenuItemType) => {
         switch (menuItem.title) {
-        case "Log out":
-            try {
-            // Gọi API logout
-            await logoutUser();
-            // Xóa token trong localStorage
-            // localStorage.removeItem("token");
-            logout();
-            // Chờ 1s rồi mới chuyển trang
-            setTimeout(() => {
-                navigate("/home");
-            }, 1500);
-            } catch (error) {
-            console.error("Logout failed:", error);
-            }
-            break;
+            case "Log out":
+                try {
+                    // Gọi API logout
+                    await logoutUser();
+                    // Xóa token trong localStorage
+                    // localStorage.removeItem("token");
+                    logout();
+                    // Chờ 1s rồi mới chuyển trang
+                    setTimeout(() => {
+                        navigate("/home");
+                    }, 1500);
+                } catch (error) {
+                    console.error("Logout failed:", error);
+                }
+                break;
 
             default:
                 break;
@@ -196,10 +196,10 @@ function Header() {
                     title: noti.title,
                     message: noti.message,
                     type: noti.type,
-                    isRead: noti.isRead, 
-                    createAt: noti.createdAt.slice(0,10)
+                    isRead: noti.isRead,
+                    createAt: noti.createdAt.slice(0, 10)
                 }));
-                
+
                 setNotifications(listNotifications);
 
 
@@ -212,7 +212,7 @@ function Header() {
                     setNotifications((prev) => [data, ...prev]);
                     setUnreadCount((prev) => prev + 1);
                 });
-                
+
             } catch (error) {
                 if (error instanceof AxiosError) {
                     setCurrentUser(false);
@@ -224,8 +224,8 @@ function Header() {
             }
         };
         getInfoResponse();
-    
-    
+
+
         return () => {
             const socket = getSocket();
             socket?.off("notification");
@@ -241,13 +241,12 @@ function Header() {
     const handleLoginClick = () => {
         // Nếu đang ở trang Auth (login/register/otp)
         if (location.pathname === "/register" || location.pathname === "/auth") {
-        // Gửi sự kiện để AuthPage biết cần hiển thị form login
-        window.dispatchEvent(new CustomEvent("switchToLogin"));
+            // Gửi sự kiện để AuthPage biết cần hiển thị form login
+            window.dispatchEvent(new CustomEvent("switchToLogin"));
         } else {
-        openLogin();
+            openLogin();
         }
     };
-  
 
 
     return (
@@ -266,7 +265,13 @@ function Header() {
                         </span>
                     </div>
                     <div className={cx('nav-item')}>
-                        <span className={cx('nav-link')}>On Sale</span>
+                        
+                        <Link
+                            to="/casual"
+                            className={styles.card}
+                        >
+                            <span className={styles.label}>All Product</span>
+                        </Link>
                     </div>
                     <div className={cx('nav-item')}>
                         <span className={cx('nav-link')}>New Arrivals</span>
@@ -302,24 +307,38 @@ function Header() {
                                             <p className={cx('no-notify')}>No notifications yet</p>
                                         ) : (
                                             notifications.map((noti, idx) => (
+
                                                 <div
                                                     key={idx}
                                                     className={cx('notification-item', { 'read': noti.isRead })}
                                                     onClick={() => handleOpenNotification(noti)}
+                                                    style={{
+                                                        display: "flex",
+                                                        alignItems: "center",
+                                                        justifyContent: "center"
+                                                    }}
                                                 >
-                                                    <p>{noti.title}</p>
+                                                    <p style={{
+                                                        fontFamily: "Segoe UI Emoji",
+                                                        fontWeight: "400",
+                                                        fontSize: "0.875rem",
+                                                        lineHeight: "1.43",
+                                                        color: "rgb(107, 119, 140)",
+                                                        display: "block",
+                                                        margin: "0px"
+                                                    }}>{noti.title}</p>
                                                 </div>
                                             ))
                                         )}
                                     </div>
                                 )}
                             </div>
-                            <Tippy delay={[0, 50]} content="Inbox" placement="bottom">
+                            {/* <Tippy delay={[0, 50]} content="Inbox" placement="bottom">
                                 <button className={cx('action-btn')}>
                                     <InboxIcon />
                                     <span className={cx('badge')}>12</span>
                                 </button>
-                            </Tippy>
+                            </Tippy> */}
                         </>
                     ) : (
                         <>
@@ -346,7 +365,7 @@ function Header() {
                     <div className={cx('modal-content')}>
                         <h2>{selectedNotification.title}</h2>
                         <p>{selectedNotification.message}</p>
-                        <p style={{fontSize: "12px", color: "#999"}}>{selectedNotification.createAt}</p>
+                        <p style={{ fontSize: "12px", color: "#999" }}>{selectedNotification.createAt}</p>
                         <button onClick={() => setIsModalOpen(false)}>Đóng</button>
                     </div>
                 </div>
