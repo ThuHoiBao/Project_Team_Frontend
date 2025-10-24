@@ -57,6 +57,7 @@
     background-color: transparent;
     padding: 2px 12px;
     cursor: pointer;
+    border: none;
 }
 
 .user-avatar {
@@ -115,6 +116,7 @@
             .dropdown-icon {
                 font-size: 12px;
                 transition: transform 0.2s ease;
+                
             }
 
             &:hover .dropdown-icon {
