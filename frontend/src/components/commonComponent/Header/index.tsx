@@ -79,8 +79,8 @@ const MENU_ITEMS: MenuItemType[] = [
     },
     {
         icon: <FontAwesomeIcon icon={faCircleQuestion} />,
-        title: 'Feedback and help',
-        to: '/feedback',
+        title: 'My order',
+        to: '/order',
     },
 ];
 

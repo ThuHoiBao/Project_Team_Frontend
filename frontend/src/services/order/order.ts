@@ -21,6 +21,7 @@ export const getOrdersByUserId = async (userId: string): Promise<any[]> => {
     dto.orderDate = new Date(orderResponse.orderDate);
     dto.phoneNumber = orderResponse.phoneNumber;
     dto.amount = orderResponse.amount;
+    dto.cancellationReason=orderResponse.cancellationReason;
 
     // Map orderItems
     dto.orderItems = orderResponse.orderItems.map((item: any) => {
