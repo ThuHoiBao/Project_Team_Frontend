@@ -224,18 +224,7 @@ function Header() {
             }
         };
         getInfoResponse();
-      }, []);
     
-    const location = useLocation();
-    const handleLoginClick = () => {
-    // Nếu đang ở trang Auth (login/register/otp)
-    if (location.pathname === "/register" || location.pathname === "/auth") {
-      // Gửi sự kiện để AuthPage biết cần hiển thị form login
-      window.dispatchEvent(new CustomEvent("switchToLogin"));
-    } else {
-      openLogin();
-    }
-  };
     
         return () => {
             const socket = getSocket();
@@ -243,10 +232,22 @@ function Header() {
             socket?.disconnect();
         };
     }, []);
+
     const toggleNotifications = () => {
         setShowNotifications((prev) => !prev);
     };
 
+    const location = useLocation();
+    const handleLoginClick = () => {
+        // Nếu đang ở trang Auth (login/register/otp)
+        if (location.pathname === "/register" || location.pathname === "/auth") {
+        // Gửi sự kiện để AuthPage biết cần hiển thị form login
+        window.dispatchEvent(new CustomEvent("switchToLogin"));
+        } else {
+        openLogin();
+        }
+    };
+  
 
 
     return (
@@ -353,7 +354,6 @@ function Header() {
         </header>
 
     );
-
 }
 
 export default Header;
