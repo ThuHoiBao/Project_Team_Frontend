@@ -1,20 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from "react-router-dom";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import classNames from "classnames/bind";
+import styles from "./ProductDetailPage.module.scss";
+import Header from "../../commonComponent/Header";
+import Footer from "../../commonComponent/Footer";
+import LoginPromptModal from "../../LoginPromptModal/LoginPromptModal";
+import { toast } from "react-toastify";
+
 import {
-  getProductDetail, getSizes, getProductByCategory, getFullnameUserFeedback, getImageFeedbacks,
-  saveFavoriteProduct, deleteFavoriteProduct, checkExistedWishlist
+  getProductDetail,
+  getSizes,
+  getProductByCategory,
+  getFullnameUserFeedback,
+  getImageFeedbacks,
+  saveFavoriteProduct,
+  deleteFavoriteProduct,
+  checkExistedWishlist,
 } from "../../../services/product/productDetailApi";
 
-import classNames from "classnames/bind";
-import styles from './ProductDetailPage.module.scss'
-
-import Header from '../../commonComponent/Header';
-import Footer from '../../commonComponent/Footer';
-import LoginPromptModal from '../../LoginPromptModal/LoginPromptModal';
-
+import { useCart } from "../../../context/CartContext";
+import { CartItemInfo } from "../../../services/cart/cartApi";
 const cx = classNames.bind(styles);
 
-// TypeScript Interfaces for data structures
+// ---------- Types ----------
 interface Review {
   id: string;
   author: string;
@@ -39,271 +47,575 @@ interface Product {
   description: string;
   images: string[];
   sizes: ProductSize[];
+  categoryId: string; // Added for recommended products
 }
 interface RecommendedProduct {
   id: string;
   name: string;
   price: number;
-  images: object[];
+  images: { imageProduct?: string }[]; // from API shape
 }
 
+// ---------- Component ----------
 const ProductDetailPage: React.FC = () => {
-  const { id } = useParams();
+  const { id: productId } = useParams<{ id: string }>();
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+
+  const { cartItems, isLoadingCart, addItemToCart } = useCart();
+
+  // states
   const [product, setProduct] = useState<Product | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [recommended, setRecommended] = useState<RecommendedProduct[]>([]);
   const [usernames, setUsernames] = useState<Record<string, string>>({});
-  const [images, setImages] = useState<string[]>([]);
   const [imageFeedbacks, setImageFeedbacks] = useState<Record<string, ImageFeedback[]>>({});
   const [selectedImage, setSelectedImage] = useState<string>("");
   const [selectedSize, setSelectedSize] = useState<string>("");
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState<number>(1);
   const [isFavorite, setIsFavorite] = useState<boolean>(false);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showLoginPrompt, setShowLoginPrompt] = useState<boolean>(false);
+  const [modalImage, setModalImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Start true
+  const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false);
 
+  // ---------- Helpers ----------
+const getQuantityAlreadyInCart = useCallback(
+    (pId: string | undefined, size: string): number => {
+      if (!pId || !size || isLoadingCart || !Array.isArray(cartItems)) return 0;
+
+      // Bây giờ (cartItems as CartItemInfo[]) đã đúng kiểu
+      const itemInCart = (cartItems as CartItemInfo[]).find(
+        (it) => (it.product._id === pId || it.product.id === pId) && it.size === size
+      );
+
+      return itemInCart ? itemInCart.quantity : 0;
+    },
+    [cartItems, isLoadingCart]
+  );
+
+  const averageRating = useMemo(() => {
+    if (!reviews || reviews.length === 0) return 0;
+    const sum = reviews.reduce((s, r) => s + (r.rating || 0), 0);
+    return Math.round(sum / reviews.length || 0);
+  }, [reviews]);
+
+  const { availableStock, quantityInCart, maxMoreCanAdd } = useMemo(() => {
+    if (!product || !selectedSize || !productId) {
+      return { availableStock: 0, quantityInCart: 0, maxMoreCanAdd: 0 };
+    }
+    const sizeInfo = product.sizes.find((s) => s.size === selectedSize);
+    if (!sizeInfo) {
+      return { availableStock: 0, quantityInCart: 0, maxMoreCanAdd: 0 };
+    }
+
+    // ========= DEBUG LOGGING =========
+    console.log("---------- DEBUGGING useMemo ----------");
+    console.log("Page Product ID (pId):", productId);
+    console.log("Page Selected Size (size):", selectedSize);
+    console.log("Is Cart Loading (isLoadingCart):", isLoadingCart);
+    console.log("Total Stock (sizeInfo.quantity):", sizeInfo.quantity);
+    console.log("Raw cartItems:", JSON.stringify(cartItems, null, 2));
+
+    const qInCart = getQuantityAlreadyInCart(productId, selectedSize);
+    const totalStock = sizeInfo.quantity;
+    const available = totalStock - qInCart;
+
+    // ========= FINAL CALCULATION LOG =========
+    console.log("Calculated qInCart:", qInCart);
+    console.log("Calculated maxMoreCanAdd:", Math.max(0, available));
+    console.log("-------------------------------------");
+
+    return {
+      availableStock: totalStock,
+      quantityInCart: qInCart,
+      maxMoreCanAdd: Math.max(0, available),
+    };
+  }, [product, selectedSize, productId, getQuantityAlreadyInCart, cartItems, isLoadingCart]);
+
+  const isPlusDisabled = quantity >= maxMoreCanAdd || isAddingToCart;
+  const isAddToCartDisabled =
+    !selectedSize ||
+    quantity < 1 ||
+    !product ||
+    loading ||
+    isAddingToCart ||
+    maxMoreCanAdd === 0 ||
+    quantity > maxMoreCanAdd;
+
+  // ---------- Handlers ----------
   const handleHeartClick = async () => {
     if (!token) {
       setShowLoginPrompt(true);
       return;
     }
+    if (!productId) return;
     try {
       if (isFavorite) {
-        await deleteFavoriteProduct(id);
+        await deleteFavoriteProduct(productId);
         setIsFavorite(false);
+        toast.success("Removed from wishlist");
       } else {
-        await saveFavoriteProduct(id);
+        await saveFavoriteProduct(productId);
         setIsFavorite(true);
+        toast.success("Added to wishlist");
       }
     } catch (error: any) {
-      console.error("Lỗi khi cập nhật Wishlist: ", error);
-      alert("Lỗi xảy ra. Vui lòng thử lại.");
+      console.error("Error updating wishlist:", error);
+      toast.error("Error updating wishlist. Please try again.");
     }
   };
 
-  const handleRecommendedProductClick = async (productId: string) => {
-    try {
-      window.location.href = `/product/${productId}`;
-    } catch (error) {
-      console.error("Error navigating to product:", error);
-    }
+  const handleRecommendedProductClick = (pId: string) => {
+    navigate(`/product/${pId}`);
+    window.scrollTo(0, 0); // Scroll to top on nav
   };
 
-  const handleQuantityChange = (amount: number) => {
-    setQuantity(prev => Math.max(1, prev + amount));
-  };
-
-  useEffect(() => {
-    if (product) {
-      console.log("Product updated:", product);
-    }
-  }, [product]);
-
-  useEffect(() => {
-    reviews.forEach(review => {
-      if (!usernames[review.author]) {
-        getUserNameFeedback(review.author);
-      }
-    });
-  }, [reviews]);
-
-  useEffect(() => {
-    const fetchImages = async () => {
-      const newFeedbackImages: Record<string, ImageFeedback[]> = {};
-      for (const review of reviews) {
-        try {
-          const result = await getImageFeedbacks(review.id);
-          newFeedbackImages[review.id] = result.data;
-        } catch (error: any) {
-          console.error(`Error fetching images for review ${review.id}:`, error);
-        }
-      }
-      setImageFeedbacks(newFeedbackImages);
-    };
-    if (reviews.length > 0) fetchImages();
-  }, [reviews]);
-
-  const getUserNameFeedback = async (id: string) => {
+  // ---------- Fetch username for a review author ----------
+  const getUserNameFeedback = useCallback(async (id: string) => {
+    if (!id) return;
     try {
       const res = await getFullnameUserFeedback(id);
-      setUsernames(prev => ({ ...prev, [id]: res.data }));
+      setUsernames((prev) => ({ ...prev, [id]: res.data || "Unknown" }));
     } catch (err) {
       console.error("Error fetching username:", err);
+      setUsernames((prev) => ({ ...prev, [id]: "Unknown" }));
     }
-  };
+  }, []);
 
+  // ---------- Effects ----------
+
+  // FIX: Robust data fetching
   useEffect(() => {
-    if (!id) return;
+    if (!productId) return;
+
+    let cancelled = false;
     const fetchData = async () => {
+      setLoading(true);
+      window.scrollTo(0, 0); // Scroll to top on new product load
+
+      // Reset state for new product
+      setProduct(null);
+      setReviews([]);
+      setRecommended([]);
+      setSelectedImage("");
+      setSelectedSize("");
+      setQuantity(1);
+      setIsFavorite(false);
+      setImageFeedbacks({});
+      setUsernames({});
+
       try {
-        if (id) {
-          if (token) {
-            const status = await checkExistedWishlist(id);
-            setIsFavorite(status);
+        // --- Wishlist (non-critical) ---
+        if (token) {
+          try {
+            const exists = await checkExistedWishlist(productId);
+            if (!cancelled) setIsFavorite(Boolean(exists));
+          } catch (e) {
+            console.warn("checkExistedWishlist failed:", e);
           }
         }
-        const productData = await getProductDetail(id);
-        const sizeData = await getSizes(id);
-        const categoryProducts = await getProductByCategory(
-          productData.data.product.category.id,
-          productData.data.product.id
-        );
 
-        const recommendedProducts = categoryProducts.data.map((item: any) => ({
-          id: item.id,
-          name: item.productName,
-          price: item.price,
-          images: item.listImage
-        }));
+        // --- Core Product Data (critical) ---
+        let rawProduct: any;
+        let sizeData: ProductSize[] = [];
+        let feedbacks: any[] = [];
+        try {
+          const [productRes, sizesRes] = await Promise.all([
+            getProductDetail(productId),
+            getSizes(productId),
+          ]);
+          rawProduct = productRes.data.product;
+          feedbacks = Array.isArray(productRes.data.feedbacks) ? productRes.data.feedbacks : [];
+          sizeData = Array.isArray(sizesRes.data) ? sizesRes.data : [];
+        } catch (err) {
+          console.error("Error fetching core product data:", err);
+          toast.error("Failed to fetch product details.");
+          if (!cancelled) setLoading(false);
+          return; // Stop if core data fails
+        }
 
-        setProduct({
-          id: productData.data.product.id,
-          name: productData.data.product.productName,
-          price: productData.data.product.price,
-          description: productData.data.product.description,
-          images: productData.data.product.listImage.map((img: any) => img.imageProduct),
-          sizes: sizeData.data,
-        });
+        const imagesFromApi = Array.isArray(rawProduct.listImage)
+          ? rawProduct.listImage.map((img: any) => img.imageProduct).filter(Boolean)
+          : [];
+        
+        const categoryId = rawProduct?.category?.id || rawProduct?.category?._id;
 
-        setImages(productData.data.product.listImage.map((img: any) => img.imageProduct));
-        setReviews(productData.data.feedbacks.map((fb: any) => ({
-          id: fb.feedback.id,
-          author: fb.order.user,
-          rating: fb.feedback.rating,
-          text: fb.feedback.comment,
-          date: fb.feedback.date
-        })));
+        // --- Recommended Products (non-critical) ---
+        let recommendedProducts: RecommendedProduct[] = [];
+        if (categoryId) {
+          try {
+            const currentPId = rawProduct.id || rawProduct._id;
+            const categoryRes = await getProductByCategory(categoryId, currentPId);
+            recommendedProducts = Array.isArray(categoryRes.data)
+              ? categoryRes.data.map((item: any) => ({
+                  id: item.id || item._id,
+                  name: item.productName,
+                  price: item.price,
+                  images: item.listImage || [],
+                }))
+              : [];
+          } catch (e) {
+            console.warn("getProductByCategory failed:", e);
+          }
+        }
 
-        setSelectedImage(productData.data.product.listImage[0].imageProduct);
-        setRecommended(recommendedProducts);
-        setSelectedSize(sizeData.data[0].size);
+        // --- Set State ---
+        if (!cancelled) {
+          setProduct({
+            id: rawProduct._id || rawProduct.id,
+            name: rawProduct.productName,
+            price: rawProduct.price,
+            description: rawProduct.description,
+            images: imagesFromApi,
+            sizes: sizeData,
+            categoryId: categoryId,
+          });
+
+          setSelectedImage(imagesFromApi[0] || "");
+          setRecommended(recommendedProducts);
+
+          // FIX: Set default size to first *in stock* size, or just first
+          const defaultSize =
+            sizeData.find((s) => s.quantity > 0)?.size ||
+            sizeData[0]?.size ||
+            "";
+          setSelectedSize(defaultSize);
+
+          // build reviews
+          const mappedReviews: Review[] = feedbacks.map((fb: any) => ({
+            id: fb.feedback?.id || fb.feedback?._id,
+            author: fb.order?.user,
+            rating: fb.feedback?.rating || 0,
+            text: fb.feedback?.comment || "",
+            date: fb.feedback?.date || "",
+          }));
+          setReviews(mappedReviews);
+        }
       } catch (err) {
-        console.error("Error fetching product:", err);
+        // This will catch any unexpected errors
+        console.error("Error in fetchData:", err);
+        toast.error("An unexpected error occurred.");
+      } finally {
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchData();
-  }, [id]);
+    return () => {
+      cancelled = true;
+    };
+  }, [productId, token]); // token dependency is correct for wishlist
 
-  const modal = document.getElementById("imageModal") as HTMLDivElement;
-  const modalImg = document.getElementById("fullImage") as HTMLImageElement;
-  
+  // fetch usernames for each review author (only once per author)
+  useEffect(() => {
+    reviews.forEach((r) => {
+      if (r.author && !usernames[r.author]) {
+        getUserNameFeedback(r.author);
+      }
+    });
+  }, [reviews, usernames, getUserNameFeedback]);
 
-  function openModal(element: HTMLImageElement) {
-    if (modal && modalImg) {
-      modal.style.display = "block";
-      modalImg.src = element.src;
+  // FIX: Performance - fetch images in parallel
+  useEffect(() => {
+    if (!reviews || reviews.length === 0) return;
+    let cancelled = false;
+
+    const fetchAllFeedbackImages = async () => {
+      const promises = reviews.map(async (r) => {
+        try {
+          const res = await getImageFeedbacks(r.id);
+          return { reviewId: r.id, images: Array.isArray(res.data) ? res.data : [] };
+        } catch (e) {
+          console.warn(`Error fetching images for review ${r.id}:`, e);
+          return { reviewId: r.id, images: [] }; // Return empty on error
+        }
+      });
+
+      const results = await Promise.all(promises);
+
+      if (!cancelled) {
+        const accum: Record<string, ImageFeedback[]> = {};
+        results.forEach((result) => {
+          accum[result.reviewId] = result.images;
+        });
+        setImageFeedbacks(accum);
+      }
+    };
+
+    fetchAllFeedbackImages();
+    return () => {
+      cancelled = true;
+    };
+  }, [reviews]);
+
+  // FIX: Bug - Reset quantity to 1 when size changes
+  useEffect(() => {
+    setQuantity(1);
+  }, [selectedSize]);
+
+  // ---------- Image modal ----------
+  const openModal = (imgSrc: string) => setModalImage(imgSrc);
+  const closeModal = () => setModalImage(null);
+
+  // ---------- Quantity adjustments ----------
+  // FIX: Cleaned up quantity adjustment logic
+  const handleQuantityChange = (delta: number) => {
+    if (!product || !selectedSize) {
+      toast.warn("Please select a size first.");
+      return;
     }
-  }
 
-  function closeModal() {
-    if (modal) {
-      modal.style.display = "none";
+    const sizeInfo = product.sizes.find((s) => s.size === selectedSize);
+    if (!sizeInfo) {
+      toast.error("Selected size information not found.");
+      return;
     }
-  }
 
-  window.onclick = function (event: MouseEvent) {
-    const target = event.target as HTMLElement;
-    if (target === modal) {
-      closeModal();
+    const next = quantity + delta;
+
+    if (next < 1) {
+      setQuantity(1); 
+      return;
+    }
+
+    if (maxMoreCanAdd === 0) {
+      if (delta > 0) { 
+        toast.error("You already have the maximum stock for this size in your cart.");
+      }
+      setQuantity(1);
+      return;
+    }
+
+    if (next > maxMoreCanAdd) {
+      toast.error(`Stock limit reached. You can add up to ${maxMoreCanAdd} more item(s).`);
+      setQuantity(maxMoreCanAdd); 
+      return; 
+    }
+
+    setQuantity(next);
+  };
+
+  // ---------- Add to cart ----------
+  const handleAddToCart = async () => {
+    if (!token) {
+      setShowLoginPrompt(true);
+      return;
+    }
+    if (isAddToCartDisabled || isAddingToCart) {
+      if (!selectedSize) {
+        toast.warn("Please select a size.");
+      } else {
+        toast.error("Cannot add to cart. Check stock or quantity.");
+      }
+      return;
+    }
+    if (!productId) {
+      toast.error("Product ID missing.");
+      return;
+    }
+
+    try {
+      setIsAddingToCart(true);
+      await addItemToCart(productId, selectedSize, quantity);
+      toast.success("Product added to cart!");
+      setQuantity(1); // Reset quantity to 1 after successful add
+    } catch (err: any) {
+      console.error("Error adding to cart:", err);
+      toast.error(err?.message || "Failed to add product to cart.");
+    } finally{
+      setIsAddingToCart(false);
     }
   };
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className={cx("product-detail-page")}>
+          <main className={cx("main-content")}>
+            <div className={cx("loading")}>Loading product...</div>
+          </main>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!product) {
+    return (
+      <>
+        <Header />
+        <div className={cx("product-detail-page")}>
+          <main className={cx("main-content")}>
+            <div className={cx("loading")}>Product not found.</div>
+          </main>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
       <Header />
       <div className={cx("product-detail-page")}>
-        <header className={cx("page-header")}>
-          <nav>SHOP.CO</nav>
-        </header>
-
         <main className={cx("main-content")}>
           <div className={cx("product-container")}>
             <div className={cx("product-gallery")}>
               <div className={cx("thumbnails")}>
-                {product?.images.map((img, index) => (
+                {(product?.images || []).map((img, idx) => (
                   <img
-                    key={index}
+                    key={idx}
                     src={img}
-                    alt={`Thumbnail ${index + 1}`}
+                    alt={`Thumbnail ${idx + 1}`}
                     className={cx({ active: selectedImage === img })}
                     onClick={() => setSelectedImage(img)}
                   />
                 ))}
               </div>
+
               <div className={cx("main-image")}>
-                {selectedImage && <img src={selectedImage} alt={product?.name} />}
+                {selectedImage ? (
+                  // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+                  <img
+                    src={selectedImage}
+                    alt={product?.name || "Product image"}
+                    onClick={() => openModal(selectedImage)}
+                    style={{ cursor: "zoom-in" }}
+                  />
+                ) : (
+                  <div className={cx("no-image")}>No image</div>
+                )}
               </div>
             </div>
 
             <div className={cx("product-info")}>
-              <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                <h1 className={cx("product-name")}>{product?.name}</h1>
-                <img src={isFavorite ? "https://icons.iconarchive.com/icons/designbolts/free-valentine-heart/256/Heart-icon.png"
-                  : "https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png"
-                } style={{
-                  maxWidth: "30px", maxHeight: "30px",
-                  marginTop: "10px", cursor: "pointer"
-                }} onClick={handleHeartClick} />
+              {/* FIX: Accessibility - use button for wishlist */}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                }}
+              >
+                <h1 className={cx("product-name")}>{product?.name || "Unnamed product"}</h1>
+                <button
+                  type="button"
+                  onClick={handleHeartClick}
+                  aria-label={isFavorite ? "Remove from wishlist" : "Add to wishlist"}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    padding: 0,
+                    cursor: "pointer",
+                    marginLeft: "10px",
+                    lineHeight: 0,
+                    flexShrink: 0,
+                  }}
+                >
+                  <img
+                    src={
+                      isFavorite
+                        ? "https://icons.iconarchive.com/icons/designbolts/free-valentine-heart/256/Heart-icon.png"
+                        : "https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png"
+                    }
+                    alt="" // Decorative, button has label
+                    style={{ maxWidth: "30px", maxHeight: "30px" }}
+                  />
+                </button>
               </div>
 
               <div className={cx("product-rating")}>
                 <span>
-                  {"★".repeat(Math.round((reviews.reduce((sum, obj) => sum + obj.rating, 0)) / reviews.length))}
-                  {"☆".repeat(Math.round(5 - (reviews.reduce((sum, obj) => sum + obj.rating, 0)) / reviews.length))}
+                  {"★".repeat(averageRating)}
+                  {"☆".repeat(5 - averageRating)}
+                </span>
+                <span style={{ marginLeft: "10px", fontSize: "0.9em" }}>
+                  ({reviews.length} reviews)
                 </span>
               </div>
 
               <div className={cx("product-price")}>
-                <span className={cx("current-price")}>${product?.price}</span>
+                <span className={cx("current-price")}>${product?.price?.toFixed(2) ?? "0.00"}</span>
               </div>
 
               <p className={cx("product-description")}>{product?.description}</p>
 
               <div className={cx("product-options")}>
                 <div className={cx("option-group")}></div>
+
                 <div className={cx("option-group")}>
                   <label>Choose Size</label>
                   <div className={cx("size-selector")}>
-                    {product?.sizes.map(s => (
+                    {(product?.sizes || []).map((s) => (
                       <button
                         key={s.id}
                         className={cx("size-button", { selected: selectedSize === s.size })}
                         onClick={() => setSelectedSize(s.size)}
+                        disabled={s.quantity === 0 || isAddingToCart }
+                        type="button"
                       >
-                        {s.size} ({s.quantity})
+                        {s.size} {s.quantity === 0 ? "(Out of Stock)" : `(${s.quantity})`}
                       </button>
                     ))}
+                    {(!product?.sizes || product.sizes.length === 0) && (
+                      <div>No sizes available</div>
+                    )}
                   </div>
                 </div>
               </div>
 
               <div className={cx("product-actions")}>
                 <div className={cx("quantity-adjuster")}>
-                  <button onClick={() => handleQuantityChange(-1)}>-</button>
+                  <button type="button" onClick={() => handleQuantityChange(-1)} disabled={isAddingToCart}>
+                    -
+                  </button>
                   <span>{quantity}</span>
-                  <button onClick={() => handleQuantityChange(1)}>+</button>
+                  <button
+                    type="button"
+                    onClick={() => handleQuantityChange(1)}
+                    // FIX: Cleaned up disabled logic
+                    disabled={isPlusDisabled}
+                  >
+                    +
+                  </button>
                 </div>
-                <button className={cx("add-to-cart-btn")}>Add to Cart</button>
+
+                <button
+                  className={cx("add-to-cart-btn")}
+                  onClick={handleAddToCart}
+                  // FIX: Cleaned up disabled logic
+                  disabled={isAddToCartDisabled}
+                  type="button"
+                >
+                  {maxMoreCanAdd === 0 && selectedSize ? "Out of Stock" : "Add to Cart"}
+                </button>
               </div>
             </div>
           </div>
 
+          {/* Reviews */}
           <div className={cx("reviews-section")}>
             <div className={cx("tabs")}>
               <button className={cx("tab-btn", "active")}>Rating & Reviews</button>
             </div>
+
             <div className={cx("reviews-header")}>
               <h2>
                 All Reviews <span className={cx("review-count")}>({reviews.length})</span>
               </h2>
               <div>
-                <button className={cx("latest-btn")}>Latest</button>
+                <button className={cx("latest-btn")} type="button">
+                  Latest
+                </button>
               </div>
             </div>
 
             <div className={cx("reviews-grid")}>
-              {reviews.map(review => (
+              {reviews.length === 0 && <p>No reviews for this product yet.</p>}
+              {reviews.map((review) => (
                 <div key={review.id} className={cx("review-card")}>
                   <div className={cx("review-card-header")}>
                     <div>
@@ -311,7 +623,7 @@ const ProductDetailPage: React.FC = () => {
                         {"★".repeat(review.rating)}
                         {"☆".repeat(5 - review.rating)}
                       </span>
-                      <h4>{usernames[review.author] || "Loading..."}</h4>
+                      <h4>{usernames[review.author] ?? "Loading..."}</h4>
                     </div>
                   </div>
 
@@ -321,34 +633,54 @@ const ProductDetailPage: React.FC = () => {
                         key={image.id}
                         src={image.imageFeedback}
                         className={cx("thumbnail")}
-                        onClick={(event) => openModal(event.target as HTMLImageElement)}
+                        alt="feedback"
+                        onClick={() => openModal(image.imageFeedback)}
+                        style={{ cursor: "pointer" }}
                       />
                     ))}
 
                   <p>{review.text}</p>
-                  <span className={cx("review-date")}>{review.date.slice(0, 10)}</span>
+                  <span className={cx("review-date")}>{(review.date || "").slice(0, 10)}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div id="imageModal" className={cx("modal")}>
-            <span className={cx("close")} onClick={closeModal}>&times;</span>
-            <img className={cx("modal-content")} id="fullImage" />
-          </div>
+          {/* Modal for image */}
+          {modalImage && (
+            <div className={cx("modal")} onClick={closeModal} role="dialog" aria-modal="true">
+              <span className={cx("close")} onClick={closeModal} style={{ cursor: "pointer" }}>
+                &times;
+              </span>
+              <img className={cx("modal-content")} src={modalImage} alt="Full size" />
+            </div>
+          )}
 
+          {/* Recommendations */}
           <div className={cx("recommendations")}>
             <h2>YOU MIGHT ALSO LIKE</h2>
             <div className={cx("product-grid")}>
-              {recommended.map(recommended => (
+              {recommended.length === 0 && <p>No recommendations found.</p>}
+              {recommended.map((rec) => (
                 <div
-                  key={recommended.id}
+                  key={rec.id}
                   className={cx("product-card")}
-                  onClick={() => handleRecommendedProductClick(recommended.id)}
+                  onClick={() => handleRecommendedProductClick(rec.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleRecommendedProductClick(rec.id);
+                  }}
                 >
-                  <img src={(recommended.images[0] as any).imageProduct} alt={recommended.name} />
-                  <h3>{recommended.name}</h3>
-                  <p className={cx("price")}>${recommended.price}</p>
+                  <img
+                    src={
+                      (rec.images && rec.images[0] && (rec.images[0] as any).imageProduct) ||
+                      "https://via.placeholder.com/150"
+                    }
+                    alt={rec.name}
+                  />
+                  <h3>{rec.name}</h3>
+                  <p className={cx("price")}>${rec.price.toFixed(2)}</p>
                 </div>
               ))}
             </div>

@@ -1,166 +1,304 @@
 import Header from '../commonComponent/Header';
 import classNames from 'classnames/bind';
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react'; // 1. Thêm useMemo
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight, faTag } from '@fortawesome/free-solid-svg-icons';
-
-
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import CartItem from './CartItem';
 import Button from '../commonComponent/Button';
 import Footer from '../commonComponent/Footer';
 import styles from './cartPage.module.scss';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+import {
+    getCartItems,
+    removeCartItem,
+    updateCartItemQuantity,
+    CartItemInfo,
+} from '../../services/cart/cartApi';
 
 const cx = classNames.bind(styles);
 
 interface CartItemData {
-    id: string;
+    cartItemId: string;
+    productId: string;
     image: string;
     name: string;
     size: string;
-    color: string;
     price: number;
     quantity: number;
+    availableStock: number;
 }
 
 const CartPage: React.FC = () => {
-    const [cartItems, setCartItems] = useState<CartItemData[]>([
-        {
-            id: '1',
-            image: '/images/gradient-tshirt.jpg',
-            name: 'Gradient Graphic T-shirt',
-            size: 'Large',
-            color: 'White',
-            price: 145,
-            quantity: 1
-        },
-        {
-            id: '2',
-            image: '/images/checkered-shirt.jpg',
-            name: 'Checkered Shirt',
-            size: 'Medium',
-            color: 'Red',
-            price: 180,
-            quantity: 1
-        },
-        {
-            id: '3',
-            image: '/images/skinny-jeans.jpg',
-            name: 'Skinny Fit Jeans',
-            size: 'Large',
-            color: 'Blue',
-            price: 240,
-            quantity: 1
-        }
-    ]);
+    const [cartItems, setCartItems] = useState<CartItemData[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    // 2. State để quản lý item đã chọn
+    const [selectedItems, setSelectedItems] = useState(new Set<string>());
 
-    const [promoCode, setPromoCode] = useState<string>('');
+    useEffect(() => {
+        const fetchCart = async () => {
+            setIsLoading(true);
+            try {
+                const itemsFromApi = await getCartItems();
+                const formattedItems: CartItemData[] = itemsFromApi
+                    .map((item: CartItemInfo) => {
+                        if (!item.product || typeof item.product !== 'object') {
+                            return null;
+                        }
+                        return {
+                            // Dùng item.id (từ virtual) thay vì item._id
+                            cartItemId: item.id, 
+                            productId: item.product.id || item.product._id,
+                            image:
+                                item.product.image ||
+                                'https://placehold.co/100x100?text=No+Image',
+                            name: item.product.productName,
+                            size: item.size,
+                            price: item.product.price,
+                            quantity: item.quantity,
+                            availableStock: item.availableStock,
+                        };
+                    })
+                    .filter(Boolean) as CartItemData[];
 
-    const handleQuantityChange = (id: string, quantity: number): void => {
-        setCartItems(prev => 
-            prev.map(item => 
-                item.id === id ? { ...item, quantity } : item
-            )
+                setCartItems(formattedItems);
+
+                // Mặc định chọn tất cả khi tải trang
+                setSelectedItems(new Set(formattedItems.map(item => item.cartItemId)));
+
+            } catch (error) {
+                console.error('Failed to load cart:', error);
+                toast.error('Could not load your cart.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchCart();
+    }, []);
+
+    // ... (handleQuantityChange không đổi) ...
+    const handleQuantityChange = async (
+        cartItemId: string,
+        newQuantity: number,
+    ) => {
+        const originalItems = [...cartItems];
+        setCartItems((prev) =>
+            prev.map((item) =>
+                item.cartItemId === cartItemId
+                    ? { ...item, quantity: newQuantity }
+                    : item,
+            ),
         );
+        try {
+            await updateCartItemQuantity(cartItemId, newQuantity);
+        } catch (error: any) {
+            console.error('Failed to update quantity:', error);
+            toast.error(
+                error.message || 'Failed to update quantity. Reverting.',
+            );
+            setCartItems(originalItems);
+        }
+    };
+    
+    // Cập nhật handleRemoveItem
+    const handleRemoveItem = async (cartItemId: string) => {
+        const originalItems = [...cartItems];
+        setCartItems((prev) =>
+            prev.filter((item) => item.cartItemId !== cartItemId),
+        );
+        // Xóa khỏi danh sách đã chọn
+        setSelectedItems(prevSet => {
+            const newSet = new Set(prevSet);
+            newSet.delete(cartItemId);
+            return newSet;
+        });
+
+        try {
+            await removeCartItem(cartItemId);
+            toast.success('Item removed from cart.');
+        } catch (error: any) {
+            console.error('Failed to remove item:', error);
+            toast.error('Failed to remove item. Reverting.');
+            setCartItems(originalItems);
+            // (Không cần hoàn tác selectedItems vì item đã bị xóa)
+        }
     };
 
-    const handleRemoveItem = (id: string): void => {
-        setCartItems(prev => prev.filter(item => item.id !== id));
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+        }).format(amount);
     };
 
-    const handleApplyPromo = (): void => {
-        console.log('Applying promo code:', promoCode);
+    // 3. Hàm xử lý chọn item và chọn tất cả
+    const handleSelectItem = (cartItemId: string, isSelected: boolean) => {
+        setSelectedItems(prevSet => {
+            const newSet = new Set(prevSet);
+            if (isSelected) {
+                newSet.add(cartItemId);
+            } else {
+                newSet.delete(cartItemId);
+            }
+            return newSet;
+        });
     };
 
-    const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const discount = subtotal * 0.20; // 20% discount
-    const deliveryFee = 15;
-    const total = subtotal - discount + deliveryFee;
+    const isAllSelected = cartItems.length > 0 && selectedItems.size === cartItems.length;
+
+    const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const isSelected = e.target.checked;
+        if (isSelected) {
+            setSelectedItems(new Set(cartItems.map(item => item.cartItemId)));
+        } else {
+            setSelectedItems(new Set());
+        }
+    };
+
+    const selectedSubtotal = useMemo(() => {
+        return cartItems
+            .filter(item => selectedItems.has(item.cartItemId))
+            .reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    }, [cartItems, selectedItems]);
+
+    const itemsToCheckout = cartItems
+    .filter(item => selectedItems.has(item.cartItemId))
+    // 2. Map về đúng định dạng mà CheckoutPage mong đợi
+    .map(item => ({
+        id: item.cartItemId,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        size: item.size,
+        image: item.image
+    }));
+
+    if (isLoading) {
+        return (
+            <div className={cx('wrapper')}>
+                <Header />
+                <div className={cx('container')}>
+                    <h3 className={cx('cart-title')}>YOUR CART</h3>
+                    <div className={cx('loading-cart')}>Loading cart...</div>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
 
     return (
-        <div className={cx('wrapper')}>    
+        <div className={cx('wrapper')}>
             <Header />
-            <div className={cx('container')}>
-               <div className={cx('breadcrumb')}>
-                <Button text to='/home'>Home</Button>
+            <div className={cx('breadcrumb')}>
+                <Button text to="/home">
+                    Home
+                </Button>
                 <span className={cx('separator')}>{'>'}</span>
-                <Button text className={cx('active')}>Cart</Button>
+                <Button text className={cx('active')}>
+                    Cart
+                </Button>
             </div>
-                
+            <div className={cx('container')}>
                 <div className={cx('content')}>
                     <h3 className={cx('cart-title')}>YOUR CART</h3>
-                    <div className={cx('cart-layout')}>
-                        <div className={cx('cart-items')}>
-                            {cartItems.map(item => (
-                                <CartItem
-                                    key={item.id}
-                                    id={item.id}
-                                    image={item.image}
-                                    name={item.name}
-                                    size={item.size}
-                                    color={item.color}
-                                    price={item.price}
-                                    initialQuantity={item.quantity}
-                                    onQuantityChange={handleQuantityChange}
-                                    onRemove={handleRemoveItem}
-                                />
-                            ))}
-                        </div>
 
-                        <div className={cx('order-summary')}>
-                            <h2 className={cx('summary-title')}>Order Summary</h2>
+                    {/* Xóa .cart-layout-simple */}
+                    {/* Bọc bảng trong một div để cuộn */}
+                    <div className={cx('cart-table-wrapper')}>
+                        <table className={cx('cart-table')}>
+                            {/* Tiêu đề bảng (sẽ dính ở trên khi cuộn) */}
+                            <thead className={cx('table-header')}>
+                                <tr>
+                                    <th className={cx('header-select')}>
+                                        <input
+                                            type="checkbox"
+                                            id="select-all"
+                                            checked={isAllSelected}
+                                            onChange={handleSelectAll}
+                                        />
+                                    </th>
+                                    <th className={cx('header-product')}>Product</th>
+                                    <th className={cx('header-price')}>Price</th>
+                                    <th className={cx('header-quantity')}>Quantity</th>
+                                    <th className={cx('header-subtotal')}>Subtotal</th>
+                                    <th className={cx('header-remove')}>Remove</th>
+                                </tr>
+                            </thead>
                             
-                            <div className={cx('summary-details')}>
-                                <div className={cx('summary-row')}>
-                                    <span>Subtotal</span>
-                                    <span>${subtotal}</span>
-                                </div>
-                                <div className={cx('summary-row', 'discount')}>
-                                    <span>Discount (-20%)</span>
-                                    <span>-${discount.toFixed(0)}</span>
-                                </div>
-                                <div className={cx('summary-row')}>
-                                    <span>Delivery Fee</span>
-                                    <span>${deliveryFee}</span>
-                                </div>
-                                <div className={cx('summary-row', 'total')}>
-                                    <span>Total</span>
-                                    <span>${total.toFixed(0)}</span>
-                                </div>
-                            </div>
+                            {/* Thân bảng (để chứa các item) */}
+                            <tbody>
+                                {cartItems.length > 0 ? (
+                                    cartItems.map((item) => (
+                                        <CartItem
+                                            key={item.cartItemId}
+                                            id={item.cartItemId}
+                                            image={item.image}
+                                            name={item.name}
+                                            size={item.size}
+                                            price={item.price}
+                                            initialQuantity={item.quantity}
+                                            availableStock={item.availableStock}
+                                            onQuantityChange={handleQuantityChange}
+                                            onRemove={handleRemoveItem}
+                                            formatCurrency={formatCurrency}
+                                            isSelected={selectedItems.has(item.cartItemId)}
+                                            onSelectItem={handleSelectItem}
+                                        />
+                                    ))
+                                ) : (
+                                    // Hiển thị khi giỏ hàng rỗng
+                                    <tr>
+                                        <td colSpan={6} className={cx('empty-cart-message')}>
+                                            Your cart is empty.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div> {/* Hết .cart-table-wrapper */}
 
-                            <div className={cx('promo-section')}>
-                                <div className={cx('promo-input-wrapper')}>
-                                    <FontAwesomeIcon icon={faTag} className={cx('promo-icon')} />
-                                    <input
-                                        type="text"
-                                        placeholder="Add promo code"
-                                        value={promoCode}
-                                        onChange={(e) => setPromoCode(e.target.value)}
-                                        className={cx('promo-input')}
-                                    />
-                                    <Button 
-                                        className={cx('apply-btn')} 
-                                        onClick={handleApplyPromo}
-                                    >
-                                        Apply
-                                    </Button>
-                                </div>
+                    {/* Thanh Footer (Tổng tiền + Checkout) không đổi */}
+                    {cartItems.length > 0 && (
+                        <div className={cx('cart-footer')}>
+                            <div className={cx('footer-summary')}>
+                                <span className={cx('subtotal-label')}>
+                                    Subtotal ({selectedItems.size} items):
+                                </span>
+                                <span className={cx('subtotal-amount')}>
+                                    {formatCurrency(selectedSubtotal)}
+                                </span>
                             </div>
-
-                            <Button 
-                                className={cx('checkout-btn')} 
-                                primary 
-                                large
+                            
+                            <Link 
+                                to="/checkout" 
+                                state={{ 
+                                     items: itemsToCheckout, 
+                                    subtotal: selectedSubtotal 
+                                }}
+                                
+                                className={cx('checkout-btn-link', { disabled: selectedItems.size === 0 })}
+                                onClick={(e) => {
+                                    if (selectedItems.size === 0) {
+                                        e.preventDefault(); 
+                                        toast.warn("Please select at least one item.");
+                                    }
+                                }}
                             >
-                                Go to Checkout
-                                <FontAwesomeIcon icon={faArrowRight} />
-                            </Button>
+                                <button 
+                                    className={cx('checkout-btn')} 
+                                    disabled={selectedItems.size === 0} 
+                                >
+                                    Checkout
+                                    <FontAwesomeIcon icon={faArrowRight} />
+                                </button>
+                            </Link>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </div>
     );
 };

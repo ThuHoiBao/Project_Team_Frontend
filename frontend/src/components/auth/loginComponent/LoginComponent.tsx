@@ -18,9 +18,9 @@ const Login = () => {
       const response = await loginUser({ email, password });  // Gọi API đăng nhập
       // Lưu vào localStorage
       localStorage.setItem("token", response.data.token);
+      localStorage.setItem("userRole", response.data.role);
+      localStorage.setItem("userId", response.data.userId);
       console.log(response.data);  // In ra dữ liệu từ backend
- // Lưu token vào Local Storage
-      localStorage.setItem('token', response.data.token);  // Lưu token từ backend vào Local Storage
       // Hiển thị thông báo thành công và chuyển hướng đến trang Home
       setSuccessMessage('Login successful! Redirecting to home...');
       setErrorMessage('');
