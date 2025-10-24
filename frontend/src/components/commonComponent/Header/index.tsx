@@ -237,6 +237,10 @@ function Header() {
         setShowNotifications((prev) => !prev);
     };
 
+
+    const handleOpenWishlist = () => {
+        window.location.href = "/product/wishlist"
+    }
     const location = useLocation();
     const handleLoginClick = () => {
         // Nếu đang ở trang Auth (login/register/otp)
@@ -334,6 +338,14 @@ function Header() {
                                     </div>
                                 )}
                             </div>
+                            
+                                <img style={{cursor: "pointer",
+                                display: "inline-block",
+                                boxSizing: "content-box",
+                                height: "2em",
+                                width: "2.25em"
+                                }} src="https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png"
+                                onClick={handleOpenWishlist} />
                             {/* <Tippy delay={[0, 50]} content="Inbox" placement="bottom">
                                 <button className={cx('action-btn')}>
                                     <InboxIcon />
