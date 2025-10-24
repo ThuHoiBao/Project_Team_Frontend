@@ -6,6 +6,7 @@ interface IconProps {
   className?: string;
 }
 
+
 export const UploadIcon: React.FC<IconProps> = ({
   width = "2.6rem",
   height = "2.6rem",

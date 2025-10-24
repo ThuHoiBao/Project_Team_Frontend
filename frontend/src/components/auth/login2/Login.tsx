@@ -38,6 +38,7 @@ const Login: React.FC = () => {
       setTimeout(() => {
         closeLogin();
         navigate("/home");
+        window.location.reload();
         setSuccessMessage("");
       }, 700);
     } catch (error) {
@@ -64,6 +65,8 @@ const Login: React.FC = () => {
     setTimeout(() => {
       closeLogin();
       navigate("/home");
+      window.location.reload();
+      setSuccessMessage("");
     }, 700);
   } catch (error) {
     console.error(error);
