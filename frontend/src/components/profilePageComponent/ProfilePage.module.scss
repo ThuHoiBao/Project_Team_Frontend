@@ -5,9 +5,10 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(45deg, #ff6ec7, #ff8a00);
+  background: transparent;
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
+  margin-top: 80px;
 }
 
 @keyframes gradientShift {

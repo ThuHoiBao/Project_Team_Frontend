@@ -267,10 +267,11 @@ function Header() {
                     <div className={cx('nav-item')}>
                         
                         <Link
+                            style={{color: "black", textDecoration: "none"}} 
                             to="/casual"
                             className={styles.card}
                         >
-                            <span className={styles.label}>All Product</span>
+                            <span style={{color: "black", textDecoration: "none"}} className={styles.label}>All Product</span>
                         </Link>
                     </div>
                     <div className={cx('nav-item')}>
@@ -366,7 +367,7 @@ function Header() {
                         <h2>{selectedNotification.title}</h2>
                         <p>{selectedNotification.message}</p>
                         <p style={{ fontSize: "12px", color: "#999" }}>{selectedNotification.createAt}</p>
-                        <button onClick={() => setIsModalOpen(false)}>Đóng</button>
+                        <button style={{padding: "4px", color: "white", backgroundColor: "gray"}} onClick={() => setIsModalOpen(false)}>Đóng</button>
                     </div>
                 </div>
             )}

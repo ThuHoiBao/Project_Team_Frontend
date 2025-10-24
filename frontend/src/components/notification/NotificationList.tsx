@@ -11,13 +11,12 @@ interface Notification {
 }
 
 interface NotificationListProps {
-  userId: string; // 🟢 nhận userId từ FE
+  userId: string; 
 }
 
 const NotificationList: React.FC<NotificationListProps> = ({ userId }) => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  // 🟡 Gọi API lấy danh sách thông báo ban đầu
   useEffect(() => {
     const fetchNotis = async () => {
       try {
@@ -31,7 +30,6 @@ const NotificationList: React.FC<NotificationListProps> = ({ userId }) => {
     if (userId) fetchNotis();
   }, [userId]);
 
-  // 🟢 Kết nối socket để nhận realtime notification
   useEffect(() => {
     if (!userId) return;
 
@@ -63,7 +61,7 @@ const NotificationList: React.FC<NotificationListProps> = ({ userId }) => {
 
   return (
     <div className="absolute right-0 mt-2 w-80 bg-white shadow-lg rounded-md p-3 max-h-96 overflow-y-auto z-50">
-      <h3 className="font-semibold mb-2">🔔 Thông báo</h3>
+      <h3 className="font-semibold mb-2">Thông báo</h3>
 
       {notifications.length === 0 ? (
         <p className="text-gray-500 text-sm text-center">Không có thông báo nào</p>
@@ -76,7 +74,7 @@ const NotificationList: React.FC<NotificationListProps> = ({ userId }) => {
             }`}
             onClick={() => handleRead(noti._id)}
           >
-            <p className="font-medium">{noti.title}</p>
+            <p className="font-lg">{noti.title}</p>
             <p className="text-sm text-gray-600">{noti.message}</p>
             <p className="text-xs text-gray-400">
               {new Date(noti.createdAt).toLocaleString("vi-VN")}
