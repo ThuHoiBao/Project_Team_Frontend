@@ -14,7 +14,7 @@ export class OrderRequestDTO {
   private _orderDate!: Date;
   private _phoneNumber: string = '';
   private _orderItems: OrderItemRequestDTO[] = [];
-
+  private _cancellationReason : string='';
   // Getter and Setter methods
   get id(): string {
     return this._id;
@@ -82,7 +82,12 @@ export class OrderRequestDTO {
   set orderItems(value: OrderItemRequestDTO[]) {
     this._orderItems = value;
   }
-
+  get cancellationReason(): string {
+    return this._cancellationReason;
+  }
+  set cancellationReason(value: string) {
+    this._cancellationReason = value;
+  }
   // Chuyển DTO thành plain object
   toPlain() {
     return {
@@ -96,6 +101,7 @@ export class OrderRequestDTO {
       orderDate: this._orderDate,
       phoneNumber: this._phoneNumber,
       amount: this._amount,
+      cancellationReason : this._cancellationReason,
       orderItems: this._orderItems.map((item) => item.toPlain()),
     };
   }

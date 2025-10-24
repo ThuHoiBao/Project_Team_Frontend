@@ -93,9 +93,9 @@ const handleSubmitFeedback = async (feedbackList) => {
         console.log(fb.images.length )
       if (fb.comment.length >= 50) {
         if (fb.images.length > 1) {
-          totalXu += 200;  // 200 Xu nếu có hơn 1 hình ảnh
+          totalXu += 2;  // 2 Xu nếu có hơn 1 hình ảnh
         } else if (fb.images.length === 1) {
-          totalXu += 100;  // 100 Xu nếu có 1 hình ảnh
+          totalXu += 1;  // 1 Xu nếu có 1 hình ảnh
         }
       }
     });
@@ -174,9 +174,9 @@ const handleItemClick = () => {
       case 'COMPLETED':
         return (
           <>
-          <button className="btn-buy-again" onClick={() => openModal("Bạn đã mua lại thành công")}>
+          {/* <button className="btn-buy-again" onClick={() => openModal("Bạn đã mua lại thành công")}>
             Mua lại
-          </button>
+          </button> */}
           <button className="btn-feedback" onClick={() => setShowFeedbackModal(true)}>
             Viết đánh giá
           </button>
@@ -184,12 +184,12 @@ const handleItemClick = () => {
         );
 
       case 'CANCELLED':
-        return <button className="btn-buy-again" onClick={() => openModal('Bạn đã mua lại thành công')}>Mua lại</button>;
+        // return <button className="btn-buy-again" onClick={() => openModal('Bạn đã mua lại thành công')}>Mua lại</button>;
 
       case 'FEEDBACKED':
         return (
           <>
-            <button className="btn-buy-again" onClick={() => openModal('Bạn đã mua lại thành công')}>Mua lại</button>
+            {/* <button className="btn-buy-again" onClick={() => openModal('Bạn đã mua lại thành công')}>Mua lại</button> */}
              <button className="btn-view-feedback" onClick={handleViewFeedback}>
               Xem đánh giá
             </button>
@@ -212,6 +212,24 @@ const handleItemClick = () => {
           <span> {new Intl.DateTimeFormat('vi-VN').format(new Date(order.orderDate))}</span></div>
         </h3>
       </div>
+      {order.orderStatus === 'CANCELLED' && order.cancellationReason && (
+        <h3>
+          <div
+            style={{
+              color: 'red',
+              fontWeight: 400,      // chữ mảnh
+              fontSize: '15px' ,
+              paddingBottom:'15px'     // cỡ 14px
+            }}
+            role="alert"
+            aria-live="polite"
+          >
+            Lý do hủy: <span>{order.cancellationReason}</span>
+          </div>
+        </h3>
+      )}
+
+
       {/* Trạng thái đơn hàng */}
       <div className="order-status-container">
       
