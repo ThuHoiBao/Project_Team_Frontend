@@ -11,6 +11,8 @@ import Footer from "../commonComponent/Footer";
 import BrowseByDressStyle from "./BrowseByDressStyle";
 import { getNewProducts, getTopSellingProducts } from "../../services/product/productDetailApi";
 import { getBestFeedback } from "../../services/feedback/feedbackApi";
+import Login from "../auth/login2/Login";
+
 
 const cx = classNames.bind(styles);
 
@@ -37,7 +39,7 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <Header />
+      <Header/>
       <Banner />
       <div className={cx("container")}>
         <ListProduct title="New Arrivals" data={newProducts} />
@@ -47,6 +49,7 @@ const HomePage: React.FC = () => {
         <CustomerFeedback data={bestFeedback} />
       </div>
       <Footer />
+
     </>
   );
 };

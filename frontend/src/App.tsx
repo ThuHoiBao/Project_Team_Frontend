@@ -1,7 +1,7 @@
 // App.tsx
 import React from 'react';
 import { Routes, Route} from 'react-router-dom';  // Import Routes và Route từ react-router-dom
-import Login from './components/auth/loginComponent/LoginComponent';
+import Login from './components/auth/login2/Login';
 import ForgotPassword from './components/auth/forgotPasswordComponent/ForgotPasswordComponent'; // Giả sử bạn có ForgotPassword component
 import VerifyOtp from './components/auth/verifyOtp/VerifyOtpComponent';  // Import VerifyOtp component
 import Register from './components/auth/registerComponent/RegisterComponent';
@@ -18,20 +18,22 @@ import WishlistPage from './components/listFavoriteComponent/listFavoriteCompone
 import ScrollToTop from './components/ScrollToTop';
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
+import AuthPage from './components/auth/authPage/AuthPage';
 
 function App() {
   return (
     <div className="App">
       <ScrollToTop />
       <Routes>
-        <Route path="/login" element={<Login />} />  {/* Đăng nhập */}
+        {/* <Route path="/login" element={<Login />} />  Đăng nhập */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} /> 
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/register" element={<AuthPage />} />
         {/* <Route path="/verify-otp-reset" element={<VerifyOtp />} /> */}
         <Route path="/register" element={<Register />} /> 
         <Route path="/verify-otp" element={<VerifyOtp />} /> 
         <Route path="/home" element={<HomePage />} />{/* Thêm route cho trang Verify OTP */}
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/myinfo" element={<ProfilePage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/product-detail" element={<ProductDetailPage />} />
@@ -41,6 +43,7 @@ function App() {
         <Route path="/casual" element={<CasualPage/>}/>
         <Route path="/product/wishlist" element={<WishlistPage />} />
       </Routes>
+      <Login />
       <ToastContainer position="bottom-right" />
     </div>
   );

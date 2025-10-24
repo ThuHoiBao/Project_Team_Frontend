@@ -24,7 +24,10 @@ import { useEffect, useState } from 'react';
 import { getMyInfo, logoutUser } from '../../../services/user/myInfoApi';
 import images from '../../../assets/images';
 import { AxiosError } from 'axios';
-import { useNavigate } from "react-router-dom";
+import { useLoginModal } from '../../../context/LoginContext';
+import { useAuth } from '../../../context/AuthContext';
+import { useLocation, useNavigate } from "react-router-dom";
+
 
 
 const cx = classNames.bind(styles);
@@ -89,6 +92,10 @@ const navigate = useNavigate();
 
     const [avatar, setAvatar] = useState<string>(images.noImage);
     const [currentUser, setCurrentUser] = useState<boolean>();
+    const { openLogin } = useLoginModal();
+    const { isAuthenticated, logout, token } = useAuth();
+    console.log("Authenticate:", isAuthenticated)
+    console.log("Token:", token)
 
 
     // Handle logic
@@ -99,11 +106,12 @@ const navigate = useNavigate();
             // Gọi API logout
             await logoutUser();
             // Xóa token trong localStorage
-            localStorage.removeItem("token");
+            // localStorage.removeItem("token");
+            logout();
             // Chờ 1s rồi mới chuyển trang
             setTimeout(() => {
-                navigate("/login");
-            }, 1000);
+                navigate("/home");
+            }, 1500);
             } catch (error) {
             console.error("Logout failed:", error);
             }
@@ -142,25 +150,31 @@ const navigate = useNavigate();
         const getInfoResponse = async () => {
           try {
             const data = await getMyInfo();
-            setCurrentUser(true);
+            // setCurrentUser(true);
             setAvatar(data.image);
           } catch (error) {
             if (error instanceof AxiosError) {
-                setCurrentUser(false);
+                logout();
                 console.error("API error:", error.response?.data);
             } else {
-                setCurrentUser(false);
+                logout();
                 console.error("Unexpected error:", error);
             }
           }
         };
         getInfoResponse();
       }, []);
-
-      console.log("currentUser:", currentUser);
-    console.log("userMenu:", userMenu);
-
-
+    
+    const location = useLocation();
+    const handleLoginClick = () => {
+    // Nếu đang ở trang Auth (login/register/otp)
+    if (location.pathname === "/register" || location.pathname === "/auth") {
+      // Gửi sự kiện để AuthPage biết cần hiển thị form login
+      window.dispatchEvent(new CustomEvent("switchToLogin"));
+    } else {
+      openLogin();
+    }
+  };
     
 
     return (
@@ -193,7 +207,7 @@ const navigate = useNavigate();
                 <Search />
 
                 <div className={cx('actions')}>
-                    {currentUser ? (
+                    {isAuthenticated ? (
                         <>
                             <Tippy delay={[0, 50]} content="Your cart" placement="bottom">
                                 <Button to="/cart" className={cx('action-btn')}>
@@ -209,11 +223,11 @@ const navigate = useNavigate();
                         </>
                     ) : (
                         <>
-                            <Button text to="/login">Log in</Button>
+                            <Button onClick={handleLoginClick}>Log in</Button>
                         </>
                     )}
-                    <Menu items={currentUser ? userMenu : MENU_ITEMS} onChange={handleMenuChange}>
-                        {currentUser ? (
+                    <Menu items={isAuthenticated ? userMenu : MENU_ITEMS} onChange={handleMenuChange}>
+                        {isAuthenticated ? (
                             <img
                                 className={cx('user-avatar')}
                                 src= {avatar || images.noImage}

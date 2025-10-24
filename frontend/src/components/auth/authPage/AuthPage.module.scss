@@ -1,0 +1,288 @@
+.container {
+  font-family: "Roboto", sans-serif;
+  padding: 20px 10%;
+  color: #222;
+}
+
+/* --- Tiêu đề và breadcrumb --- */
+.title {
+  text-align: center;
+  font-size: 32px;
+  font-weight: 700;
+  margin-top: 60px;
+}
+
+.breadcrumb {
+  text-align: center;
+  color: #777;
+  margin-bottom: 50px;
+  font-size: 16px;
+  font-weight: 400;
+
+
+  span {
+    color: #111;
+    font-weight: 600;
+  }
+}
+
+.homeLink {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #777; 
+  }
+}
+
+
+/* --- Layout chính chứa 2 cột --- */
+.formWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 60px;
+  flex-wrap: nowrap;
+  position: relative;
+}
+
+
+/* --- Đường chia đôi mặc định --- */
+.formWrapper::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background-color: #e0e0e0;
+  transform: translateX(-50%);
+}
+
+.formWrapper.otpMode::after {
+  display: none;
+}
+
+.formWrapper.forgotMode::after {
+  display: none;
+}
+
+.formWrapper.resetMode::after {
+  display: none;
+}
+
+
+/* --- Cột trái & phải --- */
+.leftSection,
+.rightSection {
+  flex: 1;
+  max-width: 420px;
+  padding: 0 20px;
+}
+
+.leftSection h2,
+.rightSection h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+/* --- Form --- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+
+  label {
+    font-weight: 500;
+  }
+
+
+  input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 40px;
+    font-size: 14px;
+    transition: 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #111;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  input[type="email"],
+  input[type="password"],
+  input[type="text"] {
+    margin-bottom: 0px;
+  }
+}
+
+/* --- Nút chính (Đăng nhập / Đăng ký / OTP) --- */
+.loginBtn {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 12px 0;
+  margin-top: 10px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+  width: 100%;
+
+  &:hover {
+    background: #333;
+  }
+}
+
+.backText {
+  &:hover {
+    color: #777;
+    cursor: pointer;
+  }
+
+}
+
+/* --- Divider “Hoặc” --- */
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 1.5rem 0;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: #ddd;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+
+  span {
+    position: relative;
+    z-index: 2;
+    background: #fff;
+    padding: 0 10px;
+    color: #888;
+    font-size: 0.9rem;
+  }
+}
+
+/* --- Nút Google --- */
+.googleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  padding: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #555;
+
+  img {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: #f5f5f5;
+  }
+}
+
+/* --- Liên kết phụ --- */
+.forgotPassword {
+  display: block;
+  margin-top: 1rem;
+  text-align: right;
+  color: red;
+  font-size: 0.9rem;
+  text-decoration: none;
+
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+/* --- Thông báo --- */
+.error {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.success {
+  color: #388e3c;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* --- Phần phải --- */
+.rightSection {
+  text-align: center;
+
+  p {
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 25px;
+  }
+}
+
+.registerBtn {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 10px 35px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+
+  &:hover {
+    background: #333;
+  }
+}
+
+
+/* --- Responsive --- */
+@media (max-width: 900px) {
+  .formWrapper {
+    flex-direction: column;
+    align-items: center;
+
+    &::after {
+      display: none;
+    }
+  }
+
+  .leftSection,
+  .rightSection {
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .leftSection h2,
+  .rightSection h2 {
+    text-align: center;
+  }
+
+  .loginBtn,
+  .googleBtn {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
