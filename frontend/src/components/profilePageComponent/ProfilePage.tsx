@@ -4,6 +4,8 @@ import { getMyInfo, updateMyAvatar, updateMyInfo } from "../../services/user/myI
 import { AxiosError } from "axios";
 import classNames from 'classnames/bind';
 import styles from './ProfilePage.module.scss'; // Sửa từ .css thành .module.scss
+import Header from "../commonComponent/Header";
+import Footer from "../commonComponent/Footer";
 
 const cx = classNames.bind(styles);
 
@@ -106,7 +108,9 @@ function Profile() {
   };
 
   return (
-    <div className={cx("profile-container")}>
+    <>
+    <Header/>
+    <div style={{padding: "12px"}} className={cx("profile-container")}>
       {error && (
         <div className={cx("alert", "alert-danger", "alert-dismissible")}>
           <strong>Error!</strong>{error}
@@ -198,6 +202,8 @@ function Profile() {
         )}
       </div>
     </div>
+    <Footer />
+    </>
   );
 }
 

@@ -41,7 +41,8 @@ const CasualPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([categoryId]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(categoryId ? [categoryId] : [])  // nếu có categoryId thì set, còn không thì mảng rỗng;
+
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
