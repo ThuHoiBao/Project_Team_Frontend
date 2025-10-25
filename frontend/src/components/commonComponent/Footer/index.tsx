@@ -19,7 +19,9 @@ const Footer: React.FC = () => {
             <div className={cx('container')}>
                 <div className={cx('footer-content')}>
                     <div className={cx('footer-section')}>
-                        <h2 className={cx('logo')}>UTESHOP</h2>
+                        <h2 onClick={() => {
+                            window.location.href = "/home"
+                        }} className={cx('logo')}>UTESHOP</h2>
                         <p className={cx('description')}>
                             We have clothes that suits your style and which you're proud to wear. 
                             From women to men.

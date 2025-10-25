@@ -16,8 +16,8 @@ function ProductItem({ data }: ProductItemProps) {
       <img className={cx("avatar")} src={data.listImage[0]?.imageProduct} alt={data.productName} />
 
       <div className={cx("info")}>
-        <h4 className={cx("name")}>
-          <span>{data.productName}</span>
+        <h4 style={{textDecoration: "none", color: "black"}} className={cx("name")}>
+          <span style={{textDecoration: "none", color: "black"}}>{data.productName}</span>
         </h4>
         <span className={cx("price")}>
           {data.price.toLocaleString("vi-VN")} đ
