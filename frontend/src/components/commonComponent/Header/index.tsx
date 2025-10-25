@@ -257,7 +257,9 @@ function Header() {
         <header className={cx('wrapper')}>
             <div className={cx('inner')}>
                 <div className={cx('logo')}>
-                    <h1>UTESHOP</h1>
+                    <h1 style={{cursor: "pointer"}} onClick={() => {
+                            window.location.href = "/home"
+                        }}>UTESHOP</h1>
                 </div>
 
                 {/* Navigation Menu */}
