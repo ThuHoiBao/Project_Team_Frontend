@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import classNames from 'classnames/bind';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styles from './CheckoutPage.module.scss';
-import { Lock, CreditCard, Truck, Tag, Coins } from 'lucide-react';
+import { Lock, CreditCard, Truck, Tag, Coins, MapPin } from 'lucide-react';
 import Header from '../commonComponent/Header';
 import Button from '../commonComponent/Button';
 import Footer from '../commonComponent/Footer';
@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import CouponModal from './Coupon/CouponModal';
 import { getCoinBalance } from '../../services/coin/coinApi';
 import { getDefaultAddress, AddressDelivery } from '../../services/addressDelivery/addressApi';
+import AddressModal from './AddressModal/AddressModal';
 
 const cx = classNames.bind(styles);
 
@@ -40,7 +41,6 @@ const CheckoutPage: React.FC = () => {
   const subtotal = navigationState?.subtotal; 
 
 
-  const [formData, setFormData] = useState({ fullName: '', address: '', phoneNumber: '' });
   const [discountCode, setDiscountCode] = useState('');
   const [xuAmount, setXuAmount] = useState<number | string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(PaymentMethod.COD);
@@ -50,17 +50,24 @@ const CheckoutPage: React.FC = () => {
   const [xuValue, setXuValue] = useState(0);
   const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 
-    const [userCoinBalance, setUserCoinBalance] = useState<number>(0);
-    const [isLoadingBalance, setIsLoadingBalance] = useState(true);
+  const [userCoinBalance, setUserCoinBalance] = useState<number>(0);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
 
-    
+  const [selectedAddress, setSelectedAddress] = useState<AddressDelivery | null>(null);
+  const [isLoadingAddress, setIsLoadingAddress] = useState(true);
+  
+  // === ADD STATE FOR ADDRESS MODAL VISIBILITY ===
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const handleAddressSelect = (newAddress: AddressDelivery) => {
+      setSelectedAddress(newAddress); // Update the displayed address
+  };
+  
   useEffect(() => {
-    if (!cartItems || cartItems.length === 0) {
+    if (!location.state ||!cartItems || cartItems.length === 0) {
       console.warn("No checkout items found, redirecting to cart.");
-      // Dùng replace: true để người dùng không thể "Back" lại trang checkout rỗng
       navigate('/cart', { replace: true });
     }
-  }, [cartItems, navigate]);
+  }, [cartItems, location.state, navigate]);
 
 
   useEffect(() => {
@@ -81,8 +88,24 @@ const CheckoutPage: React.FC = () => {
         fetchBalance();
     }, []);
 
+    useEffect(() => {
+        const fetchAddress = async () => {
+            setIsLoadingAddress(true);
+            try {
+                const address = await getDefaultAddress();
+                setSelectedAddress(address); 
+            } catch (error: any) {
+                console.error("Error fetching default address:", error);
+                toast.error(error.message || "Could not load shipping address.");
+                setSelectedAddress(null); 
+            } finally {
+                setIsLoadingAddress(false);
+            }
+        };
+        fetchAddress();
+    }, []);
 
- const total = useMemo(() => {
+    const total = useMemo(() => {
         const currentSubtotal = subtotal || 0;
         const effectiveDiscount = Math.min(discountValue, currentSubtotal);
         const effectiveXu = Math.min(xuValue, currentSubtotal - effectiveDiscount);
@@ -90,11 +113,7 @@ const CheckoutPage: React.FC = () => {
     }, [subtotal, discountValue, xuValue]);
 
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
+ 
   const handlePaymentMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedPaymentMethod(e.target.value as PaymentMethod);
   };
@@ -177,16 +196,21 @@ const CheckoutPage: React.FC = () => {
      };
 
 
-  const handlePayNow = (e: React.FormEvent) => {
-   e.preventDefault();
-        // ... (validation)
+     const handlePayNow = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!selectedAddress) {
+            toast.error("Please select or add a shipping address.");
+            return;
+        }
+
         const actualCoinsApplied = Math.ceil(xuValue / 1000);
+
         const orderData = {
-            // ... (shippingInfo, paymentMethod, items, subtotal)
-             shippingAddress: {
-                 fullName: formData.fullName,
-                 address: formData.address,
-                 phoneNumber: formData.phoneNumber,
+            shippingAddress: { 
+                 fullName: selectedAddress.fullName,
+                 address: selectedAddress.address,
+                 phoneNumber: selectedAddress.phoneNumber, 
             },
             paymentMethod: selectedPaymentMethod,
             orderItems: cartItems.map(item => ({
@@ -201,9 +225,10 @@ const CheckoutPage: React.FC = () => {
             couponCode: appliedCoupon ? appliedCoupon.code : null,
             coinsApplied: actualCoinsApplied,
         };
+
         console.log('Submitting Order Data:', orderData);
         alert('Proceeding to payment/order creation...');
-  };
+    };
 
   if (!cartItems) {
     return (
@@ -234,20 +259,41 @@ const CheckoutPage: React.FC = () => {
           <div className={cx('leftColumn')}>
             {/* --- Shipping Information --- */}
             <div className={cx('sectionCard', 'shippingInfo')}>
-              <h2>Shipping Information</h2>
-              <div className={cx('formGroup')}>
-                <label htmlFor="fullName">Full Name <span className={cx('red')}>*</span></label>
-                <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleInputChange} required />
-              </div>
-              <div className={cx('formGroup')}>
-                <label htmlFor="address">Address <span className={cx('red')}>*</span></label>
-                <input type="text" id="address" name="address" placeholder="Enter your delivery address" value={formData.address} onChange={handleInputChange} required />
-              </div>
-              <div className={cx('formGroup')}>
-                <label htmlFor="phoneNumber">Phone Number <span className={cx('red')}>*</span></label>
-                <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" value={formData.phoneNumber} onChange={handleInputChange} required />
-              </div>
-            </div>
+                            <h2 className={cx('shipping-title')}>
+                                <MapPin size={20} /> Shipping Address {/* Changed title */}
+                            </h2>
+                            {isLoadingAddress ? (
+                                <div className={cx('address-loading')}>Loading address...</div>
+                            ) : selectedAddress ? (
+                                // Display fetched address
+                                <div className={cx('address-display')}>
+                                    <div className={cx('address-details')}>
+                                        <span className={cx('name-phone')}>
+                                            {selectedAddress.fullName} (+{selectedAddress.phoneNumber}) {/* Format phone if needed */}
+                                        </span>
+                                        <span className={cx('address-line')}>
+                                            {selectedAddress.address}
+                                        </span>
+                                    </div>
+                                    <div className={cx('address-actions')}>
+                                        {selectedAddress.isDefault && (
+                                            <span className={cx('default-tag')}>Default</span>
+                                        )}
+                                        {/* TODO: Implement Change Address Modal */}
+                                        <button type="button" className={cx('change-btn')} onClick={() => setIsAddressModalOpen(true)}>
+                                            Change
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                // Display if no address found
+                                <div className={cx('no-address')}>
+                                    <p>No shipping address found.</p>
+                                    {/* TODO: Add Button/Link to add address page/modal */}
+                                    <button type="button" className={cx('add-address-btn')} onClick={() => alert('Add address functionality needed!')}>Add Address</button>
+                                </div>
+                            )}
+                        </div>
 
             {/* --- Review Your Cart --- */}
            <div className={cx('sectionCard', 'reviewCart')}>
@@ -303,7 +349,7 @@ const CheckoutPage: React.FC = () => {
                    <button type="button" onClick={handleOpenCouponModal}>Select Coupon</button>
                 </div>
                <div className={cx('appliedDiscount-1')}>
-                  <span>Discount {appliedCoupon ? `(${appliedCoupon.code})` : ''}</span>
+                  <span>Discount <span className={cx('qTyColor')}>{appliedCoupon ? `(${appliedCoupon.code})` : ''}</span></span>
                   <span className={cx('discountAmount-1')}>
                       - {formatCurrency(discountValue)}
                   </span>
@@ -335,9 +381,13 @@ const CheckoutPage: React.FC = () => {
                         />
                     <button type="button" onClick={handleApplyXu} disabled={isLoadingBalance}>Apply</button>
                 </div>
-                {xuValue > 0 && (
-                    <p className={cx('applied-value')}>Applied: -{formatCurrency(xuValue)}</p>
-                 )}
+
+                  <div className={cx('appliedDiscount-1')}>
+                    <span>Coin <span className={cx('qTyColor')}> {xuAmount ? `(${xuAmount})` : ''}</span></span>
+                    <span className={cx('discountAmount-1')}>
+                        - {formatCurrency(xuValue)}
+                    </span>
+                </div>
             </div>
 
             {/* --- Payment Method --- */}
@@ -362,7 +412,7 @@ const CheckoutPage: React.FC = () => {
                  <div className={cx('pricingSummary')}>
                     <div><span>Subtotal</span><span>{formatCurrency(subtotal || 0)}</span></div>
                     <div><span>Discount</span><span className={cx('discountAmount')}>- {formatCurrency(discountValue)}</span></div>
-                    <div><span>Xu Applied</span><span className={cx('xuAmount')}>- {formatCurrency(xuValue)}</span></div>
+                    <div><span>Coin Applied</span><span className={cx('xuAmount')}>- {formatCurrency(xuValue)}</span></div>
                    <div className={cx('total')}><span>Total</span><span>{formatCurrency(total)}</span></div>
                 </div>
                  <button type="submit" className={cx('payNowButton')}>Pay Now</button>
@@ -382,6 +432,12 @@ const CheckoutPage: React.FC = () => {
           onClose={() => setIsCouponModalOpen(false)} 
           onApply={handleApplyCouponFromModal}       
       />
+      <AddressModal
+          isOpen={isAddressModalOpen}
+          onClose={() => setIsAddressModalOpen(false)}
+          currentAddress={selectedAddress} 
+          onSelectAddress={handleAddressSelect}
+        />
     </div>
   );
 };

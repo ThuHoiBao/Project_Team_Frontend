@@ -105,40 +105,99 @@
 
 // --- Style cho Shipping Info ---
 .shippingInfo {
-  // Styles riêng nếu cần
-}
-
-.formGroup {
-  margin-bottom: 1.25rem;
-
-  label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: #374151;
-  }
-
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"] {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    color: #1f2937;
-    transition: border-color 0.2s, box-shadow 0.2s; // Hiệu ứng focus mượt hơn
-
-    &::placeholder { color: #9ca3af; }
-    &:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 1px #3b82f6;
+    h2.shipping-title { // Style the title with icon
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #e57373; // Example red color like the image
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
     }
-  }
-}
 
+    .address-loading, .no-address p {
+        padding: 20px;
+        text-align: center;
+        color: #888;
+        font-style: italic;
+    }
+    
+    .no-address {
+        text-align: center;
+        .add-address-btn { // Simple button style
+            margin-top: 10px;
+            padding: 8px 15px;
+            cursor: pointer;
+            // Add your button styles
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            &:hover {
+                background-color: #ddd;
+            }
+        }
+    }
+
+
+    .address-display {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; // Align items to the top
+        padding: 10px 0; // Add some padding if needed
+    }
+
+    .address-details {
+        display: flex;
+        flex-direction: column;
+        gap: 5px; // Space between lines
+        flex-grow: 1; // Take available space
+        padding-right: 15px; // Space before buttons
+    }
+
+    .name-phone {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .address-line {
+        font-size: 0.95rem;
+        color: #555;
+        line-height: 1.4;
+    }
+
+    .address-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px; // Space between tag and button
+        flex-shrink: 0; // Prevent shrinking
+    }
+
+    .default-tag {
+        border: 1px solid #e57373; // Red border
+        color: #e57373; // Red text
+        padding: 3px 8px;
+        font-size: 0.75rem;
+        border-radius: 3px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .change-btn {
+        background: none;
+        border: none;
+        color: #007bff; // Blue link color
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.95rem;
+        font-weight: 500;
+        white-space: nowrap;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
 // --- Style cho Review Cart ---
 .reviewCart {
     h2 {
@@ -382,4 +441,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center; 
+}
+
+
+.qTyColor {
+  color: #2563eb;
 }
