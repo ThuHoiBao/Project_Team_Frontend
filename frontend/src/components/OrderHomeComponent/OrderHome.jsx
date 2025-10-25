@@ -6,17 +6,19 @@ import './OrderHome.css';  // Thêm CSS cho OrderHome
 import Footer from '../commonComponent/Footer';
 import Header from '../commonComponent/Header';
 import AdBanner from '../AddBannerComponent/AddBanner';
-import { getOrdersByUserId } from '../../services/order/order';const OrderHome = () => {
+import { getOrdersByUserId } from '../../services/order/order';
+const OrderHome = () => {
   const [statusFilter, setStatusFilter] = useState('Tất cả');
-  const userId = "68e7313a4e30d6bb62f03934";
+  const [userId, setUserId] = useState('');
   const [orders, setOrders] = useState([]);
   const filteredOrders = orders.filter(order =>
     statusFilter === 'Tất cả' || order.orderStatus === statusFilter
   );
   const fetchOrders = async () => {
     try {
-      const data = await getOrdersByUserId(userId);
-      setOrders(data);
+      const data = await getOrdersByUserId();
+      setOrders(data.orders);
+      setUserId(data.userId)
     } catch (error) {
       console.error("Lỗi khi gọi API orders:", error);
     }
