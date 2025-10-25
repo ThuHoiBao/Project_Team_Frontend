@@ -6,6 +6,11 @@ import { Lock, CreditCard, Truck, Tag, Coins } from 'lucide-react';
 import Header from '../commonComponent/Header';
 import Button from '../commonComponent/Button';
 import Footer from '../commonComponent/Footer';
+import { Coupon } from '../../services/coupon/couponApi';
+import { toast } from 'react-toastify';
+import CouponModal from './Coupon/CouponModal';
+import { getCoinBalance } from '../../services/coin/coinApi';
+import { getDefaultAddress, AddressDelivery } from '../../services/addressDelivery/addressApi';
 
 const cx = classNames.bind(styles);
 
@@ -40,10 +45,15 @@ const CheckoutPage: React.FC = () => {
   const [xuAmount, setXuAmount] = useState<number | string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(PaymentMethod.COD);
 
-
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [discountValue, setDiscountValue] = useState(0);
   const [xuValue, setXuValue] = useState(0);
+  const [isCouponModalOpen, setIsCouponModalOpen] = useState(false);
 
+    const [userCoinBalance, setUserCoinBalance] = useState<number>(0);
+    const [isLoadingBalance, setIsLoadingBalance] = useState(true);
+
+    
   useEffect(() => {
     if (!cartItems || cartItems.length === 0) {
       console.warn("No checkout items found, redirecting to cart.");
@@ -53,9 +63,31 @@ const CheckoutPage: React.FC = () => {
   }, [cartItems, navigate]);
 
 
-  const total = useMemo(() => {
-    return (subtotal || 0) - discountValue - xuValue;
-  }, [subtotal, discountValue, xuValue]);
+  useEffect(() => {
+   const fetchBalance = async () => {
+    setIsLoadingBalance(true); 
+      try {
+          const balance = await getCoinBalance(); 
+          setUserCoinBalance(balance);
+      } catch (error: any) {
+          console.error("Failed to fetch coin balance:", error);
+          toast.error(error.message || "Could not load coin balance.");
+          setUserCoinBalance(0); 
+      } finally {
+          setIsLoadingBalance(false); 
+      }
+    };
+
+        fetchBalance();
+    }, []);
+
+
+ const total = useMemo(() => {
+        const currentSubtotal = subtotal || 0;
+        const effectiveDiscount = Math.min(discountValue, currentSubtotal);
+        const effectiveXu = Math.min(xuValue, currentSubtotal - effectiveDiscount);
+        return Math.max(0, currentSubtotal - effectiveDiscount - effectiveXu);
+    }, [subtotal, discountValue, xuValue]);
 
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,15 +99,110 @@ const CheckoutPage: React.FC = () => {
     setSelectedPaymentMethod(e.target.value as PaymentMethod);
   };
 
-  const handleApplyDiscount = () => { console.log('Applying discount:', setDiscountValue(100000)); /* TODO: API call */ };
-  const handleApplyXu = () => { console.log('Applying Xu:', setXuValue(50000)); /* TODO: API call */ };
+ const handleOpenCouponModal = () => {
+        setIsCouponModalOpen(true);
+ };
+
+  const handleApplyCouponFromModal = (coupon: Coupon) => {
+      const currentSubtotal = subtotal || 0;
+
+      const percentageDiscount = (coupon.discountValue / 100) * currentSubtotal;
+
+      let actualDiscount = percentageDiscount;
+      if (coupon.maxDiscount != null && coupon.maxDiscount < actualDiscount) {
+        actualDiscount = coupon.maxDiscount;
+        toast.info(`Discount capped at ${formatCurrency(coupon.maxDiscount)}.`);
+      }
+
+      actualDiscount = Math.min(actualDiscount, currentSubtotal);
+
+      actualDiscount = Math.round(actualDiscount);
+
+      setAppliedCoupon(coupon);       
+      setDiscountValue(actualDiscount); 
+      setIsCouponModalOpen(false);   
+      toast.success(`Applied coupon: ${coupon.code} (-${formatCurrency(actualDiscount)})`);
+
+      setXuValue(0);
+      setXuAmount('');
+      toast.info("Coin application reset due to coupon change.");
+  };
+
+  const handleApplyXu = () => {
+         const amountInput = Number(xuAmount);
+         const currentSubtotal = subtotal || 0;
+
+         if (isNaN(amountInput) || amountInput < 0) {
+              toast.error("Please enter a valid positive number for Xu.");
+              setXuAmount(''); 
+              setXuValue(0);
+              return;
+         }
+
+         // Check against fetched balance
+        if (amountInput > userCoinBalance) {
+            toast.error(`You only have ${userCoinBalance} coins available.`);
+            setXuValue(0); // Reset value if input exceeds balance
+            return;
+        }
+
+         const requestedCoinValue = Math.round(amountInput * 1000); // Convert coin to VND value & round
+         const applicableSubtotal = Math.max(0, currentSubtotal - discountValue);
+
+
+         if (applicableSubtotal <= 0) {
+             toast.warn("Cannot apply coins as the total is already covered.");
+             setXuAmount('');
+             setXuValue(0);
+             return;
+        }
+
+        const maxCoinsNeeded = Math.ceil(applicableSubtotal / 1000);
+        const coinsToUse = Math.min(amountInput, maxCoinsNeeded, userCoinBalance);
+        let actualXuValueApplied = Math.min(coinsToUse * 1000, applicableSubtotal);
+        actualXuValueApplied = Math.round(actualXuValueApplied);
+
+        setXuValue(actualXuValueApplied);
+        setXuAmount(coinsToUse);
+
+        if (coinsToUse > 0) {
+             toast.info(`Applied ${coinsToUse} coins (-${formatCurrency(actualXuValueApplied)}).`);
+        } else {
+             toast.info("No coins applied.");
+             setXuAmount('');
+        }
+         if (amountInput > coinsToUse && coinsToUse < maxCoinsNeeded) {
+            toast.warn(`Adjusted coins to ${coinsToUse} due to remaining balance or order total.`);
+         }
+     };
+
 
   const handlePayNow = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Shipping Data:', formData);
-    console.log('Payment Method:', selectedPaymentMethod);
-    // TODO: Thêm logic gọi API tạo đơn hàng
-    alert('Proceeding to payment...');
+   e.preventDefault();
+        // ... (validation)
+        const actualCoinsApplied = Math.ceil(xuValue / 1000);
+        const orderData = {
+            // ... (shippingInfo, paymentMethod, items, subtotal)
+             shippingAddress: {
+                 fullName: formData.fullName,
+                 address: formData.address,
+                 phoneNumber: formData.phoneNumber,
+            },
+            paymentMethod: selectedPaymentMethod,
+            orderItems: cartItems.map(item => ({
+                productId: item.id,
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                image: item.image,
+                size: item.size
+            })),
+            subtotal: subtotal || 0,
+            couponCode: appliedCoupon ? appliedCoupon.code : null,
+            coinsApplied: actualCoinsApplied,
+        };
+        console.log('Submitting Order Data:', orderData);
+        alert('Proceeding to payment/order creation...');
   };
 
   if (!cartItems) {
@@ -123,44 +250,94 @@ const CheckoutPage: React.FC = () => {
             </div>
 
             {/* --- Review Your Cart --- */}
-            <div className={cx('sectionCard', 'reviewCart')}>
-              <h2>Review Your Order</h2>
-              <div className={cx('cartItemsList')}>
-                {cartItems.map(item => (
-                  <div key={item.id} className={cx('cartItem')}>
-                    <img src={item.image} alt={item.name} className={cx('cartItemImage')} />
-                    <div className={cx('cartItemDetails')}>
-                      <span>{item.name} ({item.size})</span>
-                      <span>Qty: {item.quantity}</span>
-                    </div>
-                    <span className={cx('cartItemPrice')}>{formatCurrency(item.price)}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+           <div className={cx('sectionCard', 'reviewCart')}>
+                            <h2>Review Your Order</h2>
+                            {/* Thay thế div bằng table */}
+                            <div className={cx('review-table-wrapper')}> {/* Thêm wrapper nếu cần cuộn */}
+                                <table className={cx('review-table')}>
+                                    {/* 1. Thêm Tiêu đề bảng */}
+                                    <thead>
+                                        <tr>
+                                            <th className={cx('header-product')}>Product</th>
+                                            <th className={cx('header-price')}>Price</th>
+                                            <th className={cx('header-quantity')}>Quantity</th>
+                                            <th className={cx('header-subtotal')}>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    {/* 2. Thân bảng */}
+                                    <tbody>
+                                        {cartItems.map(item => (
+                                            // 3. Mỗi item là một hàng <tr>
+                                            <tr key={item.id} className={cx('review-item-row')}>
+                                                {/* Ô Product */}
+                                                <td className={cx('cell-product')}>
+                                                    <div className={cx('product-display')}>
+                                                        <img src={item.image} alt={item.name} className={cx('product-image')} />
+                                                        <div className={cx('product-info')}>
+                                                            <span className={cx('product-name')}>{item.name}</span>
+                                                            <span className={cx('size')}>Size: <span className={cx('size-value')}>{item.size}</span></span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                {/* Ô Price */}
+                                                <td className={cx('cell-price')}>{formatCurrency(item.price)}</td>
+                                                {/* Ô Quantity (chỉ hiển thị số) */}
+                                                <td className={cx('cell-quantity')}>{item.quantity}</td>
+                                                {/* Ô Subtotal */}
+                                                <td className={cx('cell-subtotal')}>{formatCurrency(item.price * item.quantity)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div> {/* Kết thúc wrapper */}
+                        </div>
           </div> {/* Kết thúc cột trái */}
 
           {/* === CỘT PHẢI: DISCOUNT, XU, PAYMENT, SUMMARY === */}
           <div className={cx('rightColumn')}>
             {/* --- Discount Code --- */}
             <div className={cx('sectionCard', 'discountCard')}>
-                <h2>Discount Code</h2>
+                <h2>VOUCHER</h2>
                 <div className={cx('applySection')}>
                     <Tag size={18} className={cx('applyIcon')}/>
-                    <input type="text" placeholder="Enter discount code" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} />
-                    <button type="button" onClick={handleApplyDiscount}>Apply</button>
+                   <button type="button" onClick={handleOpenCouponModal}>Select Coupon</button>
+                </div>
+               <div className={cx('appliedDiscount-1')}>
+                  <span>Discount {appliedCoupon ? `(${appliedCoupon.code})` : ''}</span>
+                  <span className={cx('discountAmount-1')}>
+                      - {formatCurrency(discountValue)}
+                  </span>
                 </div>
             </div>
 
             {/* --- Xu (Coins/Points) --- */}
             <div className={cx('sectionCard', 'xuCard')}>
                 <h2>Use Coin <span className={cx('coinInfo')}> (1coin = 1000đ)</span></h2>
+               <p>
+                  Coin available:{' '}
+                  {isLoadingBalance ? (
+                   <span className={cx('coin-value', 'loading')}>Loading...</span>
+                   ) : (
+                       <span className={cx('coin-value')}>{userCoinBalance}</span>
+                  )}
+                </p>
                 <div className={cx('applySection')}>
                     <Coins size={18} className={cx('applyIcon')}/>
-                    <input type="number" placeholder="Enter Xu amount" value={xuAmount} onChange={(e) => setXuAmount(e.target.value)} min="0" />
-                    <button type="button" onClick={handleApplyXu}>Apply</button>
+                    <input 
+                        type="number" 
+                        placeholder="Enter coin amount" 
+                        value={xuAmount} 
+                        onChange={(e) => setXuAmount(e.target.value)} 
+                        min="0"
+                        step="1" 
+                        max={userCoinBalance}
+                        disabled={isLoadingBalance}
+                        />
+                    <button type="button" onClick={handleApplyXu} disabled={isLoadingBalance}>Apply</button>
                 </div>
-                 {/* <p className={cx('xuBalance')}>Available Xu: 1000</p> */}
+                {xuValue > 0 && (
+                    <p className={cx('applied-value')}>Applied: -{formatCurrency(xuValue)}</p>
+                 )}
             </div>
 
             {/* --- Payment Method --- */}
@@ -200,6 +377,11 @@ const CheckoutPage: React.FC = () => {
         </form>
       </div>
       <Footer />
+      <CouponModal
+          isOpen={isCouponModalOpen}
+          onClose={() => setIsCouponModalOpen(false)} 
+          onApply={handleApplyCouponFromModal}       
+      />
     </div>
   );
 };

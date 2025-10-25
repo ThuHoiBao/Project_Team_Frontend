@@ -53,7 +53,7 @@ const CartPage: React.FC = () => {
                             image:
                                 item.product.image ||
                                 'https://placehold.co/100x100?text=No+Image',
-                            name: item.product.productName,
+                            name: item.product.name,
                             size: item.size,
                             price: item.product.price,
                             quantity: item.quantity,
