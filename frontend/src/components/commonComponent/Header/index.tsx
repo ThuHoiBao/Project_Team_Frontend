@@ -88,8 +88,8 @@ const MENU_ITEMS: MenuItemType[] = [
     },
     {
         icon: <FontAwesomeIcon icon={faCircleQuestion} />,
-        title: 'My order',
-        to: '/order',
+        title: 'Feedback and help',
+        to: '/feedback',
     },
 ];
 type NotificationData = {
@@ -171,8 +171,8 @@ function Header() {
         },
         {
             icon: <FontAwesomeIcon icon={faGear} />,
-            title: 'Settings',
-            to: '/settings',
+            title: 'My order',
+            to: '/order',
         },
         ...MENU_ITEMS,
         {
@@ -215,10 +215,12 @@ function Header() {
 
             } catch (error) {
                 if (error instanceof AxiosError) {
-                    setCurrentUser(false);
+                    //setCurrentUser(false);
+                    logout()
                     console.error("API error:", error.response?.data);
                 } else {
                     //setCurrentUser(false);
+                    logout()
                     console.error("Unexpected error:", error);
                 }
             }
