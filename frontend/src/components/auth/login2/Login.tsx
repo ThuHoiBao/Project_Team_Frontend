@@ -1,6 +1,6 @@
 // src/components/Login/Login.tsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./Login.module.scss";
 import { googleLogin, loginUser } from "../../../services/auth/authApi";
 import { AxiosError } from "axios";
@@ -17,6 +17,7 @@ const Login: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const { isLoginOpen, closeLogin } = useLoginModal();
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
 
   useEffect(() => {
@@ -37,7 +38,7 @@ const Login: React.FC = () => {
       setErrorMessage("");
       setTimeout(() => {
         closeLogin();
-        navigate("/home");
+        navigate(location.pathname); // Quay lại đúng trang hiện tại
         window.location.reload();
         setSuccessMessage("");
       }, 700);
@@ -64,7 +65,7 @@ const Login: React.FC = () => {
     setErrorMessage("");
     setTimeout(() => {
       closeLogin();
-      navigate("/home");
+      navigate(location.pathname); // Quay lại đúng trang hiện tại
       window.location.reload();
       setSuccessMessage("");
     }, 700);
