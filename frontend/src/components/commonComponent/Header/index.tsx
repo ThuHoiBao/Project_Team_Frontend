@@ -219,11 +219,11 @@ function Header() {
             } catch (error) {
                 if (error instanceof AxiosError) {
                     //setCurrentUser(false);
-                    logout()
+                    if (error.response?.data.message === "Invalid or expired token")
+                        logout()
                     console.error("API error:", error.response?.data);
                 } else {
                     //setCurrentUser(false);
-                    logout()
                     console.error("Unexpected error:", error);
                 }
             }
