@@ -146,7 +146,7 @@ function Header() {
                     logout();
                     // Chờ 1s rồi mới chuyển trang
                     setTimeout(() => {
-                        navigate("/home");
+                        navigate(location.pathname);
                     }, 1500);
                 } catch (error) {
                     console.error("Logout failed:", error);
