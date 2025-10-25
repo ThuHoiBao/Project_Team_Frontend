@@ -183,9 +183,7 @@ const handleItemClick = () => {
         </>
         );
 
-      case 'CANCELLED':
-        // return <button className="btn-buy-again" onClick={() => openModal('Bạn đã mua lại thành công')}>Mua lại</button>;
-
+     
       case 'FEEDBACKED':
         return (
           <>
