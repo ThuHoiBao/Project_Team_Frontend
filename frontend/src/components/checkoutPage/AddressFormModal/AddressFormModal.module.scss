@@ -1,0 +1,127 @@
+/* AddressFormModal.module.scss */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1060; // Higher than AddressList modal
+}
+
+.modalContent {
+    background: #fff;
+    padding: 25px 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px; // Standard modal width
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.backButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem; // Match close button size
+    color: #888;
+    padding: 0;
+    line-height: 1;
+    display: flex; // Align icon nicely
+    align-items: center;
+
+    &:hover { color: #555; }
+}
+
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; // Space between form groups
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    label {
+        font-weight: 500;
+        color: #444;
+        font-size: 0.9rem;
+    }
+
+    input {
+        padding: 10px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+
+        &:focus {
+            outline: none;
+            border-color: #555;
+            box-shadow: 0 0 0 2px rgba(85, 85, 85, 0.2);
+        }
+    }
+
+    .error {
+        font-size: 0.8rem;
+        color: #dc3545;
+        margin-top: 2px;
+    }
+}
+
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.cancelButton, .submitButton {
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    border: 1px solid #ccc;
+}
+
+.cancelButton {
+    background-color: #fff;
+    color: #555;
+    &:hover { background-color: #f5f5f5; }
+}
+
+.submitButton {
+    background-color: #e57373; // Match theme
+    color: white;
+    border-color: #e57373;
+    &:hover { background-color: #ef5350; }
+    &:disabled {
+        background-color: #ccc;
+        border-color: #ccc;
+        cursor: not-allowed;
+    }
+}
