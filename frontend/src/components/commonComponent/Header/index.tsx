@@ -22,7 +22,7 @@ import Search from '../Search';
 // import { Link } from 'react-router-dom';
 import { MenuItemType } from "../types/MenuItemType";
 import { useEffect, useState } from 'react';
-import { getMyInfo, logoutUser } from '../../../services/user/myInfoApi';
+import { getCoin, getMyInfo, logoutUser } from '../../../services/user/myInfoApi';
 import images from '../../../assets/images';
 import { AxiosError } from 'axios';
 import { useLoginModal } from '../../../context/LoginContext';
@@ -114,6 +114,7 @@ function Header() {
     const [showNotifications, setShowNotifications] = useState<boolean>(false);
     const [selectedNotification, setSelectedNotification] = useState<NotificationData | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [coin, setCoin] = useState('')
     const handleOpenNotification = async (noti: NotificationData) => {
         setSelectedNotification(noti);
         setIsModalOpen(true);
@@ -166,8 +167,7 @@ function Header() {
         },
         {
             icon: <FontAwesomeIcon icon={faCoins} />,
-            title: 'Get coins',
-            to: '/coin',
+            title: 'Coin: '+ coin 
         },
         {
             icon: <FontAwesomeIcon icon={faGear} />,
@@ -188,7 +188,10 @@ function Header() {
                 const data = await getMyInfo();
                 //setCurrentUser(true);
                 setAvatar(data.image);
-
+                const coinData = await getCoin(data._id)
+                if(!coinData) setCoin('0')
+                else setCoin(coinData)
+                
                 // Lấy danh sách thông báo
                 const notis = await getNotifications(data._id);
                 const listNotifications = notis.map((noti: any) => ({
