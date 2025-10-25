@@ -34,7 +34,7 @@ export const updateMyInfo = async (userInfo: UpdateMyInfoRequest) => {
 
 export const updateMyAvatar = async (file: File) => {
   const formData = new FormData();
-  formData.append("image", file); // "image" phải trùng với multer.single('image')
+  formData.append("image", file);
 
   const response = await api.post("/myinfo/upload-image", formData, {
     headers: {
@@ -49,3 +49,8 @@ export const logoutUser = async () => {
   const response = await api.post("/logout"); 
   return response.data; 
 };
+
+export const getCoin = async (userId: string) => {
+  const response = await api.get("/coin"); 
+  return response.data.data[0].value;  
+}
