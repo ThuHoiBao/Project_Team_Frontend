@@ -22,6 +22,8 @@ import { ToastContainer } from "react-toastify";
 import AuthPage from './components/auth/authPage/AuthPage';
 import CheckoutPage from './components/checkoutPage/CheckoutPage';
 import { CartProvider } from './context/CartContext'; 
+import PaymentReturnPage from './components/checkoutPage/PaymentReturnPage';
+import OrderSuccessPage from './components/checkoutPage/OrderSuccessPage';
 function App() {
   return (
      <CartProvider>
@@ -46,6 +48,8 @@ function App() {
         <Route path="/casual" element={<CasualPage/>}/>
         <Route path="/product/wishlist" element={<WishlistPage />} />
         <Route  path="/checkout" element={<CheckoutPage />}   />
+        <Route path="/payment-return" element={<PaymentReturnPage />} />
+        <Route path="/order-success/:id" element={<OrderSuccessPage />} />
       </Routes>
       <Login />
       <ToastContainer position="bottom-right" />
