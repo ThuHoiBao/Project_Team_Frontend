@@ -23,36 +23,50 @@ const HomePage: React.FC = () => {
   const [bestFeedback, setBestFeedback] = useState([]);
   
   useEffect(() => {
-    const fetchAPi = async () => {
-        const newProductResponse = await getNewProducts();
-        const topSellingProductsResponse = await getTopSellingProducts();
-        const bestFeedbackResponse = await getBestFeedback();
-        setNewProducts(newProductResponse);
-        setTopSellingProducts(topSellingProductsResponse);
-        setBestFeedback(bestFeedbackResponse);
-    };
-    fetchAPi();
-  }, []);
+  const fetchAPi = async () => {
+    try {
+      const [newProductResponse, topSellingProductsResponse, bestFeedbackResponse] = await Promise.all([
+        getNewProducts(),
+        getTopSellingProducts(),
+        getBestFeedback().catch(() => []), // nếu lỗi feedback → trả mảng rỗng
+      ]);
+
+      setNewProducts(newProductResponse || []);
+      setTopSellingProducts(topSellingProductsResponse || []);
+      setBestFeedback(bestFeedbackResponse || []);
+    } catch (error) {
+      console.error("Error fetching home page data:", error);
+    }
+  };
+
+  fetchAPi();
+}, []);
 
   console.log(newProducts);
   console.log(topSellingProducts);
   console.log(bestFeedback);
 
   return (
-    <>
-      <Header/>
-      <Banner />
-      <div className={cx("container")}>
-        <ListProduct title="New Arrivals" data={newProducts} />
-        <hr className={cx("divider")} />
-        <ListProduct title="Top Selling" data={topSellingProducts} />
-        <BrowseByDressStyle/>
+  <>
+    <Header/>
+    <Banner />
+    <div className={cx("container")}>
+      <ListProduct title="New Arrivals" data={newProducts} />
+      <hr className={cx("divider")} />
+      <ListProduct title="Top Selling" data={topSellingProducts} />
+      <BrowseByDressStyle/>
+
+      {/* Chỉ render khi có feedback */}
+      {bestFeedback && bestFeedback.length > 0 && (
         <CustomerFeedback data={bestFeedback} />
-         <ChatBot /> {/* Add the ChatBot here */}
-      </div>
-      <Footer />
-    </>
-  );
+      )}
+
+      <ChatBot />
+    </div>
+    <Footer />
+  </>
+);
+
 };
 
 export default HomePage;
