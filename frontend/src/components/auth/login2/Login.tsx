@@ -57,18 +57,22 @@ const Login: React.FC = () => {
   try {
     if (!credentialResponse.credential) return;
     const data = await googleLogin(credentialResponse.credential);
+    if(data.token === ""){
+        setErrorMessage("Tài khoản bị cấm");
+      }else{
+        localStorage.setItem("token", data.token);
+        // console.log("After setItem:", localStorage.getItem("token"));
+        login(data.token);
+        setSuccessMessage("Login successful!");
+        setErrorMessage("");
+        setTimeout(() => {
+          closeLogin();
+          navigate(location.pathname); // Quay lại đúng trang hiện tại
+          window.location.reload();
+          setSuccessMessage("");
+        }, 700);
+      }
     // console.log("Google token:", data.token);
-    localStorage.setItem("token", data.token);
-    // console.log("After setItem:", localStorage.getItem("token"));
-    login(data.token);
-    setSuccessMessage("Login successful!");
-    setErrorMessage("");
-    setTimeout(() => {
-      closeLogin();
-      navigate(location.pathname); // Quay lại đúng trang hiện tại
-      window.location.reload();
-      setSuccessMessage("");
-    }, 700);
   } catch (error) {
     console.error(error);
   }

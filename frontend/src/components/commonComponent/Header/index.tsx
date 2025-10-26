@@ -350,15 +350,10 @@ function Header() {
                                 display: "inline-block",
                                 boxSizing: "content-box",
                                 height: "2em",
-                                width: "2.25em"
+                                width: "2.25em",
+                                marginLeft: "4px"
                                 }} src="https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png"
                                 onClick={handleOpenWishlist} />
-                            {/* <Tippy delay={[0, 50]} content="Inbox" placement="bottom">
-                                <button className={cx('action-btn')}>
-                                    <InboxIcon />
-                                    <span className={cx('badge')}>12</span>
-                                </button>
-                            </Tippy> */}
                         </>
                     ) : (
                         <>

@@ -547,7 +547,7 @@ const getQuantityAlreadyInCart = useCallback(
               </div>
 
               <div className={cx("product-price")}>
-                <span className={cx("current-price")}>${product?.price?.toFixed(2) ?? "0.00"}</span>
+                <span className={cx("current-price")}>{product?.price}đ</span>
               </div>
 
               <p className={cx("product-description")}>{product?.description}</p>
@@ -693,7 +693,7 @@ const getQuantityAlreadyInCart = useCallback(
                     alt={rec.name}
                   />
                   <h3>{rec.name}</h3>
-                  <p className={cx("price")}>${rec.price.toFixed(2)}</p>
+                  <p className={cx("price")}>{rec.price}đ</p>
                 </div>
               ))}
             </div>
