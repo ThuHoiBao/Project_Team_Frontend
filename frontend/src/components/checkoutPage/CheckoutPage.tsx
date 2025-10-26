@@ -12,7 +12,9 @@ import CouponModal from './Coupon/CouponModal';
 import { getCoinBalance } from '../../services/coin/coinApi';
 import { getDefaultAddress, AddressDelivery } from '../../services/addressDelivery/addressApi';
 import AddressModal from './AddressModal/AddressModal';
-
+import { createOrder } from '../../services/order/orderApi';     
+import { createCodOrder } from '../../services/payment/paymentApi';
+import { createVnpayUrl } from '../../services/payment/paymentApi'; 
 const cx = classNames.bind(styles);
 
 // --- Mock Data (Giữ nguyên) ---
@@ -55,9 +57,11 @@ const CheckoutPage: React.FC = () => {
 
   const [selectedAddress, setSelectedAddress] = useState<AddressDelivery | null>(null);
   const [isLoadingAddress, setIsLoadingAddress] = useState(true);
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // === ADD STATE FOR ADDRESS MODAL VISIBILITY ===
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+
+
   const handleAddressSelect = (newAddress: AddressDelivery) => {
       setSelectedAddress(newAddress); // Update the displayed address
   };
@@ -105,12 +109,16 @@ const CheckoutPage: React.FC = () => {
         fetchAddress();
     }, []);
 
+    const calculatedSubtotal = useMemo(() => {
+        return cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
+     }, [cartItems]);
+
     const total = useMemo(() => {
-        const currentSubtotal = subtotal || 0;
+        const currentSubtotal = calculatedSubtotal; 
         const effectiveDiscount = Math.min(discountValue, currentSubtotal);
         const effectiveXu = Math.min(xuValue, currentSubtotal - effectiveDiscount);
         return Math.max(0, currentSubtotal - effectiveDiscount - effectiveXu);
-    }, [subtotal, discountValue, xuValue]);
+    }, [calculatedSubtotal, discountValue, xuValue]);
 
   
  
@@ -123,7 +131,7 @@ const CheckoutPage: React.FC = () => {
  };
 
   const handleApplyCouponFromModal = (coupon: Coupon) => {
-      const currentSubtotal = subtotal || 0;
+      const currentSubtotal = calculatedSubtotal || 0;
 
       const percentageDiscount = (coupon.discountValue / 100) * currentSubtotal;
 
@@ -149,7 +157,7 @@ const CheckoutPage: React.FC = () => {
 
   const handleApplyXu = () => {
          const amountInput = Number(xuAmount);
-         const currentSubtotal = subtotal || 0;
+         const currentSubtotal = calculatedSubtotal || 0;
 
          if (isNaN(amountInput) || amountInput < 0) {
               toast.error("Please enter a valid positive number for Xu.");
@@ -196,22 +204,31 @@ const CheckoutPage: React.FC = () => {
      };
 
 
-     const handlePayNow = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handlePayNow = async (e: React.FormEvent) => {
+         e.preventDefault();
+    console.log("=== CHECKOUT PROCESS START ===");
 
-        if (!selectedAddress) {
-            toast.error("Please select or add a shipping address.");
-            return;
-        }
+    // 1. Basic Validations
+    if (!selectedAddress) {
+        toast.error("Please select or add a shipping address.");
+        return;
+    }
 
+    if (!cartItems || cartItems.length === 0) {
+        toast.error("Your cart appears empty. Cannot proceed.");
+        navigate('/cart', { replace: true });
+        return;
+    }
+
+    setIsSubmitting(true);
+    toast.info("Processing your order...");
+    
+    try {
+        // 2. Prepare Order Payload
         const actualCoinsApplied = Math.ceil(xuValue / 1000);
 
-        const orderData = {
-            shippingAddress: { 
-                 fullName: selectedAddress.fullName,
-                 address: selectedAddress.address,
-                 phoneNumber: selectedAddress.phoneNumber, 
-            },
+        const orderPayload = {
+            shippingAddressId: selectedAddress.id,
             paymentMethod: selectedPaymentMethod,
             orderItems: cartItems.map(item => ({
                 productId: item.id,
@@ -221,13 +238,147 @@ const CheckoutPage: React.FC = () => {
                 image: item.image,
                 size: item.size
             })),
-            subtotal: subtotal || 0,
             couponCode: appliedCoupon ? appliedCoupon.code : null,
             coinsApplied: actualCoinsApplied,
         };
 
-        console.log('Submitting Order Data:', orderData);
-        alert('Proceeding to payment/order creation...');
+        console.log('📦 ORDER PAYLOAD:', JSON.stringify(orderPayload, null, 2));
+
+        // ============================================
+        // 3. HANDLE PAYMENT METHOD - FIXED SECTION
+        // ============================================
+
+        if (selectedPaymentMethod === PaymentMethod.COD) {
+            console.log('💵 === COD PAYMENT FLOW ===');
+            
+            // For COD, create and finalize order in one step
+            // You'll need to create this new API endpoint in backend
+            const response = await createCodOrder(orderPayload);
+            
+            if (!response || !response.orderId) {
+                throw new Error('Invalid response from server');
+            }
+
+            console.log('✅ COD Order Created:', response.orderId);
+            toast.success("Order placed successfully with Cash on Delivery!");
+            
+            // Redirect to success page
+            navigate(`/order-success/${response.orderId}`, { replace: true });
+
+        } else if (selectedPaymentMethod === PaymentMethod.VNPAY) {
+            console.log('💳 === VNPAY PAYMENT FLOW ===');
+            
+            // Step 1: Create preliminary order
+            console.log('🚀 Creating preliminary order...');
+            const preliminaryOrderResponse = await createOrder(orderPayload);
+            
+            // ✅ FIX: Validate response structure first
+            if (!preliminaryOrderResponse || typeof preliminaryOrderResponse !== 'object') {
+                throw new Error('Invalid response from server');
+            }
+
+            const { orderId, totalPrice: finalPriceFromBackend } = preliminaryOrderResponse;
+            
+            if (!orderId) {
+                throw new Error('Order ID not received from server');
+            }
+
+            console.log(`✅ Preliminary Order Created: ${orderId}`);
+            console.log(`💰 Total Price: ${finalPriceFromBackend}`);
+
+            // Step 2: Handle zero-total orders
+            if (finalPriceFromBackend <= 0) {
+                console.log('⚠️ Total is 0, skipping payment gateway');
+                toast.success("Order placed successfully! (No payment required)");
+                navigate(`/order-success/${orderId}`, { replace: true });
+                return;
+            }
+
+            // Step 3: Request VNPAY payment URL
+            const vnpayPayload = {
+                orderId: orderId,
+                orderDescription: `Payment for order ${orderId}`,
+            };
+
+            console.log('🔗 Requesting VNPAY URL...');
+            console.log('Payload:', vnpayPayload);
+            
+            const vnpayResponse = await createVnpayUrl(vnpayPayload);
+            
+            // ✅ FIX: Comprehensive validation
+            console.log('📥 VNPAY Response:', vnpayResponse);
+            
+            // Check if response exists
+            if (!vnpayResponse) {
+                throw new Error('No response from payment server');
+            }
+
+            // Validate response structure
+            if (typeof vnpayResponse !== 'object') {
+                throw new Error('Invalid response format from payment server');
+            }
+
+            // Check response code and data
+            if (vnpayResponse.code === '00' && vnpayResponse.data) {
+                console.log('✅ VNPAY URL received:', vnpayResponse.data);
+                
+                // Validate URL format
+                try {
+                    new URL(vnpayResponse.data);
+                    console.log('✅ URL is valid');
+                } catch (urlError) {
+                    console.error('❌ Invalid URL format:', vnpayResponse.data);
+                    throw new Error('Received invalid payment URL from server');
+                }
+                
+                // Show loading state before redirect
+                toast.info("Redirecting to payment gateway...");
+                
+                // Small delay to ensure user sees the message
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Redirect to VNPAY
+                console.log('🔄 Redirecting to VNPAY...');
+                window.location.href = vnpayResponse.data;
+                // Script execution stops here
+                
+            } else {
+                // Response code is not '00' or data is missing
+                console.error('❌ VNPAY Error Response:', vnpayResponse);
+                const errorMessage = vnpayResponse.message || 'Failed to initialize payment gateway';
+                throw new Error(errorMessage);
+            }
+
+        } else {
+            // Unknown payment method
+            throw new Error('Invalid payment method selected');
+        }
+
+    } catch (error: any) {
+        console.error('❌ === CHECKOUT FAILED ===');
+        console.error('Error:', error);
+        
+        // ✅ FIX: Better error handling
+        let userMessage = "An error occurred during checkout. Please try again.";
+        
+        if (error.message) {
+            // Use the error message if it's user-friendly
+            if (error.message.includes('address') || 
+                error.message.includes('stock') || 
+                error.message.includes('balance') ||
+                error.message.includes('payment')) {
+                userMessage = error.message;
+            }
+        }
+        
+        toast.error(userMessage);
+        setIsSubmitting(false);
+        
+    } finally {
+        console.log('=== CHECKOUT PROCESS END ===');
+        // Note: setIsSubmitting(false) is NOT called for VNPAY success case
+        // because we redirect away from the page
+    }
     };
 
   if (!cartItems) {
@@ -343,17 +494,21 @@ const CheckoutPage: React.FC = () => {
           <div className={cx('rightColumn')}>
             {/* --- Discount Code --- */}
             <div className={cx('sectionCard', 'discountCard')}>
-                <h2>VOUCHER</h2>
-                <div className={cx('applySection')}>
-                    <Tag size={18} className={cx('applyIcon')}/>
-                   <button type="button" onClick={handleOpenCouponModal}>Select Coupon</button>
-                </div>
-               <div className={cx('appliedDiscount-1')}>
-                  <span>Discount <span className={cx('qTyColor')}>{appliedCoupon ? `(${appliedCoupon.code})` : ''}</span></span>
-                  <span className={cx('discountAmount-1')}>
-                      - {formatCurrency(discountValue)}
-                  </span>
-                </div>
+                <h2>COUPON</h2>
+               {appliedCoupon ? (
+                    <div className={cx('appliedVoucher')}>
+                    <span>Applied: {appliedCoupon.code} <span className={cx('qTyColor')}>(-{formatCurrency(discountValue)})</span></span>
+                     <button type="button" onClick={() => {
+                        setAppliedCoupon(null); setDiscountValue(0);
+                        setXuValue(0); setXuAmount(''); toast.info("Coupon removed. Coin application reset.");
+                     }}>Remove</button>
+                                </div>
+                  ) : (
+                     <div className={cx('applySection')}>
+                        <Tag size={18} className={cx('applyIcon')} />
+                        <button type="button" onClick={handleOpenCouponModal}>Select Coupon</button>
+                        </div>
+                     )}
             </div>
 
             {/* --- Xu (Coins/Points) --- */}
@@ -382,12 +537,14 @@ const CheckoutPage: React.FC = () => {
                     <button type="button" onClick={handleApplyXu} disabled={isLoadingBalance}>Apply</button>
                 </div>
 
-                  <div className={cx('appliedDiscount-1')}>
-                    <span>Coin <span className={cx('qTyColor')}> {xuAmount ? `(${xuAmount})` : ''}</span></span>
-                    <span className={cx('discountAmount-1')}>
-                        - {formatCurrency(xuValue)}
-                    </span>
-                </div>
+                 {xuValue > 0 && (
+                    <div className={cx('appliedValueDisplay')}> {/* Use a different class or reuse appliedDiscount-1 carefully */}
+                    <span>Coin Applied <span className={cx('qTyColor')}>{xuAmount ? `(${xuAmount})` : ''}</span></span>
+                     <span className={cx('coinValueAmount')}> {/* Use a different class */}
+                         - {formatCurrency(xuValue)}
+                     </span>
+                    </div>
+                 )}
             </div>
 
             {/* --- Payment Method --- */}
@@ -410,12 +567,18 @@ const CheckoutPage: React.FC = () => {
              {/* --- Pricing Summary & Pay Button --- */}
             <div className={cx('sectionCard', 'summaryCard')}>
                  <div className={cx('pricingSummary')}>
-                    <div><span>Subtotal</span><span>{formatCurrency(subtotal || 0)}</span></div>
+                   <div><span>Subtotal</span><span>{formatCurrency(calculatedSubtotal)}</span></div>
                     <div><span>Discount</span><span className={cx('discountAmount')}>- {formatCurrency(discountValue)}</span></div>
                     <div><span>Coin Applied</span><span className={cx('xuAmount')}>- {formatCurrency(xuValue)}</span></div>
                    <div className={cx('total')}><span>Total</span><span>{formatCurrency(total)}</span></div>
                 </div>
-                 <button type="submit" className={cx('payNowButton')}>Pay Now</button>
+                <button 
+                        type="submit" 
+                        className={cx('payNowButton')}
+                        disabled={isSubmitting || !selectedAddress}
+                    >
+                        {isSubmitting ? 'Processing...' : 'Pay Now'}
+                    </button>
                  <div className={cx('secureNote')}>
                     <Lock size={14} /> Secure Checkout - SSL Encrypted
                  </div>
