@@ -38,7 +38,7 @@ const CheckoutPage: React.FC = () => {
 
   const navigationState = location.state as { items: CartItem[], subtotal: number };
   const cartItems = navigationState?.items;
-  const subtotal = navigationState?.subtotal;
+  const subtotal = navigationState?.subtotal; 
 
 
   const [discountCode, setDiscountCode] = useState('');
@@ -85,26 +85,6 @@ const CheckoutPage: React.FC = () => {
       }
     };
 
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
-    const { name, value } = e.target;
-
-    if (name === 'phoneNumber') {
-      const numericValue = value.replace(/[^0-9]/g, '');
-      setFormData(prev => ({ ...prev, [name]: numericValue }));
-
-    }
-    else if (name === 'fullName') {
-      const textValue = value.replace(
-        /[^a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ\s]/gi,
-        ''
-      );
-      setFormData(prev => ({ ...prev, [name]: textValue }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
-  };
         fetchBalance();
     }, []);
 
@@ -252,13 +232,13 @@ const CheckoutPage: React.FC = () => {
 
   if (!cartItems) {
     return (
-      <div className={cx('page')}>
-        <Header />
-        <div className={cx('body')}>
-          <div className={cx('loading')}>Redirecting...</div>
+        <div className={cx('page')}>
+            <Header />
+            <div className={cx('body')}>
+                <div className={cx('loading')}>Redirecting...</div>
+            </div>
+            <Footer />
         </div>
-        <Footer />
-      </div>
     );
   }
 
@@ -266,11 +246,11 @@ const CheckoutPage: React.FC = () => {
     <div className={cx('page')}>
       <Header />
       <div className={cx('breadcrumb')}>
-        <Button text to='/home'>Home</Button>
-        <span className={cx('separator')}>{'>'}</span>
-        <Button text to='/cart'>Cart</Button>
-        <span className={cx('separator')}>{'>'}</span>
-        <Button text className={cx('active')}>Checkout</Button>
+         <Button text to='/home'>Home</Button>
+         <span className={cx('separator')}>{'>'}</span>
+         <Button text to='/cart'>Cart</Button>
+         <span className={cx('separator')}>{'>'}</span>
+         <Button text className={cx('active')}>Checkout</Button>
       </div>
       <div className={cx('body')}>
         <form onSubmit={handlePayNow} className={cx('checkoutGrid')}>
@@ -279,20 +259,6 @@ const CheckoutPage: React.FC = () => {
           <div className={cx('leftColumn')}>
             {/* --- Shipping Information --- */}
             <div className={cx('sectionCard', 'shippingInfo')}>
-              <h2>Shipping Information</h2>
-              <div className={cx('formGroup')}>
-                <label htmlFor="fullName">Full Name <span className={cx('red')}>*</span></label>
-                <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" value={formData.fullName} onChange={handleInputChange} required />
-              </div>
-              <div className={cx('formGroup')}>
-                <label htmlFor="address">Address <span className={cx('red')}>*</span></label>
-                <input type="text" id="address" name="address" placeholder="Enter your delivery address" value={formData.address} onChange={handleInputChange} required />
-              </div>
-              <div className={cx('formGroup')}>
-                <label htmlFor="phoneNumber">Phone Number <span className={cx('red')}>*</span></label>
-                <input type="tel" minLength={10} maxLength={10} id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" value={formData.phoneNumber} onChange={handleInputChange} required />
-              </div>
-            </div>
                             <h2 className={cx('shipping-title')}>
                                 <MapPin size={20} /> Shipping Address {/* Changed title */}
                             </h2>
@@ -377,12 +343,6 @@ const CheckoutPage: React.FC = () => {
           <div className={cx('rightColumn')}>
             {/* --- Discount Code --- */}
             <div className={cx('sectionCard', 'discountCard')}>
-              <h2>Discount Code</h2>
-              <div className={cx('applySection')}>
-                <Tag size={18} className={cx('applyIcon')} />
-                <input type="text" placeholder="Enter discount code" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} />
-                <button type="button" onClick={handleApplyDiscount}>Apply</button>
-              </div>
                 <h2>VOUCHER</h2>
                 <div className={cx('applySection')}>
                     <Tag size={18} className={cx('applyIcon')}/>
@@ -447,7 +407,7 @@ const CheckoutPage: React.FC = () => {
               </div>
             </div>
 
-            {/* --- Pricing Summary & Pay Button --- */}
+             {/* --- Pricing Summary & Pay Button --- */}
             <div className={cx('sectionCard', 'summaryCard')}>
                  <div className={cx('pricingSummary')}>
                     <div><span>Subtotal</span><span>{formatCurrency(subtotal || 0)}</span></div>
