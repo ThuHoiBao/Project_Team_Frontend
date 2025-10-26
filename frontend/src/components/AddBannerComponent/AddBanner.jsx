@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './AddBanner.css'; // Đảm bảo CSS cho banner
-
+import images from '../../assets/images';
 const AdBanner = () => {
   const [currentBanner, setCurrentBanner] = useState(0);
 
   const bannerImages = [
-    'https://storage.googleapis.com/bucket_mobileapp/images/banner1.webp', 
-    'https://storage.googleapis.com/bucket_mobileapp/images/banner2.webp',
-    'https://storage.googleapis.com/bucket_mobileapp/images/banner6.png',
-    'https://storage.googleapis.com/bucket_mobileapp/images/banner7.png',
+    images.banner1, 
+    images.banner2,
+    images.banner3
   ];
 
   // Thay đổi ảnh mỗi 3 giây
