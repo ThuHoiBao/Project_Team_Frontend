@@ -109,10 +109,10 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        color: #e57373; // Example red color like the image
+        color: black; // Example red color like the image
         margin-bottom: 15px;
         font-size: 1.1rem;
-        font-weight: 600;
+        font-weight: 700;
     }
 
     .address-loading, .no-address p {
@@ -229,11 +229,13 @@
         border-bottom: 2px solid #dee2e6;
     }
 
+
+
     /* Căn chỉnh các cột tiêu đề */
-    .header-product { width: 45%; }
-    .header-price { width: 20%; text-align: center; }
-    .header-quantity { width: 15%; text-align: center; }
-    .header-subtotal { width: 20%; text-align: right; }
+    .header-product { width: 45%; color: #111827;}
+    .header-price { width: 20%; text-align: center;  color: #111827;}
+    .header-quantity { width: 15%; text-align: center;  color: #111827;}
+    .header-subtotal { width: 20%; text-align: right;  color: #111827;}
 
     tbody tr {
         border-bottom: 1px solid #f0f0f0;
@@ -447,3 +449,30 @@
 .qTyColor {
   color: #2563eb;
 }
+
+.appliedVoucher {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btnCoupon{
+  background-color: red;
+  color: #fff;
+  border-radius: 10%;
+  border: 1px solid #fff;
+}
+
+.titleVoucher {
+  font-weight: 600;
+}
+
+.appliedValueDisplay {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.discountAmount, .coinValueAmoun, .xuAmount {
+  color: red;
+}
+
