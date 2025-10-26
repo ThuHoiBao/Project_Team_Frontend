@@ -14,7 +14,20 @@ type Category = {
 const categoryImageMap: Record<string, keyof typeof images> = {
   "Áo Thun": "aoThun",
   "Áo sơ mi": "aoSoMi",
-  "Áo thể dục": "aoTheDuc"
+  "Áo thể dục": "aoTheDuc",
+// Các khoa khác
+  "Khoa chính trị luật": "khoachinhtriluat",
+  "Khoa công nghệ thông tin": "khoacongnghethongtin",
+  "Khoa cơ khí": "khoacokhi",
+  "Khoa cơ khí chế tạo máy": "khoacokhichetaomay",
+  "Đồng phục thể chất": "dongphucthechat",
+  "Đồng phục trường": "dongphuctruong",
+  "Khoa in và truyền thông": "khoainvatruyenthong",
+  "Khoa khoa học ứng dụng": "khoakhoahocungdung",
+  "Khoa kinh tế": "khoakinhte",
+  "Khoa ngoại ngữ": "khoangoaingu",
+  "Khoa thời trang du lịch": "khoathoitrangvadulich",
+
 };
 
 const BrowseByDressStyle = () => {
