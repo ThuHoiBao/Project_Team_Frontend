@@ -8,6 +8,8 @@ import imageCanceled from '../../images/cancelled.png'
 import FeedbackModal  from "../FeedbackComponent/FeedbackModal";
 import { submitBulkFeedback ,getFeedbacksByOrder } from "../../services/feedback/feedbackApi";
 import ViewFeedbackModal from "../viewFeedBack/ViewFeedbackModal";
+import Footer from '../commonComponent/Footer';
+import Header from '../commonComponent/Header';
 import { Link } from 'react-router-dom';
 // Modal hiển thị cảm ơn và số Xu
 // Modal hiển thị cảm ơn và số Xu
@@ -200,6 +202,8 @@ const handleItemClick = () => {
   };
 
   return (
+    <div>
+      <Header></Header>
     <div className="order">
       <div className="order-header">
         <h3>
@@ -298,6 +302,8 @@ const handleItemClick = () => {
     {showThankYouModal && (
       <ThankYouModal xu={xu} onClose={() => setShowThankYouModal(false)} />
     )}
+    </div>
+    <Footer></Footer>
     </div>
   );
 };

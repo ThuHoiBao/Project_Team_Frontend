@@ -24,10 +24,7 @@
     "bootstrap": "^5.3.8",
     "classnames": "^2.5.1",
     "cors": "^2.8.5",
-<<<<<<< HEAD
-=======
     "date-fns": "^4.1.0",
->>>>>>> dc3678704d723ce025e9eaf716e61f9230b7f4b2
     "fuse.js": "^7.1.0",
     "lucide-react": "^0.542.0",
     "rc-slider": "^11.1.9",
