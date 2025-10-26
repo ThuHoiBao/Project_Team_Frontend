@@ -511,12 +511,12 @@ const CheckoutPage: React.FC = () => {
                 <h2>COUPON</h2>
                {appliedCoupon ? (
                     <div className={cx('appliedVoucher')}>
-                    <span>Applied: {appliedCoupon.code} <span className={cx('qTyColor')}>(-{formatCurrency(discountValue)})</span></span>
-                     <button type="button" onClick={() => {
-                        setAppliedCoupon(null); setDiscountValue(0);
-                        setXuValue(0); setXuAmount(''); toast.info("Coupon removed. Coin application reset.");
-                     }}>Remove</button>
-                                </div>
+                        <span className={cx('titleVoucher')}>Applied: {appliedCoupon.code}</span> <span className={cx('qTyColor')}>(-{formatCurrency(discountValue)})</span>
+                        <button className={cx('btnCoupon')} type="button" onClick={() => {
+                            setAppliedCoupon(null); setDiscountValue(0);
+                            setXuValue(0); setXuAmount(''); toast.info("Coupon removed. Coin application reset.");
+                        }}>Remove</button>
+                    </div>
                   ) : (
                      <div className={cx('applySection')}>
                         <Tag size={18} className={cx('applyIcon')} />
@@ -553,10 +553,10 @@ const CheckoutPage: React.FC = () => {
 
                  {xuValue > 0 && (
                     <div className={cx('appliedValueDisplay')}> {/* Use a different class or reuse appliedDiscount-1 carefully */}
-                    <span>Coin Applied <span className={cx('qTyColor')}>{xuAmount ? `(${xuAmount})` : ''}</span></span>
-                     <span className={cx('coinValueAmount')}> {/* Use a different class */}
-                         - {formatCurrency(xuValue)}
-                     </span>
+                        <span>Coin Applied <span className={cx('qTyColor')}>{xuAmount ? `(${xuAmount})` : ''}</span></span>
+                        <span className={cx('coinValueAmount')}> {/* Use a different class */}
+                            - {formatCurrency(xuValue)}
+                        </span>
                     </div>
                  )}
             </div>
@@ -582,8 +582,10 @@ const CheckoutPage: React.FC = () => {
             <div className={cx('sectionCard', 'summaryCard')}>
                  <div className={cx('pricingSummary')}>
                    <div><span>Subtotal</span><span>{formatCurrency(calculatedSubtotal)}</span></div>
-                    <div><span>Discount</span><span className={cx('discountAmount')}>- {formatCurrency(discountValue)}</span></div>
-                    <div><span>Coin Applied</span><span className={cx('xuAmount')}>- {formatCurrency(xuValue)}</span></div>
+                    <div><span>Discount</span><span style={{ color: 'red', fontWeight: 'bold', marginLeft: '8px' }}>
+                            - {formatCurrency(discountValue)}
+                        </span></div>
+                    <div><span>Coin Applied</span><span className={cx('xuAmount')} style={{ color: 'red', fontWeight: 'bold', marginLeft: '8px' }}>- {formatCurrency(xuValue)}</span></div>
                    <div className={cx('total')}><span>Total</span><span>{formatCurrency(total)}</span></div>
                 </div>
                 <button 

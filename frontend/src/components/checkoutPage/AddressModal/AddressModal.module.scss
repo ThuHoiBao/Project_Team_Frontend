@@ -149,7 +149,7 @@
     margin: 10px 20px; // Margin around button
     border: 1px dashed #ccc;
     border-radius: 4px;
-    background-color: #fdfdfd;
+    background-color: greenyellow;
     color: #555;
     cursor: pointer;
     font-weight: 500;
@@ -179,16 +179,16 @@
 }
 
 .cancelButton {
-    background-color: #fff;
-    color: #555;
-    &:hover { background-color: #f5f5f5; }
+    background-color:orange;
+    color: #fff;
+    &:hover { background-color: red; }
 }
 
 .confirmButton {
     background-color: #e57373; // Match theme color?
     color: white;
     border-color: #e57373;
-    &:hover { background-color: #ef5350; }
+    &:hover { background-color: blue; }
     &:disabled {
         background-color: #ccc;
         border-color: #ccc;
