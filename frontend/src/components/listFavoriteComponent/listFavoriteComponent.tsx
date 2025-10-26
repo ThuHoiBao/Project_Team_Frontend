@@ -102,7 +102,7 @@ const WishlistPage: React.FC = () => {
                   className={cx("card-image")}
                   onClick={() => handleViewProduct(item.product_id)}
                 >
-                  <img src={item.image} alt={item.name} />
+                  <img style={{objectFit: "cover"}} src={item.image} alt={item.name} />
                 </div>
                 <div className={cx("card-info")}>
                   <h3
