@@ -32,7 +32,7 @@ const CheckoutPage: React.FC = () => {
 
   const navigationState = location.state as { items: CartItem[], subtotal: number };
   const cartItems = navigationState?.items;
-  const subtotal = navigationState?.subtotal; 
+  const subtotal = navigationState?.subtotal;
 
 
   const [formData, setFormData] = useState({ fullName: '', address: '', phoneNumber: '' });
@@ -57,10 +57,25 @@ const CheckoutPage: React.FC = () => {
     return (subtotal || 0) - discountValue - xuValue;
   }, [subtotal, discountValue, xuValue]);
 
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'phoneNumber') {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setFormData(prev => ({ ...prev, [name]: numericValue }));
+
+    }
+    else if (name === 'fullName') {
+      const textValue = value.replace(
+        /[^a-zàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ\s]/gi,
+        ''
+      );
+      setFormData(prev => ({ ...prev, [name]: textValue }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handlePaymentMethodChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,13 +95,13 @@ const CheckoutPage: React.FC = () => {
 
   if (!cartItems) {
     return (
-        <div className={cx('page')}>
-            <Header />
-            <div className={cx('body')}>
-                <div className={cx('loading')}>Redirecting...</div>
-            </div>
-            <Footer />
+      <div className={cx('page')}>
+        <Header />
+        <div className={cx('body')}>
+          <div className={cx('loading')}>Redirecting...</div>
         </div>
+        <Footer />
+      </div>
     );
   }
 
@@ -94,11 +109,11 @@ const CheckoutPage: React.FC = () => {
     <div className={cx('page')}>
       <Header />
       <div className={cx('breadcrumb')}>
-         <Button text to='/home'>Home</Button>
-         <span className={cx('separator')}>{'>'}</span>
-         <Button text to='/cart'>Cart</Button>
-         <span className={cx('separator')}>{'>'}</span>
-         <Button text className={cx('active')}>Checkout</Button>
+        <Button text to='/home'>Home</Button>
+        <span className={cx('separator')}>{'>'}</span>
+        <Button text to='/cart'>Cart</Button>
+        <span className={cx('separator')}>{'>'}</span>
+        <Button text className={cx('active')}>Checkout</Button>
       </div>
       <div className={cx('body')}>
         <form onSubmit={handlePayNow} className={cx('checkoutGrid')}>
@@ -118,7 +133,7 @@ const CheckoutPage: React.FC = () => {
               </div>
               <div className={cx('formGroup')}>
                 <label htmlFor="phoneNumber">Phone Number <span className={cx('red')}>*</span></label>
-                <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" value={formData.phoneNumber} onChange={handleInputChange} required />
+                <input type="tel" minLength={10} maxLength={10} id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" value={formData.phoneNumber} onChange={handleInputChange} required />
               </div>
             </div>
 
@@ -144,23 +159,23 @@ const CheckoutPage: React.FC = () => {
           <div className={cx('rightColumn')}>
             {/* --- Discount Code --- */}
             <div className={cx('sectionCard', 'discountCard')}>
-                <h2>Discount Code</h2>
-                <div className={cx('applySection')}>
-                    <Tag size={18} className={cx('applyIcon')}/>
-                    <input type="text" placeholder="Enter discount code" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} />
-                    <button type="button" onClick={handleApplyDiscount}>Apply</button>
-                </div>
+              <h2>Discount Code</h2>
+              <div className={cx('applySection')}>
+                <Tag size={18} className={cx('applyIcon')} />
+                <input type="text" placeholder="Enter discount code" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} />
+                <button type="button" onClick={handleApplyDiscount}>Apply</button>
+              </div>
             </div>
 
             {/* --- Xu (Coins/Points) --- */}
             <div className={cx('sectionCard', 'xuCard')}>
-                <h2>Use Coin <span className={cx('coinInfo')}> (1coin = 1000đ)</span></h2>
-                <div className={cx('applySection')}>
-                    <Coins size={18} className={cx('applyIcon')}/>
-                    <input type="number" placeholder="Enter Xu amount" value={xuAmount} onChange={(e) => setXuAmount(e.target.value)} min="0" />
-                    <button type="button" onClick={handleApplyXu}>Apply</button>
-                </div>
-                 {/* <p className={cx('xuBalance')}>Available Xu: 1000</p> */}
+              <h2>Use Coin <span className={cx('coinInfo')}> (1coin = 1000đ)</span></h2>
+              <div className={cx('applySection')}>
+                <Coins size={18} className={cx('applyIcon')} />
+                <input type="number" placeholder="Enter Xu amount" value={xuAmount} onChange={(e) => setXuAmount(e.target.value)} min="0" />
+                <button type="button" onClick={handleApplyXu}>Apply</button>
+              </div>
+              {/* <p className={cx('xuBalance')}>Available Xu: 1000</p> */}
             </div>
 
             {/* --- Payment Method --- */}
@@ -180,19 +195,19 @@ const CheckoutPage: React.FC = () => {
               </div>
             </div>
 
-             {/* --- Pricing Summary & Pay Button --- */}
+            {/* --- Pricing Summary & Pay Button --- */}
             <div className={cx('sectionCard', 'summaryCard')}>
-                 <div className={cx('pricingSummary')}>
-                    <div><span>Subtotal</span><span>{formatCurrency(subtotal || 0)}</span></div>
-                    <div><span>Discount</span><span className={cx('discountAmount')}>- {formatCurrency(discountValue)}</span></div>
-                    <div><span>Xu Applied</span><span className={cx('xuAmount')}>- {formatCurrency(xuValue)}</span></div>
-                   <div className={cx('total')}><span>Total</span><span>{formatCurrency(total)}</span></div>
-                </div>
-                 <button type="submit" className={cx('payNowButton')}>Pay Now</button>
-                 <div className={cx('secureNote')}>
-                    <Lock size={14} /> Secure Checkout - SSL Encrypted
-                 </div>
-             </div>
+              <div className={cx('pricingSummary')}>
+                <div><span>Subtotal</span><span>{formatCurrency(subtotal || 0)}</span></div>
+                <div><span>Discount</span><span className={cx('discountAmount')}>- {formatCurrency(discountValue)}</span></div>
+                <div><span>Xu Applied</span><span className={cx('xuAmount')}>- {formatCurrency(xuValue)}</span></div>
+                <div className={cx('total')}><span>Total</span><span>{formatCurrency(total)}</span></div>
+              </div>
+              <button type="submit" className={cx('payNowButton')}>Pay Now</button>
+              <div className={cx('secureNote')}>
+                <Lock size={14} /> Secure Checkout - SSL Encrypted
+              </div>
+            </div>
 
 
           </div> {/* Kết thúc cột phải */}

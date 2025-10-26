@@ -88,7 +88,7 @@ const WishlistPage: React.FC = () => {
           <div className={cx("empty-wishlist")}>
             <p>Danh sách yêu thích của bạn đang trống.</p>
             <button
-              onClick={() => (window.location.href = "/product")}
+              onClick={() => (window.location.href = "/casual")}
               className={cx("go-shopping-btn")}
             >
               Khám phá ngay!
