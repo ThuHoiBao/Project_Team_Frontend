@@ -1,0 +1,118 @@
+/* PaymentReturnPage.module.scss */
+
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex-grow: 1; // Push footer down
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: #f8f9fa; // Light gray background
+}
+
+.status-box {
+  background-color: #ffffff;
+  padding: 40px 50px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.icon-wrapper {
+  margin-bottom: 25px;
+}
+
+// Icon colors
+.icon-success { color: #28a745; } // Green
+.icon-failed { color: #dc3545; } // Red
+.icon-unknown { color: #ffc107; } // Yellow
+.icon-loading { color: #007bff; } // Blue
+
+// Loading spinner animation
+.spinner {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.status-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.status-message {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.action-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap; // Allow wrapping on small screens
+}
+
+.link-button {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  border: 1px solid transparent;
+  cursor: pointer;
+
+  // Primary button (e.g., View Order)
+  &, &:link, &:visited {
+    background-color: #007bff; /* <<< Replaced variable with hex code */
+    color: white;
+    border-color: #007bff; /* <<< Replaced variable with hex code */
+  }
+
+  &:hover, &:active {
+    background-color: #0056b3; /* <<< Darken the hex code */
+    border-color: #0056b3; /* <<< Darken the hex code */
+    color: white;
+  }
+
+  // Secondary button (e.g., Back to Homepage)
+  &.secondary {
+     &, &:link, &:visited {
+        background-color: #f8f9fa;
+        color: #333;
+        border-color: #ccc;
+     }
+     &:hover, &:active {
+        background-color: #e9ecef;
+        color: #333;
+     }
+  }
+}
+
+// Optional: Debug parameters style
+.debug-params {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: left;
+  font-size: 0.8rem;
+  max-height: 150px;
+  overflow-y: auto;
+  word-break: break-all;
+  white-space: pre-wrap;
+}

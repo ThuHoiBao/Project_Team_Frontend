@@ -1,0 +1,98 @@
+.page-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+}
+
+.success-box {
+  background-color: #ffffff;
+  padding: 40px 50px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.icon-wrapper {
+  margin-bottom: 25px;
+}
+
+.icon-success {
+  color: #28a745; // Green
+}
+
+.status-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.status-message {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 10px; // Less margin between paragraphs
+
+  &:last-of-type {
+    margin-bottom: 30px; // More margin before buttons
+  }
+}
+
+.order-id {
+    font-weight: bold;
+    color: #000;
+}
+
+.action-links {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.link-button {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  border: 1px solid transparent;
+  cursor: pointer;
+
+  // Primary button
+  &, &:link, &:visited {
+    background-color: #007bff; // Example Blue
+    color: white;
+    border-color: #007bff;
+  }
+  &:hover, &:active {
+    background-color: #0056b3;
+    border-color: #0056b3;
+    color: white;
+  }
+
+  // Secondary button
+  &.secondary {
+     &, &:link, &:visited {
+        background-color: #f8f9fa;
+        color: #333;
+        border-color: #ccc;
+     }
+     &:hover, &:active {
+        background-color: #e9ecef;
+        color: #333;
+     }
+  }
+}

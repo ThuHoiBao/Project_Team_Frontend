@@ -20,13 +20,13 @@ interface ItemProductProps {
 }
 
 const ItemProduct: React.FC<ItemProductProps> = ({ product }) => {
-   const handleClick = (productId: string) => {
-      try {
-        window.location.href = `/product/${productId}`;
-      } catch (error) {
-        console.error("Error navigating to product:", error);
-      }
-    };
+  const handleClick = (productId: string) => {
+    try {
+      window.location.href = `/product/${productId}`;
+    } catch (error) {
+      console.error("Error navigating to product:", error);
+    }
+  };
 
   return (
     <div className={cx("productCard")}>
@@ -34,7 +34,7 @@ const ItemProduct: React.FC<ItemProductProps> = ({ product }) => {
         src={product.listImage[0].imageProduct}
         alt={product.productName}
         className={cx("productImage")}
-        onClick ={()=>handleClick(product._id)}
+        onClick={() => handleClick(product._id)}
       />
 
       <h3 className={cx("productName")}>{product.productName}</h3>
@@ -43,7 +43,11 @@ const ItemProduct: React.FC<ItemProductProps> = ({ product }) => {
         {"★".repeat(product.averageRating) + "☆".repeat(5 - product.averageRating)}
       </div>
 
-      <div className={cx("productPrice")}>${product.price.toFixed(2)}</div>
+      <div className={cx("productPrice")}>
+        {product?.price ?
+          new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)
+          : '0 ₫'}
+      </div>
     </div>
   );
 };

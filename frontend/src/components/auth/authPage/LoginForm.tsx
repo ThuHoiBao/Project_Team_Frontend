@@ -49,15 +49,21 @@ const LoginForm: React.FC<{ onForgot: () => void }> = ({ onForgot }) => {
     try {
       if (!credentialResponse.credential) return;
       const data = await googleLogin(credentialResponse.credential);
-      // console.log("Google token:", data.token);
-      localStorage.setItem("token", data.token);
-      // console.log("After setItem:", localStorage.getItem("token"));
-      login(data.token);
-      setSuccessMessage("Login successful!");
-      setErrorMessage("");
-      setTimeout(() => {
-        navigate("/home");
-      }, 700);
+      
+      if(data.token === ""){
+        setSuccessMessage("Tài khoản bị cấm");
+      }else{
+
+        localStorage.setItem("token", data.token);
+        console.log("After setItem:", localStorage.getItem("token"));
+        login(data.token);
+        setSuccessMessage("Login successful!");
+        setErrorMessage("");
+        setTimeout(() => {
+          // navigate("/home");
+        }, 700);
+      }
+      console.log("Google token:", data.token);
     } catch (error) {
       console.error(error);
     }

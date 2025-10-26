@@ -88,7 +88,7 @@ const WishlistPage: React.FC = () => {
           <div className={cx("empty-wishlist")}>
             <p>Danh sách yêu thích của bạn đang trống.</p>
             <button
-              onClick={() => (window.location.href = "/product")}
+              onClick={() => (window.location.href = "/casual")}
               className={cx("go-shopping-btn")}
             >
               Khám phá ngay!
@@ -111,9 +111,11 @@ const WishlistPage: React.FC = () => {
                   >
                     {item.name}
                   </h3>
-                  <p className={cx("product-price-wishlist")}>
-                    ${item.price.toFixed(2)}
-                  </p>
+                  <span className={cx("product-price-wishlist")}>
+                    {item?.price ?
+                      new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)
+                      : '0 ₫'}
+                  </span>
 
                   <div className={cx("card-actions")}>
                     <button

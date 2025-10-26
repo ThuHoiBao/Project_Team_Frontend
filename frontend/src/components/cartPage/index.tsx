@@ -53,7 +53,7 @@ const CartPage: React.FC = () => {
                             image:
                                 item.product.image ||
                                 'https://placehold.co/100x100?text=No+Image',
-                            name: item.product.productName,
+                            name: item.product.name,
                             size: item.size,
                             price: item.product.price,
                             quantity: item.quantity,
@@ -163,17 +163,22 @@ const CartPage: React.FC = () => {
             .reduce((sum, item) => sum + (item.price * item.quantity), 0);
     }, [cartItems, selectedItems]);
 
-    const itemsToCheckout = cartItems
-    .filter(item => selectedItems.has(item.cartItemId))
-    // 2. Map về đúng định dạng mà CheckoutPage mong đợi
-    .map(item => ({
-        id: item.cartItemId,
+   const itemsToCheckout = cartItems
+   .filter(item => selectedItems.has(item.cartItemId))
+   .map(item => { // Added curly braces to allow statements before return
+      // --- DEBUG LOG ---
+      console.log('Mapping item for checkout:', item);
+      // --- END DEBUG LOG ---
+      return { // Return the mapped object
+        id: item.productId,
         name: item.name,
         quantity: item.quantity,
         price: item.price,
         size: item.size,
         image: item.image
-    }));
+      };
+   }); // End map
+
 
     if (isLoading) {
         return (

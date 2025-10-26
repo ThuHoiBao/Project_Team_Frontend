@@ -105,96 +105,197 @@
 
 // --- Style cho Shipping Info ---
 .shippingInfo {
-  // Styles riêng nếu cần
-}
-
-.formGroup {
-  margin-bottom: 1.25rem;
-
-  label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: #374151;
-  }
-
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"] {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    color: #1f2937;
-    transition: border-color 0.2s, box-shadow 0.2s; // Hiệu ứng focus mượt hơn
-
-    &::placeholder { color: #9ca3af; }
-    &:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 1px #3b82f6;
+    h2.shipping-title { // Style the title with icon
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #e57373; // Example red color like the image
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
     }
-  }
-}
 
+    .address-loading, .no-address p {
+        padding: 20px;
+        text-align: center;
+        color: #888;
+        font-style: italic;
+    }
+    
+    .no-address {
+        text-align: center;
+        .add-address-btn { // Simple button style
+            margin-top: 10px;
+            padding: 8px 15px;
+            cursor: pointer;
+            // Add your button styles
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            &:hover {
+                background-color: #ddd;
+            }
+        }
+    }
+
+
+    .address-display {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; // Align items to the top
+        padding: 10px 0; // Add some padding if needed
+    }
+
+    .address-details {
+        display: flex;
+        flex-direction: column;
+        gap: 5px; // Space between lines
+        flex-grow: 1; // Take available space
+        padding-right: 15px; // Space before buttons
+    }
+
+    .name-phone {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .address-line {
+        font-size: 0.95rem;
+        color: #555;
+        line-height: 1.4;
+    }
+
+    .address-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px; // Space between tag and button
+        flex-shrink: 0; // Prevent shrinking
+    }
+
+    .default-tag {
+        border: 1px solid #e57373; // Red border
+        color: #e57373; // Red text
+        padding: 3px 8px;
+        font-size: 0.75rem;
+        border-radius: 3px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .change-btn {
+        background: none;
+        border: none;
+        color: #007bff; // Blue link color
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.95rem;
+        font-weight: 500;
+        white-space: nowrap;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
 // --- Style cho Review Cart ---
 .reviewCart {
-  // Styles riêng nếu cần
+    h2 {
+        margin-bottom: 15px; // Khoảng cách dưới tiêu đề "Review Your Order"
+    }
 }
 
-.cartItemsList {
-  margin-bottom: 0; // Bỏ margin bottom nếu discount/xu ở cột phải
-  max-height: 310px; // Chiều cao tối đa trước khi cuộn
-  overflow-y: auto;
-  padding-right: 8px; // Chỗ cho thanh cuộn
-
-  // Style thanh cuộn (tùy chọn)
-  &::-webkit-scrollbar { width: 6px; }
-  &::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 3px; }
-  &::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
-  &::-webkit-scrollbar-thumb:hover { background: #aaa; }
+/* Optional: Wrapper nếu bạn muốn giới hạn chiều cao và cuộn */
+.review-table-wrapper {
+    max-height: 300px; /* Giới hạn chiều cao */
+    overflow-y: auto;  /* Thêm cuộn dọc nếu cần */
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-top: 10px; // Khoảng cách trên bảng
 }
 
-.cartItem {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #f3f4f6; // Đường kẻ nhạt hơn
+/* Bảng review */
+.review-table {
+    width: 100%;
+    border-collapse: collapse;
 
-  &:last-child {
-    border-bottom: none; margin-bottom: 0; padding-bottom: 0;
-  }
-}
+    thead th {
+        background-color: #f8f9fa; // Màu nền nhạt cho tiêu đề
+        padding: 10px 12px;
+        text-align: left;
+        font-size: 0.8rem;
+        color: #6c757d; // Màu chữ xám
+        text-transform: uppercase;
+        border-bottom: 2px solid #dee2e6;
+    }
 
-.cartItemImage {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 0.375rem;
-  border: 1px solid #e5e7eb;
-  flex-shrink: 0;
-}
+    /* Căn chỉnh các cột tiêu đề */
+    .header-product { width: 45%; }
+    .header-price { width: 20%; text-align: center; }
+    .header-quantity { width: 15%; text-align: center; }
+    .header-subtotal { width: 20%; text-align: right; }
 
-.cartItemDetails {
-  flex-grow: 1;
-  font-size: 0.875rem;
-  display: flex;
-  flex-direction: column;
+    tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        &:last-child {
+            border-bottom: none; // Hàng cuối không có viền dưới
+        }
+    }
 
-  span:first-child {
-    font-weight: 600; color: #1f2937; margin-bottom: 0.2rem; line-height: 1.3;
-  }
-  span:last-child {
-    color: #6b7280; font-size: 0.8rem;
-  }
-}
+    tbody td {
+        padding: 12px;
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
 
-.cartItemPrice {
-  font-size: 0.875rem; font-weight: 600; color: #1f2937; white-space: nowrap;
+    /* Ô Product */
+    .cell-product {
+        .product-display {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .product-image {
+            width: 50px; // Kích thước ảnh nhỏ hơn
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .product-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .product-name {
+            font-weight: 600;
+            color: #333;
+            line-height: 1.3;
+        }
+        .size {
+            font-size: 0.8rem;
+        }
+
+        .size-value {
+            font-weight: 600;
+            color: #2563eb;
+        }
+    }
+
+    /* Ô Price & Subtotal */
+    .cell-price, .cell-subtotal {
+        text-align: center;
+        font-weight: 500;
+    }
+    .cell-subtotal {
+         text-align: right;
+         font-weight: 600; // Subtotal đậm hơn
+    }
+
+
+    /* Ô Quantity */
+    .cell-quantity {
+        text-align: center;
+        font-weight: 600;
+    }
 }
 
 // --- Style cho Discount và Xu Card ---
@@ -206,7 +307,13 @@
     color: red;
 }
 
+.coin-value{
+    font-weight: 600;
+    color: #2563eb;
+} 
+
 .applySection {
+  justify-content: center;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -227,7 +334,10 @@
 
   button {
     padding: 0.6rem 1rem;
-    background-color: #e5e7eb; color: #374151; border: none; border-radius: 0.375rem;
+    background-color: #44d709; 
+    color: #fff; 
+    border: none; 
+    border-radius: 0.375rem;
     font-size: 0.875rem; font-weight: 500; cursor: pointer; white-space: nowrap;
     transition: background-color 0.2s;
     &:hover { background-color: #d1d5db; }
@@ -302,4 +412,38 @@
 .secureNote {
     display: flex; align-items: center; justify-content: center; gap: 0.5rem;
     font-size: 0.75rem; color: #6b7280; margin-top: 1rem;
+}
+
+
+.discountAmount-1 {
+    display: inline-block; 
+    background-color: #f94f17; 
+    color: white; 
+    padding: 4px 10px; 
+    font-weight: bold;
+    font-size: 0.9em; 
+    line-height: 1.2; 
+    border-radius: 3px; 
+
+    background-image: radial-gradient(circle at 0 0, rgba(0, 0, 0, 0) 4px, #ef5927 5px),
+                      radial-gradient(circle at 100% 0, rgba(0, 0, 0, 0) 4px, #e74d19 5px),
+                      radial-gradient(circle at 0 100%, rgba(0, 0, 0, 0) 4px, #e04e1d 5px),
+                      radial-gradient(circle at 100% 100%, rgba(0, 0, 0, 0) 4px, #e55627 5px);
+    background-position: top left, top right, bottom left, bottom right;
+    background-repeat: no-repeat;
+    background-size: 50% 50%; 
+    position: relative; 
+    z-index: 1;
+}
+
+.appliedDiscount-1 {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+}
+
+
+.qTyColor {
+  color: #2563eb;
 }

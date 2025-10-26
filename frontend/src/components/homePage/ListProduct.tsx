@@ -82,7 +82,7 @@ const ListProduct: React.FC<ListProductProps> = ({ title, data }) => {
                 onClick={() => handleClick(item.product.id)}
               />
               <h3>{item.product.productName}</h3>
-              <p>${item.product.price}</p>
+              <p>{item.product.price.toLocaleString('vi-VN')} ₫</p>
               <p>⭐ {item.averageRating}/5</p>
             </div>
           ))}

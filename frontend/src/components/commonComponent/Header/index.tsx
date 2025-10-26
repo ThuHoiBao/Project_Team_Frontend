@@ -88,8 +88,8 @@ const MENU_ITEMS: MenuItemType[] = [
     },
     {
         icon: <FontAwesomeIcon icon={faCircleQuestion} />,
-        title: 'My order',
-        to: '/order',
+        title: 'Feedback and help',
+        to: '/feedback',
     },
 ];
 type NotificationData = {
@@ -171,8 +171,8 @@ function Header() {
         },
         {
             icon: <FontAwesomeIcon icon={faGear} />,
-            title: 'Settings',
-            to: '/settings',
+            title: 'My order',
+            to: '/order',
         },
         ...MENU_ITEMS,
         {
@@ -218,7 +218,9 @@ function Header() {
 
             } catch (error) {
                 if (error instanceof AxiosError) {
-                    setCurrentUser(false);
+                    //setCurrentUser(false);
+                    if (error.response?.data.message === "Token has been revoked")
+                        logout()
                     console.error("API error:", error.response?.data);
                 } else {
                     //setCurrentUser(false);
@@ -348,15 +350,10 @@ function Header() {
                                 display: "inline-block",
                                 boxSizing: "content-box",
                                 height: "2em",
-                                width: "2.25em"
+                                width: "2.25em",
+                                marginLeft: "4px"
                                 }} src="https://www.iconpacks.net/icons/2/free-heart-icon-3510-thumb.png"
                                 onClick={handleOpenWishlist} />
-                            {/* <Tippy delay={[0, 50]} content="Inbox" placement="bottom">
-                                <button className={cx('action-btn')}>
-                                    <InboxIcon />
-                                    <span className={cx('badge')}>12</span>
-                                </button>
-                            </Tippy> */}
                         </>
                     ) : (
                         <>
