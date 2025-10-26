@@ -219,7 +219,7 @@ function Header() {
             } catch (error) {
                 if (error instanceof AxiosError) {
                     //setCurrentUser(false);
-                    if (error.response?.data.message === "Invalid or expired token")
+                    if (error.response?.data.message === "Token has been revoked")
                         logout()
                     console.error("API error:", error.response?.data);
                 } else {
