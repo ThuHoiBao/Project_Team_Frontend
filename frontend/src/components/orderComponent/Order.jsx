@@ -203,7 +203,6 @@ const handleItemClick = () => {
 
   return (
     <div>
-      <Header></Header>
     <div className="order">
       <div className="order-header">
         <h3>
@@ -303,7 +302,6 @@ const handleItemClick = () => {
       <ThankYouModal xu={xu} onClose={() => setShowThankYouModal(false)} />
     )}
     </div>
-    <Footer></Footer>
     </div>
   );
 };
