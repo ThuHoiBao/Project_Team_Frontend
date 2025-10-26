@@ -25,7 +25,7 @@ const LoginPromptModal: React.FC<LoginPromptModalProps> = ({ show, onClose }) =>
             className="login-btn"
             onClick={() => {
               onClose();
-              navigate("/login");
+              navigate("/register");
             }}
           >
             Đăng nhập
