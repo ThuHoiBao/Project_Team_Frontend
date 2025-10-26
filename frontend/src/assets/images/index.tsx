@@ -15,6 +15,18 @@ const images = {
     aoThun: require('./aoThun.jpg'),
     aoTheDuc: require('./aoTheDuc.jpg'),
     aoSoMi: require('./aoSoMi.jpg'),
+    // Hình ảnh các khoa khác
+    khoachinhtriluat: require('./khoachinhtriluat.png'),
+    khoacokhi: require('./khoacokhi.jpg'),
+    khoacokhichetaomay: require('./khoacokhichetaomay.jpg'),
+    khoakhoahocungdung: require('./khoakhoahocungdung.jpg'),
+    khoakinhte: require('./khoakinhte.jpg'),
+    khoangoaingu: require('./khoangoaingu.jpg'),
+    khoathoitrangvadulich: require('./khoathoitrangvadulich.jpg'),
+    khoainvatruyenthong: require('./khoainvatruyenthong.jpg'),
+    dongphucthechat: require('./dongphuctheduc.jpg'),
+    khoacongnghethongtin: require('./aoSoMi.jpg'),
+    dongphuctruong: require('./aoThun.jpg'),
     vector: require('./Vector.png')
     
 };
