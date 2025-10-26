@@ -10,24 +10,24 @@ const Banner: React.FC = () => {
         <Carousel.Item>
           <img
             className="d-block w-100"
-            src={images.banner1}
-            alt="Los Angeles"
+            src={images.banner4}
+            alt="Banner 1"
           />
         </Carousel.Item>
 
         <Carousel.Item>
           <img
             className="d-block w-100"
-            src={images.banner2}
-            alt="Chicago"
+            src={images.banner5}
+            alt="Banner 2"
           />
         </Carousel.Item>
 
         <Carousel.Item>
           <img
             className="d-block w-100"
-            src={images.banner3}
-            alt="New York"
+            src={images.banner6}
+            alt="Banner 3"
           />
         </Carousel.Item>
       </Carousel>
