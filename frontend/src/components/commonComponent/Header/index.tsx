@@ -107,8 +107,6 @@ function Header() {
     const [currentUser, setCurrentUser] = useState<boolean>();
     const { openLogin } = useLoginModal();
     const { isAuthenticated, logout, token } = useAuth();
-    console.log("Authenticate:", isAuthenticated)
-    console.log("Token:", token)
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
     const [unreadCount, setUnreadCount] = useState<number>(0);
     const [showNotifications, setShowNotifications] = useState<boolean>(false);
@@ -381,7 +379,7 @@ function Header() {
                         <h2>{selectedNotification.title}</h2>
                         <p>{selectedNotification.message}</p>
                         <p style={{ fontSize: "12px", color: "#999" }}>{selectedNotification.createAt}</p>
-                        <button style={{padding: "4px", color: "white", backgroundColor: "gray"}} onClick={() => setIsModalOpen(false)}>Đóng</button>
+                        <button style={{padding: "4px", color: "white", backgroundColor: "gray", borderRadius: "5px"}} onClick={() => setIsModalOpen(false)}>Đóng</button>
                     </div>
                 </div>
             )}
