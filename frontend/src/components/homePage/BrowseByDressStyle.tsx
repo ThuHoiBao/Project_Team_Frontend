@@ -14,6 +14,7 @@ type Category = {
 const categoryImageMap: Record<string, keyof typeof images> = {
   "Áo Thun": "aoThun",
   "Áo sơ mi": "aoSoMi",
+  "Áo thể dục": "aoTheDuc"
 };
 
 const BrowseByDressStyle = () => {
