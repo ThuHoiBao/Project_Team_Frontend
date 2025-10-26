@@ -111,9 +111,11 @@ const WishlistPage: React.FC = () => {
                   >
                     {item.name}
                   </h3>
-                  <p className={cx("product-price-wishlist")}>
-                    ${item.price.toFixed(2)}
-                  </p>
+                  <span className={cx("product-price-wishlist")}>
+                    {item?.price ?
+                      new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)
+                      : '0 ₫'}
+                  </span>
 
                   <div className={cx("card-actions")}>
                     <button
