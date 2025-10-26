@@ -1,0 +1,197 @@
+/* AddressModal.module.scss */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050; // Higher than checkout page potentially
+}
+
+.modalContent {
+    background: #fff;
+    padding: 0; // Remove padding, handle inside sections
+    border-radius: 8px;
+    width: 90%;
+    max-width: 650px; // Wider for addresses
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden; // Prevent content spilling before list scrolls
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.title {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #888;
+    padding: 0;
+    line-height: 1;
+    &:hover { color: #333; }
+}
+
+.addressList {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px 20px; // Padding for the list area
+}
+
+.loading, .empty {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+}
+
+.addressItem {
+    display: flex;
+    align-items: flex-start; // Align radio button top
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+    gap: 15px; // Space between radio and details
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.radioInput {
+    margin-top: 2px; // Align with first line of text
+    input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+}
+
+.itemDetails {
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; // Align edit button top
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.namePhone {
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px; // Space between name/phone and tag
+}
+
+.addressLine {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.4;
+}
+
+.defaultTag {
+    border: 1px solid #e57373;
+    color: #e57373;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    border-radius: 3px;
+    font-weight: 500;
+    margin-left: 5px; // Space from name/phone
+    white-space: nowrap;
+}
+
+.actions {
+    flex-shrink: 0; // Prevent shrinking
+    margin-left: 15px; // Space before action button
+    // Style for Edit/Update button
+    .editButton {
+        background: none;
+        border: none;
+        color: #007bff;
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.9rem;
+        &:hover { text-decoration: underline; }
+    }
+}
+
+
+.addNewButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    margin: 10px 20px; // Margin around button
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    background-color: #fdfdfd;
+    color: #555;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s, border-color 0.2s;
+
+    &:hover {
+        background-color: #f5f5f5;
+        border-color: #bbb;
+    }
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end; // Align buttons right
+    gap: 10px;
+    padding: 15px 20px;
+    border-top: 1px solid #eee;
+    background-color: #f9f9f9;
+}
+
+.cancelButton, .confirmButton {
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    border: 1px solid #ccc;
+}
+
+.cancelButton {
+    background-color: #fff;
+    color: #555;
+    &:hover { background-color: #f5f5f5; }
+}
+
+.confirmButton {
+    background-color: #e57373; // Match theme color?
+    color: white;
+    border-color: #e57373;
+    &:hover { background-color: #ef5350; }
+    &:disabled {
+        background-color: #ccc;
+        border-color: #ccc;
+        cursor: not-allowed;
+    }
+}

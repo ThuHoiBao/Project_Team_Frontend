@@ -8,6 +8,7 @@ import CustomerFeedback from "./CustomerFeedback";
 import styles from "./HomePage.module.scss";
 import Header from "../commonComponent/Header";
 import Footer from "../commonComponent/Footer";
+import ChatBot from "../chatBoxComponent/ChatBox";
 import BrowseByDressStyle from "./BrowseByDressStyle";
 import { getNewProducts, getTopSellingProducts } from "../../services/product/productDetailApi";
 import { getBestFeedback } from "../../services/feedback/feedbackApi";
@@ -47,9 +48,9 @@ const HomePage: React.FC = () => {
         <ListProduct title="Top Selling" data={topSellingProducts} />
         <BrowseByDressStyle/>
         <CustomerFeedback data={bestFeedback} />
+         <ChatBot /> {/* Add the ChatBot here */}
       </div>
       <Footer />
-
     </>
   );
 };
