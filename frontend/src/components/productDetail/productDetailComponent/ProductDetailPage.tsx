@@ -80,19 +80,19 @@ const ProductDetailPage: React.FC = () => {
   const [isAddingToCart, setIsAddingToCart] = useState<boolean>(false);
 
   // ---------- Helpers ----------
-const getQuantityAlreadyInCart = useCallback(
-    (pId: string | undefined, size: string): number => {
-      if (!pId || !size || isLoadingCart || !Array.isArray(cartItems)) return 0;
+  const getQuantityAlreadyInCart = useCallback(
+    (pId: string | undefined, size: string): number => {
+      if (!pId || !size || isLoadingCart || !Array.isArray(cartItems)) return 0;
 
       // Bây giờ (cartItems as CartItemInfo[]) đã đúng kiểu
-      const itemInCart = (cartItems as CartItemInfo[]).find(
-        (it) => (it.product._id === pId || it.product.id === pId) && it.size === size
-      );
+      const itemInCart = (cartItems as CartItemInfo[]).find(
+        (it) => (it.product._id === pId || it.product.id === pId) && it.size === size
+      );
 
-      return itemInCart ? itemInCart.quantity : 0;
-    },
-    [cartItems, isLoadingCart]
-  );
+      return itemInCart ? itemInCart.quantity : 0;
+    },
+    [cartItems, isLoadingCart]
+  );
 
   const averageRating = useMemo(() => {
     if (!reviews || reviews.length === 0) return 0;
@@ -238,7 +238,7 @@ const getQuantityAlreadyInCart = useCallback(
         const imagesFromApi = Array.isArray(rawProduct.listImage)
           ? rawProduct.listImage.map((img: any) => img.imageProduct).filter(Boolean)
           : [];
-        
+
         const categoryId = rawProduct?.category?.id || rawProduct?.category?._id;
 
         // --- Recommended Products (non-critical) ---
@@ -249,11 +249,11 @@ const getQuantityAlreadyInCart = useCallback(
             const categoryRes = await getProductByCategory(categoryId, currentPId);
             recommendedProducts = Array.isArray(categoryRes.data)
               ? categoryRes.data.map((item: any) => ({
-                  id: item.id || item._id,
-                  name: item.productName,
-                  price: item.price,
-                  images: item.listImage || [],
-                }))
+                id: item.id || item._id,
+                name: item.productName,
+                price: item.price,
+                images: item.listImage || [],
+              }))
               : [];
           } catch (e) {
             console.warn("getProductByCategory failed:", e);
@@ -364,7 +364,7 @@ const getQuantityAlreadyInCart = useCallback(
       modalImg.src = element.src;
     }
   }
-    function closeModal() {
+  function closeModal() {
     if (modal) {
       modal.style.display = "none";
     }
@@ -394,12 +394,12 @@ const getQuantityAlreadyInCart = useCallback(
     const next = quantity + delta;
 
     if (next < 1) {
-      setQuantity(1); 
+      setQuantity(1);
       return;
     }
 
     if (maxMoreCanAdd === 0) {
-      if (delta > 0) { 
+      if (delta > 0) {
         toast.error("You already have the maximum stock for this size in your cart.");
       }
       setQuantity(1);
@@ -408,8 +408,8 @@ const getQuantityAlreadyInCart = useCallback(
 
     if (next > maxMoreCanAdd) {
       toast.error(`Stock limit reached. You can add up to ${maxMoreCanAdd} more item(s).`);
-      setQuantity(maxMoreCanAdd); 
-      return; 
+      setQuantity(maxMoreCanAdd);
+      return;
     }
 
     setQuantity(next);
@@ -442,7 +442,7 @@ const getQuantityAlreadyInCart = useCallback(
     } catch (err: any) {
       console.error("Error adding to cart:", err);
       toast.error(err?.message || "Failed to add product to cart.");
-    } finally{
+    } finally {
       setIsAddingToCart(false);
     }
   };
@@ -547,7 +547,11 @@ const getQuantityAlreadyInCart = useCallback(
               </div>
 
               <div className={cx("product-price")}>
-                <span className={cx("current-price")}>{product?.price}đ</span>
+                <span className={cx("current-price")}>
+                  {product?.price ?
+                    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)
+                    : '0 ₫'}
+                </span>
               </div>
 
               <p className={cx("product-description")}>{product?.description}</p>
@@ -563,7 +567,7 @@ const getQuantityAlreadyInCart = useCallback(
                         key={s.id}
                         className={cx("size-button", { selected: selectedSize === s.size })}
                         onClick={() => setSelectedSize(s.size)}
-                        disabled={s.quantity === 0 || isAddingToCart }
+                        disabled={s.quantity === 0 || isAddingToCart}
                         type="button"
                       >
                         {s.size} {s.quantity === 0 ? "(Out of Stock)" : `(${s.quantity})`}
