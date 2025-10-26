@@ -60,7 +60,7 @@ const LoginForm: React.FC<{ onForgot: () => void }> = ({ onForgot }) => {
         setSuccessMessage("Login successful!");
         setErrorMessage("");
         setTimeout(() => {
-          // navigate("/home");
+          navigate("/home");
         }, 700);
       }
       console.log("Google token:", data.token);
