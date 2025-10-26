@@ -300,7 +300,7 @@ const findTrainedAnswer = (message, trainingData) => {
   // Fuse fallback
   const fuse = new Fuse(allQuestions, { includeScore: true, threshold: 0.6, keys: ["question"] });
   const fuseResult = fuse.search(userMsg);
-  return fuseResult.length > 0 && fuseResult[0].score <= 0.6
+  return fuseResult.length > 0 && fuseResult[0].score <= 0.4
     ? fuseResult[0].item.answer
     : null;
 };
@@ -322,14 +322,249 @@ const ChatBot = () => {
     return config;
   });
 
-  // Training data
   const trainingData = [
-    { question: ["xin chào", "hello", "hi"], answer: "Chào bạn! 😊" },
-    { question: ["bạn là ai", "m là ai"], answer: "Mình là UTE Shop Chatbot 💬" },
-    { question: ["shop ở đâu", "địa chỉ shop"], answer: "01 Võ Văn Ngân, Thủ Đức, TP.HCM." },
-    { question: ["giờ mở cửa", "làm việc khi nào"], answer: "8h sáng - 21h tối mỗi ngày." },
-    { question: ["tư vấn", "hỗ trợ"], answer: "Bạn cần tư vấn sản phẩm nào ạ?" },
-  ];
+  // 🏪 Giới thiệu chung
+  {
+    question: [
+      "shop là gì",
+      "shop bạn bán gì",
+      "shop hoạt động ở đâu",
+      "shop này bán áo gì",
+      "shop này có uy tín không",
+      "shop là cửa hàng gì"
+    ],
+    answer:
+      "Chào bạn 👋 UTE Fashion Shop là cửa hàng thời trang chuyên bán áo thun, áo sơ mi, áo khoác của khoa.",
+  },
+  {
+    question: [
+      "shop ở đâu",
+      "địa chỉ shop",
+      "cửa hàng ở đâu",
+      "shop có chi nhánh không"
+    ],
+    answer:
+      "Hiện shop có trụ sở chính tại 01 Võ Văn Ngân, Thủ Đức, TP.HCM và giao hàng toàn quốc 🚚.",
+  },
+  {
+    question: [
+      "shop mở cửa lúc mấy giờ",
+      "thời gian làm việc",
+      "mở cửa khi nào",
+      "giờ làm việc"
+    ],
+    answer:
+      "Shop mở cửa từ 8:00 sáng đến 21:30 tối mỗi ngày, bao gồm cả cuối tuần.",
+  },
+
+  // 👕 Sản phẩm & danh mục
+  {
+    question: [
+      "shop có những loại áo nào",
+      "shop bán những loại áo gì",
+      "có áo thun không",
+      "có áo sơ mi không",
+    
+    ],
+    answer:
+      "Shop hiện bán áo thun, áo sơ mi, áo khoác cho cả nam và nữ .",
+  },
+  {
+    question: [
+      "áo có đủ size không",
+      "có size nhỏ không",
+      "shop có size lớn không",
+      "có size cho người mập không"
+    ],
+    answer:
+      "Dạ có ạ 😊 Shop có đủ size từ S → XXL, phù hợp cho nhiều dáng người khác nhau. Bạn có thể xem bảng size chi tiết trong trang sản phẩm.",
+  },
+  {
+    question: [
+      "áo chất liệu gì",
+      "vải áo là gì",
+      "áo làm bằng gì",
+      "chất vải có tốt không"
+    ],
+    answer:
+      "Các sản phẩm của shop chủ yếu được làm từ cotton, cotton lạnh và vải thun co giãn 4 chiều, thấm hút mồ hôi rất tốt 👍.",
+  },
+
+
+  // 💰 Giá cả & khuyến mãi
+  {
+    question: [
+      "giá áo thun là bao nhiêu",
+      "áo này giá bao nhiêu",
+      "có áo dưới 200k không",
+      "shop có khuyến mãi không",
+      "giảm giá chưa"
+    ],
+    answer:
+      "Giá áo thun dao động từ 150.000đ đến 350.000đ tuỳ mẫu. Shop thường có chương trình khuyến mãi mỗi tuần 🎉.",
+  },
+  {
+    question: [
+      "khi nào sale",
+      "giảm giá bao nhiêu phần trăm",
+      "có mã giảm giá không",
+      "nhập mã gì để được giảm giá"
+    ],
+    answer:
+      "Hiện shop đang có chương trình giảm 10% cho đơn hàng đầu tiên và freeship với đơn từ 300.000đ trở lên 🚚💸.",
+  },
+
+  // 💳 Thanh toán
+  {
+    question: [
+     
+      "thanh toán thế nào",
+      "có trả tiền khi nhận hàng không",
+      "shop có nhận cod không"
+    ],
+    answer:
+      "Shop hỗ trợ thanh toán qua MoMo, ZaloPay, chuyển khoản và thanh toán khi nhận hàng (COD) nhé 💳.",
+  },
+  {
+    question: [
+      "shop có trả góp không",
+      "có thể trả góp không",
+      "mua trả góp được không"
+    ],
+    answer:
+      "Hiện tại shop chưa hỗ trợ trả góp, bạn có thể thanh toán trước 100% hoặc chọn COD để nhận hàng rồi thanh toán.",
+  },
+
+  // 🚚 Giao hàng
+  {
+    question: [
+      "shop giao hàng bằng gì",
+      "giao hàng qua đơn vị nào",
+      "shop có giao hàng toàn quốc không",
+      "thời gian giao hàng bao lâu"
+    ],
+    answer:
+      "Shop giao hàng toàn quốc qua Giao Hàng Nhanh và Viettel Post. TP.HCM: 1–2 ngày, tỉnh khác: 3–5 ngày.",
+  },
+  {
+    question: [
+      "phí ship bao nhiêu",
+      "shop có freeship không",
+      "phí vận chuyển thế nào"
+    ],
+    answer:
+      "Miễn phí vận chuyển cho đơn từ 300.000đ. Các đơn nhỏ hơn sẽ tính phí từ 25.000đ – 35.000đ tùy khu vực 🚛.",
+  },
+  {
+    question: [
+      "có được kiểm tra hàng trước khi thanh toán không",
+      "được xem hàng trước không"
+    ],
+    answer:
+      "Có ạ 💬 Bạn được kiểm tra hàng trước khi thanh toán đối với đơn COD. Nếu sản phẩm lỗi hoặc sai, có thể đổi trả ngay.",
+  },
+
+  // 🔁 Đổi trả & bảo hành
+  {
+    question: [
+      "chính sách đổi trả thế nào",
+      "đổi hàng được không",
+      "shop có nhận đổi hàng không",
+      "muốn đổi size thì sao"
+    ],
+    answer:
+      "Bạn có thể đổi hàng trong vòng 7 ngày kể từ khi nhận, nếu sản phẩm còn nguyên tag và chưa giặt. Shop hỗ trợ đổi size miễn phí 1 lần đầu tiên 👕.",
+  },
+  {
+    question: [
+      "shop có hoàn tiền không",
+      "trả hàng hoàn tiền được không",
+      "muốn trả hàng thì làm sao"
+    ],
+    answer:
+      "Shop sẽ hoàn tiền 100% nếu sản phẩm lỗi hoặc không đúng mô tả. Vui lòng liên hệ admin để được hỗ trợ chi tiết 💸.",
+  },
+
+  // 📦 Đơn hàng
+  {
+    question: [
+      "xem đơn hàng ở đâu",
+      "kiểm tra đơn hàng thế nào",
+      "làm sao biết đơn của tôi đang ở đâu"
+    ],
+    answer:
+      "Bạn có thể xem đơn hàng trong mục 'Đơn hàng của tôi' trên website hoặc app UTE Fashion Shop 📱.",
+  },
+  {
+    question: [
+      "tôi muốn hủy đơn",
+      "cách hủy đơn hàng",
+      "shop ơi hủy đơn giúp tôi"
+    ],
+    answer:
+      "Nếu đơn hàng chưa được xác nhận, bạn có thể hủy trực tiếp trong mục 'Đơn hàng của tôi' hoặc nhắn admin để được hỗ trợ.",
+  },
+
+  // 👤 Tài khoản & hỗ trợ
+  {
+    question: [
+      "quên mật khẩu",
+      "đăng nhập không được",
+      "làm sao đổi email",
+      "đăng ký tài khoản sao"
+    ],
+    answer:
+      "Bạn có thể đăng ký tài khoản nhanh bằng email hoặc Google. Nếu quên mật khẩu, nhấn 'Quên mật khẩu' tại màn hình đăng nhập để đặt lại.",
+  },
+  {
+    question: [
+      "liên hệ với shop thế nào",
+      "shop có số điện thoại không",
+      "shop có fanpage không",
+      "gọi điện cho shop ở đâu"
+    ],
+    answer:
+      "Bạn có thể liên hệ shop qua fanpage Facebook UTE Fashion, email: utefashion@gmail.com hoặc chat trực tiếp tại đây 💬.",
+  },
+  {
+    question: [
+      "shop có hỗ trợ kỹ thuật không",
+      "tư vấn giúp tôi",
+      "shop ơi hỗ trợ với"
+    ],
+    answer:
+      "Dạ có ạ 😊 Bạn cần tư vấn chọn size, phối đồ hay tìm sản phẩm phù hợp? Shop luôn sẵn sàng hỗ trợ!",
+  },
+
+  // ❤️ Phong cách & phối đồ
+  {
+    question: [
+      "phối đồ sao cho đẹp",
+      "áo này mặc với gì hợp",
+      "gợi ý phối đồ"
+    ],
+    answer:
+      "Với áo thun trơn, bạn có thể phối cùng quần jean hoặc short để tạo phong cách năng động. Còn áo sơ mi nên đi với quần tây để lịch sự hơn 😎.",
+  },
+  {
+    question: [
+      "áo này có phù hợp mùa hè không",
+      "chất liệu mát không"
+    ],
+    answer:
+      "Dạ, các áo thun và sơ mi của shop được làm từ cotton lạnh, rất thoáng mát, cực kỳ phù hợp cho mùa hè 🔥.",
+  },
+  {
+    question: [
+      "sản phẩm nào bán chạy ",
+      "Áo nào bán chạy nhất vậy"
+    ],
+    answer:
+      "Dạ, các áo thun của trường được bán chạy nhất ạ!",
+  },
+  
+];
+
 
   // === Thêm tin nhắn vào giao diện ===
   const appendLocalMessage = (role, content) => {
