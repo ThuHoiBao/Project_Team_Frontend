@@ -15,6 +15,7 @@ import AddressModal from './AddressModal/AddressModal';
 import { createOrder } from '../../services/order/orderApi';     
 import { createCodOrder } from '../../services/payment/paymentApi';
 import { createVnpayUrl } from '../../services/payment/paymentApi'; 
+import AddressFormModal from './AddressFormModal/AddressFormModal';
 const cx = classNames.bind(styles);
 
 // --- Mock Data (Giữ nguyên) ---
@@ -42,7 +43,7 @@ const CheckoutPage: React.FC = () => {
   const cartItems = navigationState?.items;
   const subtotal = navigationState?.subtotal; 
 
-
+ const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [discountCode, setDiscountCode] = useState('');
   const [xuAmount, setXuAmount] = useState<number | string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(PaymentMethod.COD);
@@ -72,6 +73,12 @@ const CheckoutPage: React.FC = () => {
       navigate('/cart', { replace: true });
     }
   }, [cartItems, location.state, navigate]);
+
+    const handleAddressFormSuccess = (newAddress: AddressDelivery) => {
+        setSelectedAddress(newAddress);
+        setIsFormModalOpen(false);
+        toast.success("Address added successfully!");
+    };
 
 
   useEffect(() => {
@@ -408,44 +415,51 @@ const CheckoutPage: React.FC = () => {
 
           {/* === CỘT TRÁI: SHIPPING & REVIEW CART === */}
           <div className={cx('leftColumn')}>
-            {/* --- Shipping Information --- */}
+         {/* --- Shipping Information --- */}
             <div className={cx('sectionCard', 'shippingInfo')}>
-                            <h2 className={cx('shipping-title')}>
-                                <MapPin size={20} /> Shipping Address {/* Changed title */}
-                            </h2>
-                            {isLoadingAddress ? (
-                                <div className={cx('address-loading')}>Loading address...</div>
-                            ) : selectedAddress ? (
-                                // Display fetched address
-                                <div className={cx('address-display')}>
-                                    <div className={cx('address-details')}>
-                                        <span className={cx('name-phone')}>
-                                            {selectedAddress.fullName} (+{selectedAddress.phoneNumber}) {/* Format phone if needed */}
-                                        </span>
-                                        <span className={cx('address-line')}>
-                                            {selectedAddress.address}
-                                        </span>
-                                    </div>
-                                    <div className={cx('address-actions')}>
-                                        {selectedAddress.isDefault && (
-                                            <span className={cx('default-tag')}>Default</span>
-                                        )}
-                                        {/* TODO: Implement Change Address Modal */}
-                                        <button type="button" className={cx('change-btn')} onClick={() => setIsAddressModalOpen(true)}>
-                                            Change
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                // Display if no address found
-                                <div className={cx('no-address')}>
-                                    <p>No shipping address found.</p>
-                                    {/* TODO: Add Button/Link to add address page/modal */}
-                                    <button type="button" className={cx('add-address-btn')} onClick={() => alert('Add address functionality needed!')}>Add Address</button>
-                                </div>
-                            )}
+                <h2 className={cx('shipping-title')}>
+                    <MapPin size={20} /> Shipping Address
+                </h2>
+                {isLoadingAddress ? (
+                    <div className={cx('address-loading')}>Loading address...</div>
+                ) : selectedAddress ? (
+                    // Display fetched address
+                    <div className={cx('address-display')}>
+                        <div className={cx('address-details')}>
+                            <span className={cx('name-phone')}>
+                                {selectedAddress.fullName} (+{selectedAddress.phoneNumber})
+                            </span>
+                            <span className={cx('address-line')}>
+                                {selectedAddress.address}
+                            </span>
                         </div>
-
+                        <div className={cx('address-actions')}>
+                            {selectedAddress.isDefault && (
+                                <span className={cx('default-tag')}>Default</span>
+                            )}
+                            <button 
+                                type="button" 
+                                className={cx('change-btn')} 
+                                onClick={() => setIsAddressModalOpen(true)}
+                            >
+                                Change
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    // ✅ FIXED: Display if no address found
+                    <div className={cx('no-address')}>
+                        <p>No shipping address found. Please add a delivery address to continue.</p>
+                        <button 
+                            type="button" 
+                            className={cx('add-address-btn')} 
+                            onClick={() => setIsFormModalOpen(true)}
+                        >
+                            <MapPin size={16} /> Add Address
+                        </button>
+                    </div>
+                )}
+            </div>
             {/* --- Review Your Cart --- */}
            <div className={cx('sectionCard', 'reviewCart')}>
                             <h2>Review Your Order</h2>
@@ -600,6 +614,13 @@ const CheckoutPage: React.FC = () => {
           onClose={() => setIsAddressModalOpen(false)}
           currentAddress={selectedAddress} 
           onSelectAddress={handleAddressSelect}
+        />
+
+        <AddressFormModal
+            isOpen={isFormModalOpen}
+            onClose={() => setIsFormModalOpen(false)}
+            onSaveSuccess={handleAddressFormSuccess}
+            initialData={null} // null = thêm mới, truyền address object = chỉnh sửa
         />
     </div>
   );
