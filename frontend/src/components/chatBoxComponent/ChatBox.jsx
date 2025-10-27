@@ -251,389 +251,561 @@
 // };
 
 // export default ChatBot;
+
+
+
+// import React, { useState, useEffect, useRef } from "react";
+// import "./ChatBox.css";
+// import imageSend from "../../images/send.png";
+// import imageChatbot from "../../images/chat-bot.png";
+// import axios from "axios";
+// import Fuse from "fuse.js";
+// import stringSimilarity from "string-similarity";
+
+// // 🔹 Hàm loại bỏ dấu tiếng Việt
+// const removeVietnameseTones = (str) =>
+//   str
+//     .normalize("NFD")
+//     .replace(/[\u0300-\u036f]/g, "")
+//     .replace(/đ/g, "d")
+//     .replace(/Đ/g, "D")
+//     .toLowerCase();
+
+// // 🔹 Từ vô nghĩa thường gặp
+// const fillerWords = [
+//   "mày","nói","nghe","vậy","bot","đi","cho","tao","biết","xem",
+//   "với","và","ơi","gì","đó","ngoài","chỉ","thôi","hả","à","không","ko"
+// ];
+
+
+// // 🔹 Chuẩn hóa câu nhập
+// const cleanSentence = (str) => {
+//   const words = removeVietnameseTones(str)
+//     .split(/\s+/)
+//     .filter((w) => !fillerWords.includes(w));
+//   return words.join(" ");
+// };
+
+// // 🔹 Tìm câu trả lời trong trainingData
+// const findTrainedAnswer = (message, trainingData) => {
+//   if (!message) return null;
+//   const userMsg = cleanSentence(message);
+//   const allQuestions = trainingData.flatMap((item) =>
+//     item.question.map((q) => ({ question: cleanSentence(q), answer: item.answer }))
+//   );
+
+//   // String-similarity trước
+//   const bestMatch = stringSimilarity.findBestMatch(
+//     userMsg,
+//     allQuestions.map((q) => q.question)
+//   );
+//   const bestScore = bestMatch.bestMatch.rating;
+//   const bestAnswer = allQuestions[bestMatch.bestMatchIndex]?.answer;
+
+//   if (bestScore > 0.6) return bestAnswer;
+
+//   // Fuse fallback
+//   const fuse = new Fuse(allQuestions, { includeScore: true, threshold: 0.4, keys: ["question"] });
+//   const fuseResult = fuse.search(userMsg);
+//   return fuseResult.length > 0 && fuseResult[0].score <= 0.6
+//     ? fuseResult[0].item.answer
+//     : null;
+// };
+
+// const ChatBot = () => {
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [messages, setMessages] = useState([]);
+//   const [userMessage, setUserMessage] = useState("");
+//   const [loading, setLoading] = useState(false);
+//   const [userId, setUserId] = useState(null); // 🔹 Nếu null thì chat local
+//   const chatBodyRef = useRef(null);
+
+//   const api = axios.create({ baseURL: "http://localhost:8088/api/chat" });
+
+//   // Middleware thêm token nếu có
+//   api.interceptors.request.use((config) => {
+//     const token = localStorage.getItem("token");
+//     if (token) config.headers.Authorization = `Bearer ${token}`;
+//     return config;
+//   });
+
+// const trainingData = [
+//   // 👋 Chào hỏi & giới thiệu
+//   {
+//     question: [
+//       "xin chào",
+//       "chào bạn",
+//       "hello",
+//       "hi",
+//       "bot ơi",
+//       "alo",
+//       "ê bot",
+//       "chào shop",
+//       "có ai không",
+//       "bạn khỏe không",
+//       "hôm nay thế nào",
+//     ],
+//     answer:
+//       "Chào bạn 👋 Mình là UTE Shop Chatbot — trợ lý ảo của UTE Fashion Shop! Rất vui được hỗ trợ bạn hôm nay 💬.",
+//   },
+//   {
+//     question: [
+//       "bạn là ai",
+//       "bạn tên gì",
+//       "m là ai",
+//       "ai tạo ra bạn",
+//       "bạn được làm bởi ai",
+//     ],
+//     answer:
+//       "Mình là UTE Shop Chatbot 🤖, được phát triển bởi đội ngũ sinh viên UTE để hỗ trợ khách hàng mua sắm nhanh chóng, thân thiện và tiện lợi nhất!",
+//   },
+//   {
+//     question: [
+//       "shop là gì",
+//       "shop này bán gì",
+//       "shop bạn bán áo gì",
+//       "shop có uy tín không",
+//       "shop là cửa hàng gì",
+//     ],
+//     answer:
+//       "UTE Fashion Shop là cửa hàng thời trang của sinh viên Trường ĐH Sư phạm Kỹ thuật TP.HCM (HCMUTE) 👕. Shop chuyên bán áo khoác, áo thun, áo sơ mi của các khoa trong trường — vừa đẹp vừa mang tinh thần UTE ❤️.",
+//   },
+//   {
+//     question: [
+//       "shop ở đâu",
+//       "địa chỉ shop",
+//       "shop nằm ở đâu",
+//       "có chi nhánh không",
+//     ],
+//     answer:
+//       "Shop có trụ sở chính tại 01 Võ Văn Ngân, Thủ Đức, TP.HCM 🏬. Ngoài ra, bạn có thể đặt hàng online, shop giao toàn quốc nhé 🚚.",
+//   },
+//   {
+//     question: [
+//       "giờ mở cửa",
+//       "shop mở cửa lúc mấy giờ",
+//       "giờ làm việc",
+//       "làm việc đến mấy giờ",
+//     ],
+//     answer:
+//       "Shop mở cửa từ 8:00 sáng đến 21:30 tối mỗi ngày, bao gồm cả thứ Bảy và Chủ nhật ⏰.",
+//   },
+
+//   // 👕 Sản phẩm & danh mục
+//   {
+//     question: [
+//       "shop có những loại áo nào",
+//       "shop có những loại sản phẩm nào",
+//       "shop bán gì",
+//       "shop bán những loại áo gì",
+//       "có áo thun không",
+//       "có áo sơ mi không",
+//       "có áo khoác không",
+//       "có áo khoa không",
+//     ],
+//     answer:
+//       "Shop chuyên bán áo khoác, áo thun, áo sơ mi các khoa của trường HCMUTE như Khoa CNTT, Cơ khí, Điện – Điện tử, Ô tô, và nhiều hơn nữa 🎓.",
+//   },
+//   {
+//     question: [
+//       "áo khoa là gì",
+//       "áo khoa của trường là sao",
+//       "áo khoa ute là gì",
+//     ],
+//     answer:
+//       "Áo khoa là áo đồng phục riêng của từng khoa trong Trường ĐH Sư phạm Kỹ thuật TP.HCM 💙. Mỗi khoa có thiết kế và màu sắc riêng, thể hiện cá tính sinh viên UTE.",
+//   },
+//   {
+//     question: [
+//       "áo chất liệu gì",
+//       "vải áo là gì",
+//       "chất liệu có bền không",
+//       "áo làm bằng gì",
+//       "áo có mát không",
+//     ],
+//     answer:
+//       "Áo của shop được làm từ vải thun cotton lạnh, co giãn 4 chiều, thấm hút mồ hôi cực tốt 🌿. Áo khoác thì may bằng vải kaki nhẹ, thoáng mát, bền đẹp lâu dài.",
+//   },
+//   {
+//     question: [
+//       "áo có đủ size không",
+//       "shop có size lớn không",
+//       "có size nhỏ không",
+//       "có size cho người mập không",
+//     ],
+//     answer:
+//       "Shop có đủ size từ S → XXL nhé! 🧍‍♂️🧍‍♀️ Phù hợp với mọi dáng người. Nếu cần tư vấn chọn size, bạn chỉ cần gửi chiều cao và cân nặng, mình giúp chọn ngay.",
+//   },
+//   {
+//     question: [
+//       "sản phẩm nào bán chạy nhất",
+//       "áo nào hot nhất",
+//       "áo nào đẹp nhất",
+//       "áo nào được mua nhiều nhất",
+//     ],
+//     answer:
+//       "Các mẫu áo thun khoa và áo khoác khoa luôn là lựa chọn hot nhất 🔥 vì mang phong cách sinh viên UTE năng động, trẻ trung và tự hào khoa mình!",
+//   },
+
+//   // 💰 Giá cả & khuyến mãi
+//   {
+//     question: [
+//       "giá bao nhiêu",
+//       "giá áo thun là bao nhiêu",
+//       "áo khoác giá bao nhiêu",
+//       "có áo dưới 200k không",
+//       "shop có khuyến mãi không",
+//       "đang sale không",
+//       "giảm giá chưa",
+//     ],
+//     answer:
+//       "Giá áo thun dao động từ 150k – 300k, áo khoác từ 250k – 450k tuỳ mẫu. Shop thường có khuyến mãi mỗi tuần 🎉 và giảm 10% cho đơn đầu tiên.",
+//   },
+//   {
+//     question: [
+//       "có mã giảm giá không",
+//       "nhập mã gì để giảm giá",
+//       "có freeship không",
+//       "phí ship bao nhiêu",
+//     ],
+//     answer:
+//       "Hiện shop đang freeship cho đơn từ 300.000đ 🚚 và tặng mã giảm 10% cho khách hàng mới! Bạn chỉ cần nhập mã **UTESHOP10** khi thanh toán nhé 💸.",
+//   },
+
+//   // 💳 Thanh toán & giao hàng
+//   {
+//     question: [
+//       "thanh toán như thế nào",
+//       "có nhận cod không",
+//       "trả tiền khi nhận hàng được không",
+//       "shop có trả góp không",
+//     ],
+//     answer:
+//       "Shop hỗ trợ thanh toán bằng MoMo, ZaloPay, chuyển khoản hoặc COD (nhận hàng rồi trả tiền) 💳. Hiện tại chưa hỗ trợ trả góp nhé!",
+//   },
+//   {
+//     question: [
+//       "giao hàng bằng gì",
+//       "shop giao hàng toàn quốc không",
+//       "bao lâu nhận hàng",
+//       "thời gian giao hàng",
+//     ],
+//     answer:
+//       "Shop giao toàn quốc qua Giao Hàng Nhanh và Viettel Post 🚚. TP.HCM nhận trong 1–2 ngày, các tỉnh khác 3–5 ngày làm việc.",
+//   },
+//   {
+//     question: [
+//       "được kiểm tra hàng không",
+//       "xem hàng trước khi thanh toán được không",
+//     ],
+//     answer:
+//       "Có ạ ✅ Bạn được kiểm tra hàng trước khi thanh toán với đơn COD. Nếu hàng lỗi hoặc sai mẫu, shop hỗ trợ đổi trả ngay.",
+//   },
+
+//   // 🔁 Đổi trả & bảo hành
+//   {
+//     question: [
+//       "chính sách đổi trả",
+//       "đổi hàng được không",
+//       "muốn đổi size",
+//       "đổi áo được không",
+//     ],
+//     answer:
+//       "Shop hỗ trợ đổi size hoặc đổi mẫu trong vòng 7 ngày kể từ khi nhận hàng, miễn phí đổi lần đầu 🎽. Chỉ cần áo còn tag và chưa giặt là được.",
+//   },
+//   {
+//     question: [
+//       "shop có hoàn tiền không",
+//       "muốn trả hàng",
+//       "trả hàng hoàn tiền thế nào",
+//     ],
+//     answer:
+//       "Shop sẽ hoàn tiền 100% nếu sản phẩm lỗi hoặc không đúng mô tả 🪙. Bạn chỉ cần liên hệ admin hoặc gửi lại hình ảnh để được hỗ trợ nhanh nhất.",
+//   },
+
+//   // 📦 Đơn hàng
+//   {
+//     question: [
+//       "kiểm tra đơn hàng",
+//       "xem đơn hàng ở đâu",
+//       "đơn hàng của tôi đang ở đâu",
+//     ],
+//     answer:
+//       "Bạn có thể xem tình trạng đơn hàng tại mục **Đơn hàng của tôi** trên website hoặc app UTE Shop 📱.",
+//   },
+//   {
+//     question: [
+//       "muốn hủy đơn",
+//       "cách hủy đơn",
+//       "shop ơi hủy đơn giúp tôi",
+//     ],
+//     answer:
+//       "Nếu đơn hàng chưa xác nhận, bạn có thể hủy trực tiếp trong mục Đơn hàng của tôi hoặc nhắn admin để được hỗ trợ 💬.",
+//   },
+
+//   // 👤 Hỗ trợ & tài khoản
+//   {
+//     question: [
+//       "quên mật khẩu",
+//       "đăng nhập không được",
+//       "đăng ký tài khoản sao",
+//       "đổi email như thế nào",
+//     ],
+//     answer:
+//       "Bạn có thể đăng ký nhanh bằng Google hoặc email. Nếu quên mật khẩu, nhấn 'Quên mật khẩu' trên màn hình đăng nhập để đặt lại 🔐.",
+//   },
+//   {
+//     question: [
+//       "liên hệ shop thế nào",
+//       "shop có số điện thoại không",
+//       "shop có fanpage không",
+//       "shop có zalo không",
+//     ],
+//     answer:
+//       "Bạn có thể liên hệ shop qua fanpage **UTE Fashion**, Zalo hoặc email: **utefashion@gmail.com** nhé 📞.",
+//   },
+//   {
+//     question: [
+//       "tư vấn giúp tôi",
+//       "shop ơi hỗ trợ với",
+//       "cần tư vấn chọn áo",
+//       "chọn size giúp tôi",
+//     ],
+//     answer:
+//       "Dạ có ạ 😊 Bạn cần tư vấn chọn size, mẫu áo, hay phối đồ? Gửi mình chiều cao, cân nặng hoặc sở thích nhé — mình giúp ngay!",
+//   },
+
+//   // 💡 Phong cách & phối đồ
+//   {
+//     question: [
+//       "áo này mặc với gì hợp",
+//       "phối đồ sao cho đẹp",
+//       "mặc áo khoa sao cho ngầu",
+//       "gợi ý phối đồ",
+//     ],
+//     answer:
+//       "Áo khoác khoa bạn có thể phối với áo thun trắng + quần jean là chuẩn style sinh viên UTE 😎. Áo sơ mi thì hợp quần tây hoặc kaki để lịch sự hơn.",
+//   },
+// ];
+
+
+//   // === Thêm tin nhắn vào giao diện ===
+//   const appendLocalMessage = (role, content) => {
+//     setMessages((prev) => [
+//       ...prev,
+//       { role, content, date: new Date().toISOString() },
+//     ]);
+//   };
+
+//   // === Gửi tin nhắn ===
+//   const sendMessage = async (e) => {
+//     e.preventDefault();
+//     if (!userMessage.trim()) return;
+
+//     const userMsg = userMessage.trim();
+//     appendLocalMessage("user", userMsg);
+//     setUserMessage("");
+//     setLoading(true);
+
+//     try {
+//       const trainedAnswer = findTrainedAnswer(userMsg, trainingData);
+
+//       if (trainedAnswer) {
+//         appendLocalMessage("bot", trainedAnswer);
+
+//         // 🔹 Nếu có userId → lưu BE
+//         if (userId) {
+//           await api.post(`/save-message`, { userId, message: userMsg, role: "user" });
+//           await api.post(`/save-message`, { userId, message: trainedAnswer, role: "chatbot" });
+//         }
+//       } else {
+//         const fallbackText =
+//           "Xin lỗi, câu hỏi này hiện không nằm trong phạm vi hỗ trợ. Bạn hãy thử lại nhé! 🙏";
+//         appendLocalMessage("bot", fallbackText);
+
+//         if (userId) {
+//           await api.post(`/save-message`, { userId, message: userMsg, role: "user" });
+//           await api.post(`/save-message`, { userId, message: fallbackText, role: "chatbot" });
+//         }
+//       }
+//     } catch (err) {
+//       console.error("Send error:", err);
+//       appendLocalMessage("bot", "Xin lỗi, hệ thống gặp sự cố 😢");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // === Lấy lịch sử chat khi có userId ===
+//   useEffect(() => {
+//     const fetchChatHistory = async () => {
+//       try {
+//         const res = await api.get(`/history`);
+//         if (res.data.userId) {
+//           setUserId(res.data.userId);
+//           const history = res.data.chatHistory.map((msg) => ({
+//             content: msg.comment || "",
+//             role: msg.role?.toLowerCase() === "user" ? "user" : "bot",
+//             date: msg.createdAt,
+//           }));
+//           setMessages(history);
+//         } else {
+//           console.log("⚠️ Chưa đăng nhập — chỉ chat local");
+//         }
+//       } catch (e) {
+//         console.error("Fetch history error:", e);
+//       }
+//     };
+//     fetchChatHistory();
+//   }, []);
+
+//   useEffect(() => {
+//     if (chatBodyRef.current)
+//       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
+//   }, [messages]);
+
+//   const formatTime = (isoDate) => {
+//     const d = new Date(isoDate);
+//     return `${d.getHours().toString().padStart(2, "0")}:${d
+//       .getMinutes()
+//       .toString()
+//       .padStart(2, "0")} - ${d.toLocaleDateString("vi-VN")}`;
+//   };
+
+//   return (
+//     <div className="chatbot">
+//       {/* Nút bật chat */}
+//       <button id="chatbot-toggler" onClick={() => setIsOpen(!isOpen)}>
+//         <img
+//           src={imageChatbot}
+//           alt="chatbot"
+//           style={{
+//             width: 80,
+//             height: 80,
+//             borderRadius: "50%",
+//             border: "none",
+//           }}
+//         />
+//       </button>
+
+//       {/* Popup Chat */}
+//       {isOpen && (
+//         <div className="chatbot-popup">
+//           <div className="chat-header">
+//             <div className="chatbot-info">
+//               <img src={imageChatbot} alt="bot" className="bot-avatar" />
+//               <h3>UTE Shop Chatbot</h3>
+//             </div>
+//             <button id="close-chatbot" onClick={() => setIsOpen(false)}>
+//               ✕
+//             </button>
+//           </div>
+
+//           <div className="chat-body" ref={chatBodyRef}>
+//             {messages.map((m, idx) => (
+//               <div
+//                 key={idx}
+//                 className={`message ${m.role === "user" ? "user" : "bot"}`}
+//               >
+//                 <div className="bubble">{m.content}</div>
+//                 <div className="timestamp">{formatTime(m.date)}</div>
+//               </div>
+//             ))}
+//             {loading && <div className="thinking">Đang trả lời...</div>}
+//           </div>
+
+//           <div className="chat-footer">
+//             <form onSubmit={sendMessage} className="chat-form">
+//               <input
+//                 value={userMessage}
+//                 onChange={(e) => setUserMessage(e.target.value)}
+//                 placeholder="Nhập tin nhắn..."
+//               />
+//               <button type="submit" disabled={loading}>
+//                 <img
+//                   style={{ width: 36, height: 36 }}
+//                   src={imageSend}
+//                   alt="send"
+//                 />
+//               </button>
+//             </form>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ChatBot;
+
+
+
+
+
 import React, { useState, useEffect, useRef } from "react";
-import "./ChatBox.css";
+import axios from "axios";
 import imageSend from "../../images/send.png";
 import imageChatbot from "../../images/chat-bot.png";
-import axios from "axios";
-import Fuse from "fuse.js";
-import stringSimilarity from "string-similarity";
-
-// 🔹 Hàm loại bỏ dấu tiếng Việt
-const removeVietnameseTones = (str) =>
-  str
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .toLowerCase();
-
-// 🔹 Từ vô nghĩa thường gặp
-const fillerWords = ["mày", "nói", "nghe", "vậy", "bot", "đi", "cho", "tao", "biết", "xem", "với", "và", "ơi", "gì", "đó"];
-
-// 🔹 Chuẩn hóa câu nhập
-const cleanSentence = (str) => {
-  const words = removeVietnameseTones(str)
-    .split(/\s+/)
-    .filter((w) => !fillerWords.includes(w));
-  return words.join(" ");
-};
-
-// 🔹 Tìm câu trả lời trong trainingData
-const findTrainedAnswer = (message, trainingData) => {
-  if (!message) return null;
-  const userMsg = cleanSentence(message);
-  const allQuestions = trainingData.flatMap((item) =>
-    item.question.map((q) => ({ question: cleanSentence(q), answer: item.answer }))
-  );
-
-  // String-similarity trước
-  const bestMatch = stringSimilarity.findBestMatch(
-    userMsg,
-    allQuestions.map((q) => q.question)
-  );
-  const bestScore = bestMatch.bestMatch.rating;
-  const bestAnswer = allQuestions[bestMatch.bestMatchIndex]?.answer;
-
-  if (bestScore > 0.35) return bestAnswer;
-
-  // Fuse fallback
-  const fuse = new Fuse(allQuestions, { includeScore: true, threshold: 0.6, keys: ["question"] });
-  const fuseResult = fuse.search(userMsg);
-  return fuseResult.length > 0 && fuseResult[0].score <= 0.4
-    ? fuseResult[0].item.answer
-    : null;
-};
+import "./ChatBox.css";
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [userMessage, setUserMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState(null); // 🔹 Nếu null thì chat local
+   const [userId, setUserId] = useState(null); // 🔹 Nếu null thì chat local
   const chatBodyRef = useRef(null);
 
-  const api = axios.create({ baseURL: "http://localhost:8088/api/chat" });
-
-  // Middleware thêm token nếu có
+  const api = axios.create({ baseURL: "http://localhost:8088/api" });
   api.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   });
 
-  const trainingData = [
-  // 🏪 Giới thiệu chung
-  {
-    question: [
-      "shop là gì",
-      "shop bạn bán gì",
-      "shop hoạt động ở đâu",
-      "shop này bán áo gì",
-      "shop này có uy tín không",
-      "shop là cửa hàng gì"
-    ],
-    answer:
-      "Chào bạn 👋 UTE Fashion Shop là cửa hàng thời trang chuyên bán áo thun, áo sơ mi, áo khoác của khoa.",
-  },
-  {
-    question: [
-      "shop ở đâu",
-      "địa chỉ shop",
-      "cửa hàng ở đâu",
-      "shop có chi nhánh không"
-    ],
-    answer:
-      "Hiện shop có trụ sở chính tại 01 Võ Văn Ngân, Thủ Đức, TP.HCM và giao hàng toàn quốc 🚚.",
-  },
-  {
-    question: [
-      "shop mở cửa lúc mấy giờ",
-      "thời gian làm việc",
-      "mở cửa khi nào",
-      "giờ làm việc"
-    ],
-    answer:
-      "Shop mở cửa từ 8:00 sáng đến 21:30 tối mỗi ngày, bao gồm cả cuối tuần.",
-  },
-
-  // 👕 Sản phẩm & danh mục
-  {
-    question: [
-      "shop có những loại áo nào",
-      "shop bán những loại áo gì",
-      "có áo thun không",
-      "có áo sơ mi không",
-    
-    ],
-    answer:
-      "Shop hiện bán áo thun, áo sơ mi, áo khoác cho cả nam và nữ .",
-  },
-  {
-    question: [
-      "áo có đủ size không",
-      "có size nhỏ không",
-      "shop có size lớn không",
-      "có size cho người mập không"
-    ],
-    answer:
-      "Dạ có ạ 😊 Shop có đủ size từ S → XXL, phù hợp cho nhiều dáng người khác nhau. Bạn có thể xem bảng size chi tiết trong trang sản phẩm.",
-  },
-  {
-    question: [
-      "áo chất liệu gì",
-      "vải áo là gì",
-      "áo làm bằng gì",
-      "chất vải có tốt không"
-    ],
-    answer:
-      "Các sản phẩm của shop chủ yếu được làm từ cotton, cotton lạnh và vải thun co giãn 4 chiều, thấm hút mồ hôi rất tốt 👍.",
-  },
-
-
-  // 💰 Giá cả & khuyến mãi
-  {
-    question: [
-      "giá áo thun là bao nhiêu",
-      "áo này giá bao nhiêu",
-      "có áo dưới 200k không",
-      "shop có khuyến mãi không",
-      "giảm giá chưa"
-    ],
-    answer:
-      "Giá áo thun dao động từ 150.000đ đến 350.000đ tuỳ mẫu. Shop thường có chương trình khuyến mãi mỗi tuần 🎉.",
-  },
-  {
-    question: [
-      "khi nào sale",
-      "giảm giá bao nhiêu phần trăm",
-      "có mã giảm giá không",
-      "nhập mã gì để được giảm giá"
-    ],
-    answer:
-      "Hiện shop đang có chương trình giảm 10% cho đơn hàng đầu tiên và freeship với đơn từ 300.000đ trở lên 🚚💸.",
-  },
-
-  // 💳 Thanh toán
-  {
-    question: [
-     
-      "thanh toán thế nào",
-      "có trả tiền khi nhận hàng không",
-      "shop có nhận cod không"
-    ],
-    answer:
-      "Shop hỗ trợ thanh toán qua MoMo, ZaloPay, chuyển khoản và thanh toán khi nhận hàng (COD) nhé 💳.",
-  },
-  {
-    question: [
-      "shop có trả góp không",
-      "có thể trả góp không",
-      "mua trả góp được không"
-    ],
-    answer:
-      "Hiện tại shop chưa hỗ trợ trả góp, bạn có thể thanh toán trước 100% hoặc chọn COD để nhận hàng rồi thanh toán.",
-  },
-
-  // 🚚 Giao hàng
-  {
-    question: [
-      "shop giao hàng bằng gì",
-      "giao hàng qua đơn vị nào",
-      "shop có giao hàng toàn quốc không",
-      "thời gian giao hàng bao lâu"
-    ],
-    answer:
-      "Shop giao hàng toàn quốc qua Giao Hàng Nhanh và Viettel Post. TP.HCM: 1–2 ngày, tỉnh khác: 3–5 ngày.",
-  },
-  {
-    question: [
-      "phí ship bao nhiêu",
-      "shop có freeship không",
-      "phí vận chuyển thế nào"
-    ],
-    answer:
-      "Miễn phí vận chuyển cho đơn từ 300.000đ. Các đơn nhỏ hơn sẽ tính phí từ 25.000đ – 35.000đ tùy khu vực 🚛.",
-  },
-  {
-    question: [
-      "có được kiểm tra hàng trước khi thanh toán không",
-      "được xem hàng trước không"
-    ],
-    answer:
-      "Có ạ 💬 Bạn được kiểm tra hàng trước khi thanh toán đối với đơn COD. Nếu sản phẩm lỗi hoặc sai, có thể đổi trả ngay.",
-  },
-
-  // 🔁 Đổi trả & bảo hành
-  {
-    question: [
-      "chính sách đổi trả thế nào",
-      "đổi hàng được không",
-      "shop có nhận đổi hàng không",
-      "muốn đổi size thì sao"
-    ],
-    answer:
-      "Bạn có thể đổi hàng trong vòng 7 ngày kể từ khi nhận, nếu sản phẩm còn nguyên tag và chưa giặt. Shop hỗ trợ đổi size miễn phí 1 lần đầu tiên 👕.",
-  },
-  {
-    question: [
-      "shop có hoàn tiền không",
-      "trả hàng hoàn tiền được không",
-      "muốn trả hàng thì làm sao"
-    ],
-    answer:
-      "Shop sẽ hoàn tiền 100% nếu sản phẩm lỗi hoặc không đúng mô tả. Vui lòng liên hệ admin để được hỗ trợ chi tiết 💸.",
-  },
-
-  // 📦 Đơn hàng
-  {
-    question: [
-      "xem đơn hàng ở đâu",
-      "kiểm tra đơn hàng thế nào",
-      "làm sao biết đơn của tôi đang ở đâu"
-    ],
-    answer:
-      "Bạn có thể xem đơn hàng trong mục 'Đơn hàng của tôi' trên website hoặc app UTE Fashion Shop 📱.",
-  },
-  {
-    question: [
-      "tôi muốn hủy đơn",
-      "cách hủy đơn hàng",
-      "shop ơi hủy đơn giúp tôi"
-    ],
-    answer:
-      "Nếu đơn hàng chưa được xác nhận, bạn có thể hủy trực tiếp trong mục 'Đơn hàng của tôi' hoặc nhắn admin để được hỗ trợ.",
-  },
-
-  // 👤 Tài khoản & hỗ trợ
-  {
-    question: [
-      "quên mật khẩu",
-      "đăng nhập không được",
-      "làm sao đổi email",
-      "đăng ký tài khoản sao"
-    ],
-    answer:
-      "Bạn có thể đăng ký tài khoản nhanh bằng email hoặc Google. Nếu quên mật khẩu, nhấn 'Quên mật khẩu' tại màn hình đăng nhập để đặt lại.",
-  },
-  {
-    question: [
-      "liên hệ với shop thế nào",
-      "shop có số điện thoại không",
-      "shop có fanpage không",
-      "gọi điện cho shop ở đâu"
-    ],
-    answer:
-      "Bạn có thể liên hệ shop qua fanpage Facebook UTE Fashion, email: utefashion@gmail.com hoặc chat trực tiếp tại đây 💬.",
-  },
-  {
-    question: [
-      "shop có hỗ trợ kỹ thuật không",
-      "tư vấn giúp tôi",
-      "shop ơi hỗ trợ với"
-    ],
-    answer:
-      "Dạ có ạ 😊 Bạn cần tư vấn chọn size, phối đồ hay tìm sản phẩm phù hợp? Shop luôn sẵn sàng hỗ trợ!",
-  },
-
-  // ❤️ Phong cách & phối đồ
-  {
-    question: [
-      "phối đồ sao cho đẹp",
-      "áo này mặc với gì hợp",
-      "gợi ý phối đồ"
-    ],
-    answer:
-      "Với áo thun trơn, bạn có thể phối cùng quần jean hoặc short để tạo phong cách năng động. Còn áo sơ mi nên đi với quần tây để lịch sự hơn 😎.",
-  },
-  {
-    question: [
-      "áo này có phù hợp mùa hè không",
-      "chất liệu mát không"
-    ],
-    answer:
-      "Dạ, các áo thun và sơ mi của shop được làm từ cotton lạnh, rất thoáng mát, cực kỳ phù hợp cho mùa hè 🔥.",
-  },
-  {
-    question: [
-      "sản phẩm nào bán chạy ",
-      "Áo nào bán chạy nhất vậy"
-    ],
-    answer:
-      "Dạ, các áo thun của trường được bán chạy nhất ạ!",
-  },
-  
-];
-
-
-  // === Thêm tin nhắn vào giao diện ===
-  const appendLocalMessage = (role, content) => {
-    setMessages((prev) => [
-      ...prev,
-      { role, content, date: new Date().toISOString() },
-    ]);
+  const appendMessage = (role, content) => {
+    setMessages((prev) => [...prev, { role, content, date: new Date().toISOString() }]);
   };
 
-  // === Gửi tin nhắn ===
-  const sendMessage = async (e) => {
+const sendMessage = async (e) => {
     e.preventDefault();
     if (!userMessage.trim()) return;
 
-    const userMsg = userMessage.trim();
-    appendLocalMessage("user", userMsg);
+    const msg = userMessage.trim();
+    appendMessage("user", msg);
     setUserMessage("");
     setLoading(true);
 
     try {
-      const trainedAnswer = findTrainedAnswer(userMsg, trainingData);
+      // Gửi kèm userId nếu có
+      const body = userId ? { userId, message: msg } : { message: msg };
+      const res = await api.post("/chat/send-message", body);
 
-      if (trainedAnswer) {
-        appendLocalMessage("bot", trainedAnswer);
-
-        // 🔹 Nếu có userId → lưu BE
-        if (userId) {
-          await api.post(`/save-message`, { userId, message: userMsg, role: "user" });
-          await api.post(`/save-message`, { userId, message: trainedAnswer, role: "chatbot" });
-        }
-      } else {
-        const fallbackText =
-          "Xin lỗi, câu hỏi này hiện không nằm trong phạm vi hỗ trợ. Bạn hãy thử lại nhé! 🙏";
-        appendLocalMessage("bot", fallbackText);
-
-        if (userId) {
-          await api.post(`/save-message`, { userId, message: userMsg, role: "user" });
-          await api.post(`/save-message`, { userId, message: fallbackText, role: "chatbot" });
-        }
-      }
+      const botReply = res.data?.botMsg?.comment || "Không có phản hồi từ chatbot.";
+      appendMessage("bot", botReply);
     } catch (err) {
       console.error("Send error:", err);
-      appendLocalMessage("bot", "Xin lỗi, hệ thống gặp sự cố 😢");
+      appendMessage("bot", "Xin lỗi, hệ thống gặp sự cố 😢");
     } finally {
       setLoading(false);
     }
   };
-
-  // === Lấy lịch sử chat khi có userId ===
   useEffect(() => {
-    const fetchChatHistory = async () => {
+    const fetchHistory = async () => {
       try {
-        const res = await api.get(`/history`);
-        if (res.data.userId) {
-          setUserId(res.data.userId);
-          const history = res.data.chatHistory.map((msg) => ({
-            content: msg.comment || "",
-            role: msg.role?.toLowerCase() === "user" ? "user" : "bot",
-            date: msg.createdAt,
-          }));
-          setMessages(history);
-        } else {
-          console.log("⚠️ Chưa đăng nhập — chỉ chat local");
-        }
-      } catch (e) {
-        console.error("Fetch history error:", e);
+        const res = await api.get("/chat/history");
+        const history = res.data.chatHistory.map((m) => ({
+          content: m.comment,
+          role: m.role,
+          date: m.createdAt,
+        }));
+        setMessages(history);
+        setUserId(res.data.userId);
+      } catch (err) {
+        console.error("Không thể tải lịch sử chat:", err);
       }
     };
-    fetchChatHistory();
+    fetchHistory();
   }, []);
 
   useEffect(() => {
@@ -641,15 +813,12 @@ const ChatBot = () => {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
   }, [messages]);
 
-  const formatTime = (isoDate) => {
-    const d = new Date(isoDate);
-    return `${d.getHours().toString().padStart(2, "0")}:${d
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")} - ${d.toLocaleDateString("vi-VN")}`;
+  const formatTime = (iso) => {
+    const d = new Date(iso);
+    return `${d.getHours()}:${d.getMinutes()} - ${d.toLocaleDateString("vi-VN")}`;
   };
 
-  return (
+    return (
     <div className="chatbot">
       {/* Nút bật chat */}
       <button id="chatbot-toggler" onClick={() => setIsOpen(!isOpen)}>
